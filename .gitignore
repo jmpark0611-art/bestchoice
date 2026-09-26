@@ -1,0 +1,27 @@
+# mTLS 인증서/키 — 절대 커밋 금지
+*.pem
+*.crt
+*.key
+*.p12
+*.pfx
+*.csr
+certs/
+secrets/
+
+# env
+.env
+.env.*
+!.env.example
+supabase/.env
+supabase/functions/.env
+
+# node / build
+node_modules/
+dist/
+.granite/
+*.log
+.DS_Store
+
+# supabase local
+supabase/.branches/
+supabase/.temp/
