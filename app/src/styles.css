@@ -17,7 +17,7 @@
 html,
 body {
   margin: 0;
-  background: var(--bc-bg);
+  background: #eef3fb;
   color: var(--bc-text);
   font-family:
     'Toss Product Sans',
@@ -34,6 +34,17 @@ body {
 .page {
   min-height: 100vh;
   padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #f7faff 0, #fff 320px);
+}
+
+.page-inner {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(24, 59, 112, .08);
 }
 
 .section {
@@ -53,12 +64,16 @@ body {
 .card {
   margin: 0 24px;
   padding: 20px;
-  border-radius: 16px;
-  background: var(--bc-subtle);
+  border: 1px solid #edf1f7;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(35, 70, 120, .07);
 }
 
 .card.highlight {
-  background: var(--bc-blue-weak);
+  border: 0;
+  background: linear-gradient(145deg, #eaf3ff, #f5f9ff);
+  box-shadow: 0 14px 36px rgba(49, 130, 246, .15);
 }
 
 .card h3 {
@@ -125,7 +140,7 @@ body {
 }
 
 .axis-bar {
-  height: 8px;
+  height: 9px;
   margin: 8px 0;
   border-radius: 4px;
   background: var(--bc-border);
@@ -136,7 +151,7 @@ body {
   display: block;
   height: 100%;
   border-radius: 4px;
-  background: var(--bc-blue);
+  background: linear-gradient(90deg, #6aa9ff, var(--bc-blue));
 }
 
 .axis-text {
@@ -157,11 +172,29 @@ body {
   padding: 0 24px 28px;
 }
 
+.question-card {
+  margin: 0 16px 16px;
+  padding: 22px 18px;
+  border: 1px solid #edf1f7;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 26px rgba(35, 70, 120, .06);
+}
+
 .question-title {
   margin: 0 0 12px;
   font-size: 17px;
   font-weight: 700;
   line-height: 1.5;
+}
+
+.question-number {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--bc-blue);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .04em;
 }
 
 .choices {
@@ -175,7 +208,7 @@ body {
   min-height: 52px;
   padding: 14px 16px;
   border: 1.5px solid var(--bc-border);
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--bc-bg);
   color: var(--bc-text);
   font: inherit;
@@ -188,6 +221,23 @@ body {
   border-color: var(--bc-blue);
   background: var(--bc-blue-weak);
   font-weight: 600;
+  box-shadow: 0 5px 16px rgba(49, 130, 246, .12);
+}
+
+.progress-track {
+  height: 6px;
+  margin: -4px 24px 22px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #edf1f7;
+}
+
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--bc-blue);
+  transition: width .25s ease;
 }
 
 .center {
@@ -244,4 +294,107 @@ body {
 /* TDS TextArea는 자체 좌우 여백이 있어 .question/.section 여백과 겹치지 않게 */
 .bleed {
   margin: 0 -24px;
+}
+
+.question-card .bleed { margin: 0; }
+
+/* Home */
+.home-hero {
+  position: relative;
+  padding: 30px 24px 8px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(49,130,246,.16), transparent 34%),
+    linear-gradient(180deg, #f4f8ff 0%, #fff 92%);
+}
+
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px 7px 8px;
+  border-radius: 99px;
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 4px 18px rgba(49,130,246,.10);
+  color: #354052;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.brand-mark {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--bc-blue);
+  color: #fff;
+  font-size: 14px;
+}
+
+.home-kicker { margin: 32px 0 7px; color: var(--bc-blue); font-size: 15px; font-weight: 700; }
+.home-hero h1 { margin: 0; font-size: 38px; line-height: 1.22; letter-spacing: -1.8px; }
+.home-hero h1 em { color: var(--bc-blue); font-style: normal; }
+.home-description { margin: 17px 0 4px; color: var(--bc-sub); font-size: 16px; line-height: 1.65; }
+
+.choice-visual { position: relative; height: 205px; margin: 20px -4px 0; }
+.visual-path {
+  position: absolute;
+  top: 22px;
+  width: 44%;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.9);
+  border-radius: 19px;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 12px 32px rgba(35,70,120,.10);
+  color: #6b7684;
+  font-size: 14px;
+  font-weight: 700;
+}
+.path-left { left: 2%; transform: rotate(-4deg); }
+.path-right { right: 2%; transform: rotate(4deg); }
+.visual-path::after { content: ''; position: absolute; top: 66px; width: 2px; height: 42px; background: #b9d7ff; }
+.path-left::after { right: 18%; transform: rotate(-35deg); }
+.path-right::after { left: 18%; transform: rotate(35deg); }
+.visual-result {
+  position: absolute;
+  left: 50%;
+  bottom: 9px;
+  transform: translateX(-50%);
+  width: 76%;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #4590fb, #246fe1);
+  box-shadow: 0 16px 34px rgba(49,130,246,.28);
+  color: #fff;
+}
+.visual-result span { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: rgba(255,255,255,.2); font-size: 20px; }
+.visual-result b { font-size: 16px; }
+.home-action { padding-top: 8px; }
+.how-it-works { margin: 32px 16px 12px; padding: 24px 16px; border-radius: 22px; background: #f7f9fc; }
+.section-label { margin: 0 0 16px; color: #333d4b; font-size: 17px; font-weight: 800; }
+.process-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.process-grid div { min-width: 0; padding: 15px 10px; border-radius: 16px; background: #fff; }
+.process-grid b { display: block; margin-bottom: 12px; color: var(--bc-blue); font-size: 12px; }
+.process-grid span { display: block; font-size: 14px; font-weight: 700; }
+.process-grid p { margin: 7px 0 0; color: var(--bc-hint); font-size: 11px; line-height: 1.45; }
+.recent-list { margin: 0 16px; padding: 0; overflow: hidden; border: 1px solid #edf1f7; border-radius: 18px; background: #fff; box-shadow: 0 7px 24px rgba(35,70,120,.05); }
+
+.example-chips { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
+.example-chips::-webkit-scrollbar { display: none; }
+.example-chips button { flex: 0 0 auto; padding: 10px 13px; border: 0; border-radius: 99px; background: var(--bc-blue-weak); color: #1b64c8; font: inherit; font-size: 13px; }
+
+.result-report { padding-bottom: 24px; }
+.result-badge { display: inline-block; margin: 0 24px 12px; padding: 7px 10px; border-radius: 8px; background: #191f28; color: #fff; font-size: 12px; font-weight: 700; }
+
+@media (max-width: 360px) {
+  .home-hero { padding-left: 20px; padding-right: 20px; }
+  .home-hero h1 { font-size: 34px; }
+  .process-grid p { display: none; }
 }

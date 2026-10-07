@@ -27,10 +27,15 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
     set(id, list.includes(choiceId) ? list.filter((c) => c !== choiceId) : [...list, choiceId]);
   };
   const complete = answersComplete(clarification.questions, answers);
+  const answeredCount = clarification.questions.filter((q) => {
+    const value = answers[q.id];
+    return typeof value === 'string' ? value.trim().length > 0 : Array.isArray(value) && value.length > 0;
+  }).length;
 
   return (
     <Page>
       <PageTop title="3가지만 더 알려주세요" subtitle="답에 따라 추천이 달라져요." />
+      <div className="progress-track" aria-label={`질문 ${answeredCount}개 답변 완료`}><span style={{ width: `${(answeredCount / clarification.questions.length) * 100}%` }} /></div>
       {notice && (
         <>
           <p className="section muted">{notice}</p>
@@ -42,9 +47,9 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
       </Card>
       <Gap size={24} />
       {clarification.questions.map((q, i) => (
-        <div className="question" key={q.id}>
+        <div className="question question-card" key={q.id}>
           <p className="question-title">
-            {i + 1}. {q.text}
+            <span className="question-number">Q{i + 1}</span>{q.text}
             {q.inputType === 'multiple' && <span className="muted"> (여러 개 선택)</span>}
           </p>
           {q.inputType === 'text' ? (

@@ -13,9 +13,10 @@ import { Card, Gap, PageTop } from './ui';
 
 export function ResultView({ analysis, highStakes }: { analysis: Analysis; highStakes: boolean }) {
   return (
-    <>
+    <div className="result-report">
       <PageTop title="이렇게 판단했어요" subtitle={analysis.summary} />
-      <Card title="추천" highlight>
+      <div className="result-badge">AI 판단 리포트</div>
+      <Card title="추천 결과" highlight>
         <p className="big">{recommendationLabel(analysis)}</p>
         <Gap size={8} />
         <p>{analysis.recommendation.rationale}</p>
@@ -72,7 +73,7 @@ export function ResultView({ analysis, highStakes }: { analysis: Analysis; highS
       </Card>
       <Gap />
       <p className="section muted">{analysis.disclaimer}</p>
-    </>
+    </div>
   );
 }
 
