@@ -15,7 +15,7 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomeScreen />} />
-      {/* 콘솔 주요 기능 딥링크: intoss://Bestchoice/input, intoss://Bestchoice/history */}
+      {/* 콘솔 주요 기능 딥링크: intoss://bestchoice/input, intoss://bestchoice/history */}
       <Route path="/input" element={<InputScreen />} />
       <Route path="/history" element={<HistoryScreen />} />
       <Route path="/decision/:id" element={<DecisionScreen />} />

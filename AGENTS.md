@@ -60,7 +60,7 @@
 - OpenAI 충전(실제 흐름 테스트 직전), 지출 한도·알림 설정
 - 실기기에서 실제 요청 `Origin` 확인 후 `ALLOWED_ORIGINS` 등록 (추측 도메인 등록 금지)
 - 토스 mTLS 인증서/키를 Supabase secrets에 직접 등록
-- 앱 콘솔에 새 `.ait` 업로드, 주요 기능(`intoss://Bestchoice/input`, `/history`) 등록 후 검수 요청
+- 앱 콘솔에 새 `.ait` 업로드, 주요 기능(`intoss://bestchoice/input`, `intoss://bestchoice/history`) 등록 후 검수 요청
 
 코드로 할 것
 - 앱인토스 문서 접속 가능해지면 6번의 "반드시 확인" 5개 항목을 문서와 대조
@@ -77,7 +77,7 @@
 - Edge Function CORS 허용 Origin 후보(작업지시서 기준, 실제 Origin 확인 후 확정):
   `https://bestchoice.apps.tossmini.com`, `https://bestchoice.private-apps.tossmini.com`,
   `https://bestchoice.web.tossmini.com`, `https://bestchoice.private-web.tossmini.com`
-  (주의: 콘솔 appName은 `Bestchoice` 대문자로 보고됨. 실제 도메인 대소문자 확인 필요)
+  (2026-10-07 콘솔 화면에서 appName `bestchoice` 소문자로 확인. 번들과 딥링크도 동일하게 사용)
 
 ## 6. 앱 개발 방법
 ```bash

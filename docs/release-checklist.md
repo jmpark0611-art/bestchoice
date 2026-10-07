@@ -6,7 +6,7 @@
 
 ## 현재 완료
 
-- 콘솔 미니앱 등록 및 appName `Bestchoice` 확인
+- 콘솔 화면에서 appName `bestchoice` 소문자 확인 및 번들 설정 일치
 - Web Framework SDK 3.x, TDS, 뒤로가기/홈 동작 코드 적용
 - Supabase 사용자별 저장, RLS, 쓰기 RPC, 익명 인증 원격 검증
 - AI 질문 3개·6축 결과 계약, 중복 요청 방지, Edge Function 배포
@@ -35,8 +35,8 @@
 
 | 표시 문구 | 피처 주소 | 목적 |
 |---|---|---|
-| 고민 판단하기 | `intoss://Bestchoice/input` | 홈을 거치지 않고 고민 입력으로 진입 |
-| 내 결정 기록 확인하기 | `intoss://Bestchoice/history` | 저장된 분석·선택 기록 확인 |
+| 고민 판단하기 / Decide | `intoss://bestchoice/input` | 홈을 거치지 않고 고민 입력으로 진입 |
+| 결정 기록 보기 / History | `intoss://bestchoice/history` | 저장된 분석·선택 기록 확인 |
 
 주요 기능 문구는 기능이 드러나는 `~하기` 형태로 작성하고, 등록 후 각 딥링크가 실제 경로를 여는지 샌드박스에서 확인한다.
 
