@@ -25,6 +25,21 @@
 4. 검수 반려 시: 사유 확인 → `codex/review-remote-ai` 기반으로 수정 → `npm run build:release`로 재빌드
    (`app/.env`에 `VITE_ENABLE_AI=true`, 실제 publishable 키 필요. `.env`·`.ait`는 커밋 금지)
 
+### 수익화 작업 (2026-10-15 시작, **미출시·DB 미적용**)
+- 사용자 결정: **보상형 광고**, **하루 무료 3건**(이후 광고 1회 시청 = 1건, 하루 최대 5건 추가)
+- 코드(이 브랜치): `app/src/lib/rewardedAd.ts`(SDK `loadFullScreenAd`/`showFullScreenAd`, `userEarnedReward` 후 닫힐 때만 보상),
+  입력 화면 "오늘 남은 분석 N건" 표시와 "광고 보고 1건 더 받기" 다이얼로그, 테스트 47개 통과
+- DB: `supabase/migrations/20261016000000_bc_free_quota_and_ad_bonus.sql` (로컬 검증 완료, **원격 미적용**)
+  - `bc_create_decision`: 하루 20건 → 무료 3건 + 보너스, 초과 시 `FREE_LIMIT`
+  - `bc_get_quota()`, `bc_grant_ad_bonus()`(하루 5회, 30초 간격) 추가, 사용자 AI 호출 한도 10 → 20
+  - ⚠️ **광고 UI가 있는 앱 버전 출시 직전에 적용.** 먼저 적용하면 기존 버전 사용자가 3건 후 이유 없이 막힘.
+    적용 후 로컬 파일명을 원격 버전으로 바꾸고 advisors 점검
+  - 한계: 광고 보상은 클라이언트 신고 기반(서버 검증 불가)이고, 익명 계정을 새로 만들면 무료 3건이 초기화됨. 전체 일일 100회 상한이 최종 방어선
+- 출시 전에 필요한 것 (`npm run build:release`가 없으면 막음)
+  1. 콘솔에서 **보상형 광고 그룹 ID** 발급 → `app/.env`에 `VITE_AD_GROUP_REWARDED=...`
+  2. 개인정보처리방침·이용약관 광고 조항 추가됨 → **새 시행일** 기입(`[광고 버전 출시일 기입]` 자리)
+  3. 현재 검토 중인 `20261015-4`가 출시된 뒤에 이 버전을 올릴 것
+
 ### 브랜치
 - 실제 출시 코드는 `codex/review-remote-ai`(Codex 작업: 퀘스트형 UI, appName 소문자 `bestchoice`, 정책 시행일 확정, 출시 전 점검·AI 스모크 테스트 스크립트).
 - 2026-10-15에 이 브랜치를 `claude/bestchoice-miniapp-dev-ar5jtm`에 병합함. 두 브랜치 내용 동일 + 이 문서 갱신.

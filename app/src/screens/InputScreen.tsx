@@ -1,18 +1,21 @@
-import { FixedBottomCTA, TextArea, useToast } from '@toss/tds-mobile';
-import { useState } from 'react';
+import { FixedBottomCTA, TextArea, useDialog, useToast } from '@toss/tds-mobile';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import aiNotice from '../../../docs/legal/ai-notice.md?raw';
 import { Gap, Page, PageTop } from '../components/ui';
-import { createDecision } from '../lib/api';
+import { createDecision, getQuota, grantAdBonus, type Quota } from '../lib/api';
 import { CONCERN_MAX, concernError } from '../lib/contract';
 import { AppError, errorMessage } from '../lib/errors';
 import { parseMarkdown } from '../lib/markdown';
+import { rewardedAdAvailable, watchRewardedAd } from '../lib/rewardedAd';
 
 const noticeItems = parseMarkdown(aiNotice).flatMap((b) => (b.type === 'list' ? b.items : []));
 
 export function InputScreen() {
   const navigate = useNavigate();
   const { openToast } = useToast();
+  const { openConfirm } = useDialog();
+  const [quota, setQuota] = useState<Quota | null>(null);
   const [text, setText] = useState('');
   const [touched, setTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -30,13 +33,66 @@ export function InputScreen() {
     ['새로 시작할까?', '새로운 일을 지금 시작할지 조금 더 준비한 뒤 시작할지 고민이에요. 기회와 위험을 비교하고 싶어요.'],
   ];
 
+  const refreshQuota = useCallback(() => {
+    getQuota()
+      .then(setQuota)
+      .catch(() => setQuota(null));
+  }, []);
+  useEffect(refreshQuota, [refreshQuota]);
+
+  const codeOf = (e: unknown) => (e instanceof AppError ? e.code : 'UNKNOWN');
+
+  /** 무료 분석을 다 썼을 때: 보상형 광고를 보면 1건 추가. 성공하면 true */
+  const earnBonus = async (): Promise<boolean> => {
+    const canEarn = quota?.canEarnBonus !== false && rewardedAdAvailable();
+    if (!canEarn) {
+      openToast(errorMessage(quota?.canEarnBonus === false ? 'AD_BONUS_LIMIT' : 'FREE_LIMIT'));
+      return false;
+    }
+    const ok = await openConfirm({
+      title: '오늘 무료 분석을 모두 썼어요',
+      description: '짧은 광고를 끝까지 보면 분석 1건을 더 받을 수 있어요.',
+      confirmButton: '광고 보고 1건 더 받기',
+      cancelButton: '내일 할게요',
+    });
+    if (!ok) return false;
+    try {
+      const earned = await watchRewardedAd();
+      if (!earned) {
+        openToast(errorMessage('AD_NOT_COMPLETED'));
+        return false;
+      }
+      setQuota(await grantAdBonus());
+      return true;
+    } catch (e) {
+      openToast(errorMessage(codeOf(e)));
+      return false;
+    }
+  };
+
   const submit = async () => {
     setSubmitting(true);
     try {
+      if (quota && quota.remaining <= 0 && !(await earnBonus())) {
+        setSubmitting(false);
+        return;
+      }
       const id = await createDecision(text);
       navigate(`/decision/${id}`, { replace: true });
     } catch (e) {
-      openToast(errorMessage(e instanceof AppError ? e.code : 'UNKNOWN'));
+      // 남은 수 표시가 오래됐을 수 있으니 서버가 막으면 광고 제안 후 한 번만 다시 시도
+      if (codeOf(e) === 'FREE_LIMIT' && (await earnBonus())) {
+        try {
+          const id = await createDecision(text);
+          navigate(`/decision/${id}`, { replace: true });
+          return;
+        } catch (retry) {
+          openToast(errorMessage(codeOf(retry)));
+        }
+      } else if (codeOf(e) !== 'FREE_LIMIT') {
+        openToast(errorMessage(codeOf(e)));
+      }
+      refreshQuota();
       setSubmitting(false);
     }
   };
@@ -90,6 +146,15 @@ export function InputScreen() {
           <li key={item}>{item}</li>
         ))}
       </ul>
+      {quota && (
+        <p className="section muted quota-hint" aria-live="polite">
+          {quota.remaining > 0
+            ? `오늘 남은 분석 ${quota.remaining}건`
+            : quota.canEarnBonus && rewardedAdAvailable()
+              ? '오늘 무료 분석을 모두 썼어요. 광고를 보면 1건 더 받을 수 있어요.'
+              : '오늘 분석을 모두 썼어요. 내일 다시 이용해주세요.'}
+        </p>
+      )}
       <FixedBottomCTA disabled={!category || !urgency || !!error || submitting} loading={submitting} onClick={submit}>
         질문 카드 열기
       </FixedBottomCTA>

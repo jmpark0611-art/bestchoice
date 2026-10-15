@@ -40,6 +40,22 @@ export async function createDecision(concern: string): Promise<string> {
   return id;
 }
 
+export type Quota = { freeLimit: number; used: number; bonus: number; remaining: number; canEarnBonus: boolean };
+
+/** 오늘 남은 무료 고민 수(무료 3건 + 광고 보너스) */
+export async function getQuota(): Promise<Quota> {
+  const { data, error } = await getSupabase().rpc('bc_get_quota');
+  if (error) rpcError(error);
+  return data as Quota;
+}
+
+/** 보상형 광고를 끝까지 본 뒤 호출. 하루 최대 5회, 30초 간격 */
+export async function grantAdBonus(): Promise<Quota> {
+  const { data, error } = await getSupabase().rpc('bc_grant_ad_bonus');
+  if (error) rpcError(error);
+  return data as Quota;
+}
+
 type DecisionRow = {
   id: string;
   concern_text: string;

@@ -29,10 +29,13 @@ const key = env.VITE_SUPABASE_PUBLISHABLE_KEY ?? '';
 if (url !== 'https://njrtcxohbkfgrgwhlvua.supabase.co') failures.push('VITE_SUPABASE_URL이 Bestchoice 프로젝트와 일치하지 않습니다.');
 if (!key.startsWith('sb_publishable_') || key.includes('xxx')) failures.push('VITE_SUPABASE_PUBLISHABLE_KEY가 실제 publishable 키가 아닙니다.');
 if (env.VITE_ENABLE_AI !== 'true') failures.push('VITE_ENABLE_AI=true가 아닙니다. AI가 꺼진 번들은 출시할 수 없습니다.');
+if (!env.VITE_AD_GROUP_REWARDED) failures.push('VITE_AD_GROUP_REWARDED(보상형 광고 그룹 ID)가 없습니다. 무료 3건 이후 사용자가 막힙니다.');
 
 for (const file of ['../docs/legal/privacy-policy.md', '../docs/legal/terms-of-service.md']) {
   const content = fs.readFileSync(path.resolve(cwd, file), 'utf8');
-  if (!content.includes('시행일: 2026년 10월 15일')) failures.push(`${file}의 시행일이 확정되지 않았습니다.`);
+  const effective = /^시행일: (\d{4})년 (\d{1,2})월 (\d{1,2})일\s*$/m.exec(content);
+  if (!effective) failures.push(`${file}의 시행일이 확정되지 않았습니다. ("시행일: YYYY년 M월 D일" 형식)`);
+  if (/\[(확정 필요|광고 버전 출시일)/.test(content)) failures.push(`${file}에 채우지 않은 [ ] 항목이 있습니다.`);
 }
 
 if (failures.length) {
@@ -41,4 +44,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('출시 사전점검 통과: Supabase 설정, AI 활성화, 정책 시행일을 확인했습니다.');
+console.log('출시 사전점검 통과: Supabase 설정, AI 활성화, 광고 그룹 ID, 정책 시행일을 확인했습니다.');

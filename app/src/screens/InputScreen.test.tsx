@@ -4,8 +4,12 @@ import { AppError } from '../lib/errors';
 import { renderAt } from '../test/render';
 import { InputScreen } from './InputScreen';
 
-const api = vi.hoisted(() => ({ createDecision: vi.fn() }));
+const api = vi.hoisted(() => ({ createDecision: vi.fn(), getQuota: vi.fn(), grantAdBonus: vi.fn() }));
 vi.mock('../lib/api', () => api);
+const ad = vi.hoisted(() => ({ rewardedAdAvailable: vi.fn(() => true), watchRewardedAd: vi.fn() }));
+vi.mock('../lib/rewardedAd', () => ad);
+
+const quota = (remaining: number, canEarnBonus = true) => ({ freeLimit: 3, used: 3 - remaining, bonus: 0, remaining, canEarnBonus });
 
 const long = '지금 회사에 남을지 새 회사로 옮길지 고민이에요. 연봉은 비슷해요.';
 const completeQuest = async (user: ReturnType<typeof userEvent.setup>) => {
@@ -14,7 +18,11 @@ const completeQuest = async (user: ReturnType<typeof userEvent.setup>) => {
 };
 
 describe('InputScreen', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    api.getQuota.mockResolvedValue(quota(3));
+    ad.rewardedAdAvailable.mockReturnValue(true);
+  });
 
   it('20자 미만이면 제출할 수 없고 안내를 보여준다', async () => {
     const user = userEvent.setup();
@@ -53,5 +61,82 @@ describe('InputScreen', () => {
     expect((await screen.findAllByText(/오늘은 고민을 더 등록할 수 없어요/)).length).toBeGreaterThan(0);
     // 토스트가 떠 있는 동안 TDS가 하단 CTA를 접근성 트리에서 숨기므로 텍스트로 찾는다
     await waitFor(() => expect(screen.getByText('질문 카드 열기').closest('button')).toBeEnabled());
+  });
+
+  it('남은 무료 분석 수를 보여준다', async () => {
+    api.getQuota.mockResolvedValue(quota(2));
+    renderAt('/input', '/input', <InputScreen />);
+    expect(await screen.findByText('오늘 남은 분석 2건')).toBeInTheDocument();
+  });
+
+  const fillAndSubmit = async (user: ReturnType<typeof userEvent.setup>) => {
+    await completeQuest(user);
+    await user.type(screen.getByRole('textbox', { name: '고민 내용' }), long);
+    await user.click(screen.getByText('질문 카드 열기').closest('button')!);
+  };
+
+  it('무료를 다 쓰면 광고를 끝까지 본 뒤 1건을 받아 등록한다', async () => {
+    api.getQuota.mockResolvedValue(quota(0));
+    ad.watchRewardedAd.mockResolvedValue(true);
+    api.grantAdBonus.mockResolvedValue({ ...quota(0), bonus: 1, remaining: 1 });
+    api.createDecision.mockResolvedValue('new-id');
+    const user = userEvent.setup();
+    renderAt('/input', '/input', <InputScreen />);
+    expect(await screen.findByText(/광고를 보면 1건 더/)).toBeInTheDocument();
+    await fillAndSubmit(user);
+    await user.click(await screen.findByRole('button', { name: '광고 보고 1건 더 받기' }));
+    expect(await screen.findByText('other-page')).toBeInTheDocument();
+    expect(api.grantAdBonus).toHaveBeenCalledTimes(1);
+    expect(api.createDecision).toHaveBeenCalledWith(long);
+  });
+
+  it('광고를 중간에 닫으면 보상 없이 등록하지 않는다', async () => {
+    api.getQuota.mockResolvedValue(quota(0));
+    ad.watchRewardedAd.mockResolvedValue(false);
+    const user = userEvent.setup();
+    renderAt('/input', '/input', <InputScreen />);
+    await screen.findByText(/광고를 보면 1건 더/);
+    await fillAndSubmit(user);
+    await user.click(await screen.findByRole('button', { name: '광고 보고 1건 더 받기' }));
+    expect((await screen.findAllByText(/광고를 끝까지 봐야/)).length).toBeGreaterThan(0);
+    expect(api.grantAdBonus).not.toHaveBeenCalled();
+    expect(api.createDecision).not.toHaveBeenCalled();
+  });
+
+  it('광고 제안을 거절하면 등록하지 않는다', async () => {
+    api.getQuota.mockResolvedValue(quota(0));
+    const user = userEvent.setup();
+    renderAt('/input', '/input', <InputScreen />);
+    await screen.findByText(/광고를 보면 1건 더/);
+    await fillAndSubmit(user);
+    await user.click(await screen.findByRole('button', { name: '내일 할게요' }));
+    expect(ad.watchRewardedAd).not.toHaveBeenCalled();
+    expect(api.createDecision).not.toHaveBeenCalled();
+  });
+
+  it('광고를 쓸 수 없으면 내일 다시 이용하라고 안내한다', async () => {
+    api.getQuota.mockResolvedValue(quota(0));
+    ad.rewardedAdAvailable.mockReturnValue(false);
+    const user = userEvent.setup();
+    renderAt('/input', '/input', <InputScreen />);
+    expect(await screen.findByText('오늘 분석을 모두 썼어요. 내일 다시 이용해주세요.')).toBeInTheDocument();
+    await fillAndSubmit(user);
+    expect((await screen.findAllByText(/오늘 무료 분석을 모두 썼어요/)).length).toBeGreaterThan(0);
+    expect(ad.watchRewardedAd).not.toHaveBeenCalled();
+    expect(api.createDecision).not.toHaveBeenCalled();
+  });
+
+  it('서버가 FREE_LIMIT으로 막으면 광고 후 한 번 다시 등록한다', async () => {
+    api.getQuota.mockResolvedValue(quota(1)); // 표시가 오래된 경우
+    api.createDecision.mockRejectedValueOnce(new AppError('FREE_LIMIT')).mockResolvedValueOnce('new-id');
+    ad.watchRewardedAd.mockResolvedValue(true);
+    api.grantAdBonus.mockResolvedValue({ ...quota(0), bonus: 1, remaining: 1 });
+    const user = userEvent.setup();
+    renderAt('/input', '/input', <InputScreen />);
+    await screen.findByText('오늘 남은 분석 1건');
+    await fillAndSubmit(user);
+    await user.click(await screen.findByRole('button', { name: '광고 보고 1건 더 받기' }));
+    expect(await screen.findByText('other-page')).toBeInTheDocument();
+    expect(api.createDecision).toHaveBeenCalledTimes(2);
   });
 });
