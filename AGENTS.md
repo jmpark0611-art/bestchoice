@@ -87,6 +87,7 @@ npm install
 npm run dev        # 브라우저 개발 (@apps-in-toss/devtools가 SDK를 mock)
 npm test           # vitest
 npm run build      # 타입체크 + vite build + ait build → Bestchoice.ait
+npm run build:release # 전체 테스트 + AI 활성화/환경/정책 검사 후 출시 번들 생성
 ```
 
 ## 7. 환경 메모
