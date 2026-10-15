@@ -1,7 +1,7 @@
 import { Button, ListRow } from '@toss/tds-mobile';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Gap, Page, PageTop } from '../components/ui';
+import { Gap, Page } from '../components/ui';
 import { listDecisions, type DecisionSummary } from '../lib/api';
 import { aiEnabled } from '../lib/supabase';
 import { statusLabel } from './HistoryScreen';
@@ -18,13 +18,20 @@ export function HomeScreen() {
 
   return (
     <Page>
-      <PageTop
-        title="고민되는 선택이 있나요?"
-        subtitle="상황을 적으면 질문 3개로 정리하고, 6가지 기준으로 판단을 도와드려요."
-      />
-      <div className="section">
+      <section className="home-hero">
+        <div className="brand-pill"><span className="brand-mark">✓</span> 결정해줘</div>
+        <p className="home-kicker">생각이 복잡할 때</p>
+        <h1>선택의 기준을<br /><em>또렷하게.</em></h1>
+        <p className="home-description">고민을 들려주면 꼭 필요한 질문을 묻고<br />6가지 기준으로 차분하게 정리해 드려요.</p>
+        <div className="choice-visual" aria-hidden="true">
+          <div className="visual-path path-left"><span>선택 A</span></div>
+          <div className="visual-path path-right"><span>선택 B</span></div>
+          <div className="visual-result"><span>✓</span><b>나에게 맞는 선택</b></div>
+        </div>
+      </section>
+      <div className="section home-action">
         <Button display="block" onClick={() => navigate('/input')}>
-          고민 판단하기
+          내 고민 정리하기
         </Button>
         {!aiEnabled() && (
           <>
@@ -33,11 +40,19 @@ export function HomeScreen() {
           </>
         )}
       </div>
+      <section className="how-it-works">
+        <p className="section-label">이렇게 도와드려요</p>
+        <div className="process-grid">
+          <div><b>01</b><span>고민 입력</span><p>상황과 선택지를<br />편하게 적어요</p></div>
+          <div><b>02</b><span>핵심 질문</span><p>딱 3가지에<br />답해요</p></div>
+          <div><b>03</b><span>판단 정리</span><p>6가지 기준으로<br />비교해요</p></div>
+        </div>
+      </section>
       <Gap size={24} />
       {recent && recent.length > 0 && (
         <>
-          <p className="section question-title">최근 결정</p>
-          <ul style={{ padding: 0, margin: 0 }}>
+          <p className="section section-label">최근 결정</p>
+          <ul className="recent-list">
             {recent.map((d) => (
               <ListRow
                 key={d.id}

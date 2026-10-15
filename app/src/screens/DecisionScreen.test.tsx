@@ -63,16 +63,19 @@ describe('DecisionScreen', () => {
     const user = userEvent.setup();
     open();
 
-    expect(await screen.findByText('3가지만 더 알려주세요')).toBeInTheDocument();
+    expect(await screen.findByText('질문 카드를 열어볼게요')).toBeInTheDocument();
     expect(api.requestAI).toHaveBeenCalledWith({ decisionId: 'd1', stage: 'clarify' });
     expect(api.requestAI).toHaveBeenCalledTimes(1);
 
-    const cta = screen.getByRole('button', { name: '분석 받기' });
+    let cta = screen.getByRole('button', { name: '다음 카드 뒤집기' });
     expect(cta).toBeDisabled();
     await user.click(screen.getByRole('button', { name: '성장' }));
+    await user.click(cta);
     await user.click(screen.getByRole('button', { name: '안정성' }));
     await user.click(screen.getByRole('button', { name: '사람' }));
+    await user.click(screen.getByRole('button', { name: '다음 카드 뒤집기' }));
     await user.type(screen.getByRole('textbox', { name: '1년 뒤 원하는 모습은?' }), '팀장');
+    cta = screen.getByRole('button', { name: '결과 리포트 열기' });
     expect(cta).toBeEnabled();
     await user.click(cta);
 
@@ -98,12 +101,16 @@ describe('DecisionScreen', () => {
     open();
 
     await user.click(await screen.findByRole('button', { name: '연봉' }));
+    await user.click(screen.getByRole('button', { name: '다음 카드 뒤집기' }));
     await user.click(screen.getByRole('button', { name: '안정성' }));
+    await user.click(screen.getByRole('button', { name: '다음 카드 뒤집기' }));
     await user.type(screen.getByRole('textbox', { name: '1년 뒤 원하는 모습은?' }), '팀장');
-    await user.click(screen.getByRole('button', { name: '분석 받기' }));
+    await user.click(screen.getByRole('button', { name: '결과 리포트 열기' }));
 
     await user.click(await screen.findByRole('button', { name: '다시 시도하기' }));
     expect(screen.getByRole('button', { name: '연봉' })).toHaveAttribute('aria-pressed', 'true');
+    await user.click(screen.getByRole('button', { name: '다음 카드 뒤집기' }));
+    await user.click(screen.getByRole('button', { name: '다음 카드 뒤집기' }));
     expect(screen.getByRole('textbox', { name: '1년 뒤 원하는 모습은?' })).toHaveValue('팀장');
   });
 

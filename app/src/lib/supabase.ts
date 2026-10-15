@@ -15,7 +15,8 @@ export function getSupabase(): SupabaseClient {
 /** 세션이 없으면 익명 로그인. 토스 로그인 연동은 투표 공유 기능(2차)에서 추가 */
 export async function ensureSession(): Promise<string> {
   const sb = getSupabase();
-  const { data } = await sb.auth.getSession();
+  const { data, error: sessionError } = await sb.auth.getSession();
+  if (sessionError) throw sessionError;
   if (data.session) return data.session.user.id;
   const { data: signed, error } = await sb.auth.signInAnonymously();
   if (error || !signed.user) throw error ?? new Error('익명 로그인 실패');

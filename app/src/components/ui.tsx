@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { errorMessage, RETRYABLE } from '../lib/errors';
 
 export function Page({ children }: { children: ReactNode }) {
-  return <main className="page">{children}</main>;
+  return <main className="page"><div className="page-inner">{children}</div></main>;
 }
 
 export function PageTop({ title, subtitle }: { title: string; subtitle?: string }) {
