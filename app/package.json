@@ -11,6 +11,7 @@
     "test": "vitest run",
     "typecheck": "tsc -b",
     "verify": "npm run test && npm run typecheck",
+    "smoke:ai": "node scripts/smoke-ai.mjs",
     "deploy": "ait deploy"
   },
   "dependencies": {
