@@ -27,6 +27,9 @@ const MESSAGES: Record<string, string> = {
   MODEL_FORMAT: '분석 결과를 만들지 못했어요. 다시 시도해주세요.',
   SAVE_UNCERTAIN: '저장 상태를 확인하지 못했어요. 기록 화면에서 확인해주세요.',
   NETWORK: '네트워크 연결을 확인해주세요.',
+  NETWORK_OFFLINE: '인터넷 연결이 끊겼어요. 연결한 뒤 다시 시도해주세요.',
+  AUTH_UNAVAILABLE: '사용자 연결을 준비하지 못했어요. 잠시 후 다시 시도해주세요.',
+  CONFIGURATION: '앱 연결 설정을 확인하고 있어요. 고객센터로 문의해주세요.',
 };
 
 export const RETRYABLE = new Set([
@@ -42,6 +45,8 @@ export const RETRYABLE = new Set([
   'AI_FAILED',
   'MODEL_FORMAT',
   'NETWORK',
+  'NETWORK_OFFLINE',
+  'AUTH_UNAVAILABLE',
 ]);
 
 export function errorMessage(code: string): string {
