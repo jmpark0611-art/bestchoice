@@ -83,7 +83,7 @@
 - OpenAI 충전(실제 흐름 테스트 직전), 지출 한도·알림 설정
 - 정식 출시 후 실제 요청 주소가 `ALLOWED_ORIGINS`와 맞는지 확인 (0장 참고)
 - 토스 mTLS 인증서/키를 Supabase secrets에 직접 등록
-- 앱 콘솔에 새 `.ait` 업로드, 주요 기능(`intoss://bestchoice/input`, `intoss://bestchoice/history`) 등록 후 검수 요청
+- 주요 기능 딥링크는 소문자 `intoss://bestchoice/input`, `intoss://bestchoice/history`
 
 코드로 할 것
 - 앱인토스 문서 접속 가능해지면 6번의 "반드시 확인" 5개 항목을 문서와 대조
