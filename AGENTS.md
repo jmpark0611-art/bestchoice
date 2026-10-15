@@ -1,11 +1,36 @@
 # 인수인계: 결정해줘 / Bestchoice (앱인토스 미니앱)
 
-다른 AI·개발자가 이어서 작업하기 위한 문서. 마지막 갱신 2026-09-29 (앱 재구축 반영).
+다른 AI·개발자가 이어서 작업하기 위한 문서. 마지막 갱신 2026-10-15 (출시·AI 활성화 버전 검토 요청 반영).
 이 저장소 작업 브랜치: `claude/bestchoice-miniapp-dev-ar5jtm`.
 
+## 0. 출시 현황 (2026-10-15) — 먼저 읽을 것
+| 버전 | 상태 | 내용 |
+|---|---|---|
+| `20261007-3` | **현재 출시됨** (10/15 20:43) | 10/07 샌드박스 테스트용 번들. **AI 꺼짐**(`VITE_ENABLE_AI=false`) → 고민을 적어도 "AI 분석을 준비하고 있어요"만 표시됨 |
+| `20261015-4` | **검토 요청함** (10/15) | AI 켜짐 정식 번들. `codex/review-remote-ai` 기준 `npm run build:release`로 빌드(테스트 35개·출시 전 점검 통과). AI 스크린샷 자동 채우기 체크 |
+| `20261007-1`, `-2` | 검토 필요(미사용) | 쓰지 않음. 검토 요청하지 말 것 |
+
+- 검증: 10/15 12:17 샌드박스 iPhone에서 `20261015-4`로 고민 등록 → 질문 3개(약 8초) → 6축 분석(약 5초) → 결과·실제 선택 저장까지 성공.
+  모델 `gpt-4.1-mini-2025-04-14`, 프롬프트 `decision-v1`.
+- `ALLOWED_ORIGINS` 등록 완료(10/15, 사용자가 대시보드에서 직접):
+  `https://bestchoice.apps.tossmini.com,https://bestchoice.private-apps.tossmini.com`
+  - `private-apps`(샌드박스) 주소는 요청 로그의 Referer로 확인. `apps`(정식) 주소는 작업지시서 기준이며 **정식 출시 후 실제 요청으로 아직 확인 안 됨**.
+  - 이 값이 없으면 decision-ai가 토스 WebView 요청을 전부 `403 ORIGIN_DENIED`로 거부함.
+- 10/07~10/15 실제 사용자 고민 4건이 AI 꺼진 번들 때문에 `draft`로 멈춤(2개월 후 자동 삭제됨).
+
+### 다음 할 일 (순서)
+1. `20261015-4` 승인 → 콘솔에서 **출시** (사용자)
+2. 출시 직후 실제 토스 앱에서 고민 1건 테스트 → Supabase `function_edge_logs`에서 `decision-ai` POST 200 확인, 403이면 `ALLOWED_ORIGINS` 주소 재확인
+3. OpenAI 지출 한도·알림 설정 (사용자, 미완료)
+4. 검수 반려 시: 사유 확인 → `codex/review-remote-ai` 기반으로 수정 → `npm run build:release`로 재빌드
+   (`app/.env`에 `VITE_ENABLE_AI=true`, 실제 publishable 키 필요. `.env`·`.ait`는 커밋 금지)
+
+### 브랜치
+- 실제 출시 코드는 `codex/review-remote-ai`(Codex 작업: 퀘스트형 UI, appName 소문자 `bestchoice`, 정책 시행일 확정, 출시 전 점검·AI 스모크 테스트 스크립트).
+- 2026-10-15에 이 브랜치를 `claude/bestchoice-miniapp-dev-ar5jtm`에 병합함. 두 브랜치 내용 동일 + 이 문서 갱신.
+
 ## 1. 현재 상태 한눈에
-- **앱은 `app/`에 Claude가 새로 만듦 (2026-09-29).** ChatGPT Codex로 만든 원래 앱 소스는 GitHub에 올라간 적이 없고
-  사용자에게도 파일이 없어서 재구축함. Codex 작업 기록이 나중에 복구되면 비교 후 더 나은 쪽을 채택할 것 (사용자 요청).
+- 앱은 `app/`. 2026-09-29 Claude가 재구축(원래 Codex 소스는 유실) → 10/04~10/15 Codex가 이어서 개선·출시 준비.
 - 이 저장소에 있는 것: 앱(`app/`), Supabase 마이그레이션, Edge Function 소스, 정책 문서, 출시 체크리스트(`docs/release-checklist.md`).
 - **1차 출시 방향: AI 판단 흐름(`bc_*`)으로 결정 (2026-09-29, 사용자).**
   단, 사용자 요청: **"나중에 다른 AI에게도 이 결정이 맞는지 물어보자."** → 이 문서를 읽는 AI는 작업 시작 시
@@ -55,10 +80,8 @@
 
 ## 4. 남은 일 (우선순위)
 사용자가 해야 할 것
-- (선택) Codex 사용량 복구 후 원래 앱 소스를 찾으면 `codex/app-source` 브랜치로 push → 재구축본과 비교
-- 검수 요청일이 정해지면 정책 문서 시행일 기입
 - OpenAI 충전(실제 흐름 테스트 직전), 지출 한도·알림 설정
-- 실기기에서 실제 요청 `Origin` 확인 후 `ALLOWED_ORIGINS` 등록 (추측 도메인 등록 금지)
+- 정식 출시 후 실제 요청 주소가 `ALLOWED_ORIGINS`와 맞는지 확인 (0장 참고)
 - 토스 mTLS 인증서/키를 Supabase secrets에 직접 등록
 - 앱 콘솔에 새 `.ait` 업로드, 주요 기능(`intoss://bestchoice/input`, `intoss://bestchoice/history`) 등록 후 검수 요청
 
