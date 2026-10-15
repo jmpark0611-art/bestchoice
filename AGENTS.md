@@ -21,7 +21,7 @@
 ### 다음 할 일 (순서)
 1. `20261015-4` 승인 → 콘솔에서 **출시** (사용자)
 2. 출시 직후 실제 토스 앱에서 고민 1건 테스트 → Supabase `function_edge_logs`에서 `decision-ai` POST 200 확인, 403이면 `ALLOWED_ORIGINS` 주소 재확인
-3. OpenAI 지출 한도·알림 설정 (사용자, 미완료)
+3. OpenAI 지출: Default project에 월 $10 한도·100% 알림 설정 완료(10/15, 이때까지 사용액 $0.01). 단 한도는 'not enforced'(알림만) → 실제 상한은 선불 충전액($5, 자동 충전 꺼짐 확인 필요). 50% 알림 추가 권장
 4. 검수 반려 시: 사유 확인 → `codex/review-remote-ai` 기반으로 수정 → `npm run build:release`로 재빌드
    (`app/.env`에 `VITE_ENABLE_AI=true`, 실제 publishable 키 필요. `.env`·`.ait`는 커밋 금지)
 
