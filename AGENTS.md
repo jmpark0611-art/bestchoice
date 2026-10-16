@@ -41,7 +41,8 @@
     2인자 버전은 4인자로 위임하는 호환용으로 유지(PostgREST가 보낸 인자 이름으로 고르므로 모호하지 않음. 구버전 앱이 내려간 뒤 삭제 가능).
     첫 시도는 `DROP FUNCTION`이 들어 있어 MCP 적용이 확인 대기 후 취소됨 → DROP 없는 방식으로 바꿔 적용. 로컬 검증(2·4인자 호출, 값 검증, 한도, anon 차단) 후 적용, advisors 새 경고 없음
 - Edge Function `decision-ai` **v10 배포됨(10/16)**, 프롬프트 버전 `decision-v2`. 분야·시급도를 AI 입력 `context`로 전달, 시급도에 따라 `nextAction.timeframeHours`를 24/48/72로 고정.
-  분야·시급도가 없으면(현재 출시 앱) `context=null`로 이전과 같게 동작. 저장소 파일이 배포본 그대로
+  분야·시급도가 없으면(현재 출시 앱) `context=null`로 이전과 같게 동작. 저장소 파일이 배포본 그대로.
+  10/16 16:13(UTC) 출시 앱으로 실사용 확인: 질문(약 4.5초)·6축 분석(약 5초) 모두 200, 결과 `decision-v2`로 저장
 - 광고 보상 한계: 클라이언트 신고 기반(서버 검증 불가), 익명 계정 재생성 시 무료 한도 초기화. 전체 일일 100회 상한이 최종 방어선
 - 출시 순서: ~~① context 마이그레이션 적용~~ → ~~② decision-ai 배포~~ (10/16 완료) → ③ `.env`에 `VITE_AD_GROUP_REWARDED` + 정책 새 시행일 → `npm run build:release`
   → ④ 샌드박스 테스트 → ⑤ 검토·출시 → ⑥ `free_daily_limit = 3` → ⑦ 콘솔에서 `result_viewed`를 전환 지표로 등록
