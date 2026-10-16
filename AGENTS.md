@@ -1,6 +1,6 @@
 # 인수인계: 결정해줘 / Bestchoice (앱인토스 미니앱)
 
-다른 AI·개발자가 이어서 작업하기 위한 문서. 마지막 갱신 2026-10-16 (AI 켜진 `20261015-4` 정식 출시·실기기 확인).
+다른 AI·개발자가 이어서 작업하기 위한 문서. 마지막 갱신 2026-10-16 (분야·시급도 DB 적용, decision-ai v10 배포).
 이 저장소 작업 브랜치: `claude/bestchoice-miniapp-dev-ar5jtm`.
 
 ## 0. 출시 현황 (2026-10-16) — 먼저 읽을 것
@@ -37,12 +37,13 @@
 - DB
   - `20261016144810_bc_free_quota_and_ad_bonus.sql` **원격 적용됨(10/16)**. 무료 한도는 `bc_app_settings.free_daily_limit`(현재 **20** = 기존과 동일).
     **광고 버전 출시 직후** `update public.bc_app_settings set free_daily_limit = 3 where id = 1;` (되돌리기는 20)
-  - `20261016000001_bc_decision_context.sql` **원격 미적용**(10/16 적용 시도가 타임아웃·취소됨). `bc_decisions.user_category/urgency` 추가, `bc_create_decision`을 4인자(기본값 있음)로 교체.
-    기존 2인자 호출과 호환. **새 앱 샌드박스 테스트 전에 적용 필요**(새 앱은 4인자로 호출). 적용 후 로컬 파일명을 원격 버전으로 변경
-- Edge Function `decision-ai`: 분야·시급도를 AI 입력 `context`로 전달, 시급도에 따라 `nextAction.timeframeHours`를 24/48/72로 고정.
-  저장소 코드만 수정, **미배포**. 위 context 마이그레이션 적용 **후에** 배포(새 컬럼 select)
+  - `20261016150131_bc_decision_context.sql` **원격 적용됨(10/16)**. `bc_decisions.user_category/urgency` 추가, `bc_create_decision` 4인자 버전(기본값 없음) 추가.
+    2인자 버전은 4인자로 위임하는 호환용으로 유지(PostgREST가 보낸 인자 이름으로 고르므로 모호하지 않음. 구버전 앱이 내려간 뒤 삭제 가능).
+    첫 시도는 `DROP FUNCTION`이 들어 있어 MCP 적용이 확인 대기 후 취소됨 → DROP 없는 방식으로 바꿔 적용. 로컬 검증(2·4인자 호출, 값 검증, 한도, anon 차단) 후 적용, advisors 새 경고 없음
+- Edge Function `decision-ai` **v10 배포됨(10/16)**, 프롬프트 버전 `decision-v2`. 분야·시급도를 AI 입력 `context`로 전달, 시급도에 따라 `nextAction.timeframeHours`를 24/48/72로 고정.
+  분야·시급도가 없으면(현재 출시 앱) `context=null`로 이전과 같게 동작. 저장소 파일이 배포본 그대로
 - 광고 보상 한계: 클라이언트 신고 기반(서버 검증 불가), 익명 계정 재생성 시 무료 한도 초기화. 전체 일일 100회 상한이 최종 방어선
-- 출시 순서: ① context 마이그레이션 적용 → ② decision-ai 배포 → ③ `.env`에 `VITE_AD_GROUP_REWARDED` + 정책 새 시행일 → `npm run build:release`
+- 출시 순서: ~~① context 마이그레이션 적용~~ → ~~② decision-ai 배포~~ (10/16 완료) → ③ `.env`에 `VITE_AD_GROUP_REWARDED` + 정책 새 시행일 → `npm run build:release`
   → ④ 샌드박스 테스트 → ⑤ 검토·출시 → ⑥ `free_daily_limit = 3` → ⑦ 콘솔에서 `result_viewed`를 전환 지표로 등록
 
 ### 브랜치

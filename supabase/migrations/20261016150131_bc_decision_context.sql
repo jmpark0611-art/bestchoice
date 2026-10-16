@@ -1,6 +1,8 @@
 -- 사용자가 고른 분야·시급도를 저장해 AI 분석에 반영 (2026-10-16, 토스 노출 정책 UX 원칙 대응)
 -- 이전에는 앱이 분야·시급도를 필수로 받으면서 서버로 보내지 않아 결과에 반영되지 않았다.
 -- 20261016144810(무료 한도·광고 보너스) 다음에 적용. 적용 후 decision-ai Edge Function 새 버전 배포(새 컬럼을 읽음).
+-- DROP 없이 오버로드를 추가하는 방식(원격 적용 도구가 DROP 포함 시 확인 대기 후 취소함).
+set local lock_timeout = '5s';
 
 alter table public.bc_decisions
   add column user_category text,
@@ -10,15 +12,15 @@ alter table public.bc_decisions
   add constraint bc_decisions_urgency_check
     check (urgency is null or urgency in ('today','week','relaxed'));
 
--- 인자 2개 버전을 남기면 PostgREST 호출이 모호해지므로 삭제 후 기본값 있는 4개 인자 버전으로 교체.
--- 기존 앱(인자 2개 호출)은 기본값으로 그대로 동작한다.
-drop function if exists public.bc_create_decision(uuid, text);
+-- 4개 인자 버전을 기본값 없이 추가한다. PostgREST는 보낸 인자 이름으로 함수를 고르므로
+-- 기존 앱(p_id, p_concern 2개)은 2인자 버전, 새 앱(4개 모두, 값 없으면 null)은 4인자 버전으로 간다.
+-- 기본값을 주면 2개만 보낸 호출이 두 함수에 모두 맞아 모호해진다. 2인자 버전은 아래에서 4인자로 위임.
 
 CREATE OR REPLACE FUNCTION public.bc_create_decision(
   p_id uuid,
   p_concern text,
-  p_category text DEFAULT NULL,
-  p_urgency text DEFAULT NULL
+  p_category text,
+  p_urgency text
 )
  RETURNS uuid
  LANGUAGE plpgsql
@@ -65,3 +67,14 @@ end $function$;
 
 revoke execute on function public.bc_create_decision(uuid, text, text, text) from public, anon;
 grant execute on function public.bc_create_decision(uuid, text, text, text) to authenticated;
+
+-- 기존 앱 호환용. 구버전 출시본이 내려간 뒤 삭제해도 된다.
+CREATE OR REPLACE FUNCTION public.bc_create_decision(p_id uuid, p_concern text)
+ RETURNS uuid
+ LANGUAGE sql
+ SECURITY DEFINER
+ SET search_path TO ''
+AS $function$ select public.bc_create_decision(p_id, p_concern, null::text, null::text) $function$;
+
+revoke execute on function public.bc_create_decision(uuid, text) from public, anon;
+grant execute on function public.bc_create_decision(uuid, text) to authenticated;
