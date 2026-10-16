@@ -15,7 +15,6 @@ export function ResultView({ analysis, highStakes }: { analysis: Analysis; highS
   return (
     <div className="result-report">
       <PageTop title="이렇게 판단했어요" subtitle={analysis.summary} />
-      <div className="result-badge">AI 판단 리포트</div>
       <Card title="추천 결과" highlight>
         <p className="big">{recommendationLabel(analysis)}</p>
         <Gap size={8} />

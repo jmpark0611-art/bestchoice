@@ -447,3 +447,55 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) { .question-card.active-card { animation: none; } }
+
+/* 입력 화면: 선택 칩 (2026-10-16 노출 정책 UX 기준에 맞춰 장식 대신 단순 칩) */
+.input-group {
+  margin-top: 24px;
+}
+
+.group-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.chip {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--bc-border);
+  border-radius: 20px;
+  background: var(--bc-bg);
+  color: var(--bc-text);
+  font: inherit;
+  font-size: 15px;
+}
+
+.chip[aria-checked='true'] {
+  border-color: var(--bc-blue);
+  background: var(--bc-blue-weak);
+  color: var(--bc-blue);
+  font-weight: 600;
+}
+
+.chip.subtle {
+  min-height: 32px;
+  padding: 4px 12px;
+  border-color: transparent;
+  background: var(--bc-subtle);
+  color: var(--bc-sub);
+  font-size: 13px;
+}
+
+.question-status {
+  margin: 8px 0 16px;
+  color: var(--bc-sub);
+  font-size: 14px;
+  font-weight: 600;
+}

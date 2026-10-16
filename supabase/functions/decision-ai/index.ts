@@ -176,6 +176,26 @@ stage=analyze: kind=analysis, clarification=null. 제공된 선택지 ID 또는 
 판단강도는 확률이 아니다. 근거, 놓친 요소 1~3개, 24~72시간 안의 작은 행동 한 개, 반대 선택이 유리해지는 조건을 포함한다.
 disclaimer에는 AI의 판단 보조이며 최종 결정은 사용자에게 있음을 안내한다.`;
 
+// 2026-10-16: 사용자가 고른 분야·시급도 반영
+var URGENCY_HOURS = { today: 24, week: 48, relaxed: 72 };
+var CATEGORY_LABELS = { career: "일·커리어", money: "소비·돈", relationship: "관계", growth: "도전·성장", other: "기타" };
+var contextInstructions = `
+input.context는 사용자가 직접 고른 참고 정보다(없을 수 있음).
+context.userCategory가 있으면 고민 분야 판단에 참고하되, 고민 내용과 다르면 고민 내용을 우선한다.
+context.urgency가 있으면 결정 기한으로 반영한다. today=오늘 안에 결정, week=이번 주 안에 결정, relaxed=시간 여유가 있음.
+analysis.nextAction.timeframeHours는 today=24, week=48, relaxed=72로 맞추고, 그 기한 안에 할 수 있는 행동을 제안한다.`;
+function decisionContext(record) {
+  const context = {};
+  if (record.user_category && CATEGORY_LABELS[record.user_category]) context.userCategory = CATEGORY_LABELS[record.user_category];
+  if (record.urgency && URGENCY_HOURS[record.urgency]) context.urgency = record.urgency;
+  return Object.keys(context).length ? context : null;
+}
+function applyUrgency(output, urgency) {
+  const hours = URGENCY_HOURS[urgency];
+  if (hours && output.kind === "analysis" && output.analysis) output.analysis.nextAction.timeframeHours = hours;
+  return output;
+}
+
 // supabase/functions/_shared/openai.ts
 async function generateDecision(args) {
   const controller = new AbortController();
@@ -193,8 +213,8 @@ async function generateDecision(args) {
             model: args.model,
             store: false,
             max_output_tokens: 4500,
-            instructions: instructions + (attempt ? "\n직전 응답이 계약 검증에 실패했다. 정확한 분기, ID와 6축을 다시 확인하라." : ""),
-            input: JSON.stringify({ stage: args.stage, concern: args.concern, clarification: args.clarification ?? null, answers: args.answers }),
+            instructions: instructions + contextInstructions + (attempt ? "\n직전 응답이 계약 검증에 실패했다. 정확한 분기, ID와 6축을 다시 확인하라." : ""),
+            input: JSON.stringify({ stage: args.stage, concern: args.concern, context: args.context ?? null, clarification: args.clarification ?? null, answers: args.answers }),
             text: { format: { type: "json_schema", name: "decision_response", strict: true, schema: modelSchema } }
           })
         });
@@ -274,7 +294,7 @@ Deno.serve(async (req) => {
     return reply(400, { error: "INVALID_INPUT" });
   }
   const user = auth.user.id;
-  const { data: record, error } = await db.from("bc_decisions").select("concern_text,clarification_json").eq("id", input.decisionId).eq("user_id", user).maybeSingle();
+  const { data: record, error } = await db.from("bc_decisions").select("concern_text,clarification_json,user_category,urgency").eq("id", input.decisionId).eq("user_id", user).maybeSingle();
   if (error) return reply(503, { error: "STORAGE_ERROR" });
   if (!record) return reply(404, { error: "NOT_FOUND" });
   let prior;
@@ -294,7 +314,7 @@ Deno.serve(async (req) => {
   if (claim.data.state === "done") return reply(200, claim.data.output);
   if (claim.data.state !== "claimed") return reply(409, { error: claim.data.state === "running" ? "IN_PROGRESS" : "PREVIOUS_FAILED" });
   try {
-    const output = obviousCrisis(record.concern_text + " " + JSON.stringify(answers)) ? crisisOutput : await generateDecision({ apiKey, model, stage: input.stage, concern: record.concern_text, clarification: prior, answers });
+    const output = obviousCrisis(record.concern_text + " " + JSON.stringify(answers)) ? crisisOutput : applyUrgency(await generateDecision({ apiKey, model, stage: input.stage, concern: record.concern_text, context: decisionContext(record), clarification: prior, answers }), record.urgency);
     const saved = await db.rpc("bc_finish_ai", { ...base, p_output: output, p_answers: answers, p_model: model + "/" + promptVersion });
     if (saved.error || !saved.data) return reply(409, { error: "SAVE_UNCERTAIN" });
     return reply(200, output);

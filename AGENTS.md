@@ -26,20 +26,24 @@
 4. 검수 반려 시: 사유 확인 → `codex/review-remote-ai` 기반으로 수정 → `npm run build:release`로 재빌드
    (`app/.env`에 `VITE_ENABLE_AI=true`, 실제 publishable 키 필요. `.env`·`.ait`는 커밋 금지)
 
-### 수익화 작업 (2026-10-15 시작, **미출시·DB 미적용**)
-- 사용자 결정: **보상형 광고**, **하루 무료 3건**(이후 광고 1회 시청 = 1건, 하루 최대 5건 추가)
-- 코드(이 브랜치): `app/src/lib/rewardedAd.ts`(SDK `loadFullScreenAd`/`showFullScreenAd`, `userEarnedReward` 후 닫힐 때만 보상),
-  입력 화면 "오늘 남은 분석 N건" 표시와 "광고 보고 1건 더 받기" 다이얼로그, 테스트 47개 통과
-- DB: `supabase/migrations/20261016000000_bc_free_quota_and_ad_bonus.sql` (로컬 검증 완료, **원격 미적용**)
-  - `bc_create_decision`: 하루 20건 → 무료 3건 + 보너스, 초과 시 `FREE_LIMIT`
-  - `bc_get_quota()`, `bc_grant_ad_bonus()`(하루 5회, 30초 간격) 추가, 사용자 AI 호출 한도 10 → 20
-  - ⚠️ **광고 UI가 있는 앱 버전 출시 직전에 적용.** 먼저 적용하면 기존 버전 사용자가 3건 후 이유 없이 막힘.
-    적용 후 로컬 파일명을 원격 버전으로 바꾸고 advisors 점검
-  - 한계: 광고 보상은 클라이언트 신고 기반(서버 검증 불가)이고, 익명 계정을 새로 만들면 무료 3건이 초기화됨. 전체 일일 100회 상한이 최종 방어선
-- 출시 전에 필요한 것 (`npm run build:release`가 없으면 막음)
-  1. 콘솔에서 **보상형 광고 그룹 ID** 발급 → `app/.env`에 `VITE_AD_GROUP_REWARDED=...`
-  2. 개인정보처리방침·이용약관 광고 조항 추가됨 → **새 시행일** 기입(`[광고 버전 출시일 기입]` 자리)
-  3. ~~`20261015-4` 출시 후 진행~~ 조건 충족(10/16). 남은 것은 1·2
+### 다음 버전 작업 (수익화 + 노출 정책 대응, 2026-10-15~16, **미출시**)
+- 사용자 결정: **보상형 광고**, **하루 무료 3건**(이후 광고 1회 = 1건, 하루 최대 5건 추가), 노출 정책 문서 기반 개선 1~4번
+- 앱(이 브랜치, 테스트 54개 통과)
+  - `lib/rewardedAd.ts`: `loadFullScreenAd`/`showFullScreenAd`, `userEarnedReward` 후 닫힐 때만 보상. 입력 화면 "오늘 남은 분석 N건", 무료 소진 시 "광고 보고 1건 더 받기"
+  - `lib/analytics.ts`: `Analytics.log` 이벤트 `decision_submitted`, **`result_viewed`(콘솔 전환 지표로 등록할 것)**, `actual_choice_saved`, `ad_reward_earned`.
+    첫 실제 선택 기록 후 `Review.request` 1회
+  - 입력 화면: 퀘스트 장식(이모지, 🔮, 단계 지도) 제거, 분야·시급도를 **선택 사항**으로 바꾸고 서버로 전송(`createDecision(text, {category, urgency})`)
+  - 질문 화면: "단서 N개 발견", 카드 뭉치, QUESTION/A·B 토큰 제거. 버튼 "다음 질문"/"분석 결과 보기". 홈의 장식 그래픽 제거
+- DB
+  - `20261016144810_bc_free_quota_and_ad_bonus.sql` **원격 적용됨(10/16)**. 무료 한도는 `bc_app_settings.free_daily_limit`(현재 **20** = 기존과 동일).
+    **광고 버전 출시 직후** `update public.bc_app_settings set free_daily_limit = 3 where id = 1;` (되돌리기는 20)
+  - `20261016000001_bc_decision_context.sql` **원격 미적용**(10/16 적용 시도가 타임아웃·취소됨). `bc_decisions.user_category/urgency` 추가, `bc_create_decision`을 4인자(기본값 있음)로 교체.
+    기존 2인자 호출과 호환. **새 앱 샌드박스 테스트 전에 적용 필요**(새 앱은 4인자로 호출). 적용 후 로컬 파일명을 원격 버전으로 변경
+- Edge Function `decision-ai`: 분야·시급도를 AI 입력 `context`로 전달, 시급도에 따라 `nextAction.timeframeHours`를 24/48/72로 고정.
+  저장소 코드만 수정, **미배포**. 위 context 마이그레이션 적용 **후에** 배포(새 컬럼 select)
+- 광고 보상 한계: 클라이언트 신고 기반(서버 검증 불가), 익명 계정 재생성 시 무료 한도 초기화. 전체 일일 100회 상한이 최종 방어선
+- 출시 순서: ① context 마이그레이션 적용 → ② decision-ai 배포 → ③ `.env`에 `VITE_AD_GROUP_REWARDED` + 정책 새 시행일 → `npm run build:release`
+  → ④ 샌드박스 테스트 → ⑤ 검토·출시 → ⑥ `free_daily_limit = 3` → ⑦ 콘솔에서 `result_viewed`를 전환 지표로 등록
 
 ### 브랜치
 - 실제 출시 코드는 `codex/review-remote-ai`(Codex 작업: 퀘스트형 UI, appName 소문자 `bestchoice`, 정책 시행일 확정, 출시 전 점검·AI 스모크 테스트 스크립트).

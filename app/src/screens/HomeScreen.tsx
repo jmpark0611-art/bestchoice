@@ -23,11 +23,6 @@ export function HomeScreen() {
         <p className="home-kicker">생각이 복잡할 때</p>
         <h1>선택의 기준을<br /><em>또렷하게.</em></h1>
         <p className="home-description">고민을 들려주면 꼭 필요한 질문을 묻고<br />6가지 기준으로 차분하게 정리해 드려요.</p>
-        <div className="choice-visual" aria-hidden="true">
-          <div className="visual-path path-left"><span>선택 A</span></div>
-          <div className="visual-path path-right"><span>선택 B</span></div>
-          <div className="visual-result"><span>✓</span><b>나에게 맞는 선택</b></div>
-        </div>
       </section>
       <div className="section home-action">
         <Button display="block" onClick={() => navigate('/input')}>

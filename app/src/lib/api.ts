@@ -33,9 +33,19 @@ function rpcError(error: { message?: string } | null): never {
   throw new AppError(codeFromRpcMessage(error?.message));
 }
 
-export async function createDecision(concern: string): Promise<string> {
+export type DecisionContext = { category?: UserCategory; urgency?: Urgency };
+export type UserCategory = 'career' | 'money' | 'relationship' | 'growth' | 'other';
+export type Urgency = 'today' | 'week' | 'relaxed';
+
+/** 고민 등록. 사용자가 고른 분야·시급도는 AI 분석에 참고 정보로 전달된다 */
+export async function createDecision(concern: string, context: DecisionContext = {}): Promise<string> {
   const id = crypto.randomUUID();
-  const { error } = await getSupabase().rpc('bc_create_decision', { p_id: id, p_concern: concern.trim() });
+  const { error } = await getSupabase().rpc('bc_create_decision', {
+    p_id: id,
+    p_concern: concern.trim(),
+    p_category: context.category ?? null,
+    p_urgency: context.urgency ?? null,
+  });
   if (error) rpcError(error);
   return id;
 }

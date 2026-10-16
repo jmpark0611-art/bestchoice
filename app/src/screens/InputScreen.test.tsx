@@ -13,8 +13,8 @@ const quota = (remaining: number, canEarnBonus = true) => ({ freeLimit: 3, used:
 
 const long = '지금 회사에 남을지 새 회사로 옮길지 고민이에요. 연봉은 비슷해요.';
 const completeQuest = async (user: ReturnType<typeof userEvent.setup>) => {
-  await user.click(screen.getByRole('button', { name: '일·커리어' }));
-  await user.click(screen.getByRole('button', { name: '이번 주' }));
+  await user.click(screen.getByRole('radio', { name: '일·커리어' }));
+  await user.click(screen.getByRole('radio', { name: '이번 주' }));
 };
 
 describe('InputScreen', () => {
@@ -31,7 +31,7 @@ describe('InputScreen', () => {
     await user.type(box, '짧은 고민');
     await user.tab();
     expect(screen.getByText(/20자 이상 적어주세요/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '질문 카드 열기' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '질문 받기' })).toBeDisabled();
   });
 
   it('AI 이용 안내를 보여준다', () => {
@@ -46,8 +46,8 @@ describe('InputScreen', () => {
     renderAt('/input', '/input', <InputScreen />);
     await completeQuest(user);
     await user.type(screen.getByRole('textbox', { name: '고민 내용' }), long);
-    await user.click(screen.getByRole('button', { name: '질문 카드 열기' }));
-    expect(api.createDecision).toHaveBeenCalledWith(long);
+    await user.click(screen.getByRole('button', { name: '질문 받기' }));
+    expect(api.createDecision).toHaveBeenCalledWith(long, { category: 'career', urgency: 'week' });
     expect(await screen.findByText('other-page')).toBeInTheDocument();
   });
 
@@ -57,10 +57,10 @@ describe('InputScreen', () => {
     renderAt('/input', '/input', <InputScreen />);
     await completeQuest(user);
     await user.type(screen.getByRole('textbox', { name: '고민 내용' }), long);
-    await user.click(screen.getByRole('button', { name: '질문 카드 열기' }));
+    await user.click(screen.getByRole('button', { name: '질문 받기' }));
     expect((await screen.findAllByText(/오늘은 고민을 더 등록할 수 없어요/)).length).toBeGreaterThan(0);
     // 토스트가 떠 있는 동안 TDS가 하단 CTA를 접근성 트리에서 숨기므로 텍스트로 찾는다
-    await waitFor(() => expect(screen.getByText('질문 카드 열기').closest('button')).toBeEnabled());
+    await waitFor(() => expect(screen.getByText('질문 받기').closest('button')).toBeEnabled());
   });
 
   it('남은 무료 분석 수를 보여준다', async () => {
@@ -72,7 +72,7 @@ describe('InputScreen', () => {
   const fillAndSubmit = async (user: ReturnType<typeof userEvent.setup>) => {
     await completeQuest(user);
     await user.type(screen.getByRole('textbox', { name: '고민 내용' }), long);
-    await user.click(screen.getByText('질문 카드 열기').closest('button')!);
+    await user.click(screen.getByText('질문 받기').closest('button')!);
   };
 
   it('무료를 다 쓰면 광고를 끝까지 본 뒤 1건을 받아 등록한다', async () => {
@@ -87,7 +87,7 @@ describe('InputScreen', () => {
     await user.click(await screen.findByRole('button', { name: '광고 보고 1건 더 받기' }));
     expect(await screen.findByText('other-page')).toBeInTheDocument();
     expect(api.grantAdBonus).toHaveBeenCalledTimes(1);
-    expect(api.createDecision).toHaveBeenCalledWith(long);
+    expect(api.createDecision).toHaveBeenCalledWith(long, { category: 'career', urgency: 'week' });
   });
 
   it('광고를 중간에 닫으면 보상 없이 등록하지 않는다', async () => {
@@ -138,5 +138,24 @@ describe('InputScreen', () => {
     await user.click(await screen.findByRole('button', { name: '광고 보고 1건 더 받기' }));
     expect(await screen.findByText('other-page')).toBeInTheDocument();
     expect(api.createDecision).toHaveBeenCalledTimes(2);
+  });
+
+  it('분야와 시급도는 선택하지 않아도 등록할 수 있다', async () => {
+    api.createDecision.mockResolvedValue('new-id');
+    const user = userEvent.setup();
+    renderAt('/input', '/input', <InputScreen />);
+    await user.type(screen.getByRole('textbox', { name: '고민 내용' }), long);
+    await user.click(screen.getByText('질문 받기').closest('button')!);
+    expect(api.createDecision).toHaveBeenCalledWith(long, { category: undefined, urgency: undefined });
+  });
+
+  it('선택한 칩을 다시 누르면 선택이 풀린다', async () => {
+    const user = userEvent.setup();
+    renderAt('/input', '/input', <InputScreen />);
+    const chip = screen.getByRole('radio', { name: '오늘' });
+    await user.click(chip);
+    expect(chip).toHaveAttribute('aria-checked', 'true');
+    await user.click(chip);
+    expect(chip).toHaveAttribute('aria-checked', 'false');
   });
 });

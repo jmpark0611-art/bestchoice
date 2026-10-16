@@ -6,6 +6,7 @@ import { QuestionsForm } from '../components/QuestionsForm';
 import { ErrorView, Gap, LoadingView, Page } from '../components/ui';
 import { getDecision, requestAI, saveActualChoice, type DecisionDetail } from '../lib/api';
 import type { Answer, AnswerValue, ChoiceType } from '../lib/contract';
+import { logEvent, requestReviewOnce } from '../lib/analytics';
 import { AppError, errorMessage } from '../lib/errors';
 import { aiEnabled } from '../lib/supabase';
 
@@ -101,15 +102,29 @@ export function DecisionScreen() {
   const saveChoice = async (type: ChoiceType, note: string) => {
     setBusy('save');
     try {
+      const first = !detail?.choiceType;
       await saveActualChoice(id, type, note);
       await reload();
       openToast('기록했어요');
+      if (first) {
+        logEvent('actual_choice_saved', { choice: type });
+        requestReviewOnce();
+      }
     } catch (e) {
       openToast(errorMessage(codeOf(e)));
     } finally {
       setBusy(null);
     }
   };
+
+  // 콘솔 전환 지표: 결과 리포트 열람 (같은 화면에서 한 번만)
+  const viewedLogged = useRef(false);
+  useEffect(() => {
+    if (view === 'result' && !viewedLogged.current) {
+      viewedLogged.current = true;
+      logEvent('result_viewed', { safety: detail?.safetyMode });
+    }
+  }, [view, detail?.safetyMode]);
 
   const home = () => navigate('/', { replace: true });
 

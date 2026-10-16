@@ -37,9 +37,11 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
 
   return (
     <Page>
-      <PageTop title="질문 카드를 열어볼게요" subtitle="한 장씩 답하면 선택의 기준이 선명해져요." />
+      <PageTop title="3가지만 더 알려주세요" subtitle="답에 따라 추천이 달라져요." />
       <div className="progress-track" aria-label={`질문 ${answeredCount}개 답변 완료`}><span style={{ width: `${(answeredCount / clarification.questions.length) * 100}%` }} /></div>
-      <div className="question-status section"><b>{step + 1} / {clarification.questions.length}</b><span>단서 {answeredCount}개 발견</span></div>
+      <p className="question-status section">
+        질문 {step + 1} / {clarification.questions.length}
+      </p>
       {notice && (
         <>
           <p className="section muted">{notice}</p>
@@ -50,11 +52,10 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
         <p>{clarification.summary}</p>
       </Card>
       <Gap size={24} />
-      <div className="question-deck" key={question.id}>
-        <div className="deck-card back-one" aria-hidden="true" /><div className="deck-card back-two" aria-hidden="true" />
-        <div className="question question-card active-card">
+      <div key={question.id}>
+        <div className="question">
           <p className="question-title">
-            <span className="question-number">QUESTION {step + 1}</span>{question.text}
+            {question.text}
             {question.inputType === 'multiple' && <span className="muted"> (여러 개 선택)</span>}
           </p>
           {question.inputType === 'text' ? (
@@ -70,7 +71,7 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
             </div>
           ) : (
             <div className="choices" role={question.inputType === 'single' ? 'radiogroup' : 'group'} aria-label={question.text}>
-              {question.choices?.map((c, choiceIndex) => {
+              {question.choices?.map((c) => {
                 const v = answers[question.id];
                 const selected = question.inputType === 'single' ? v === c.id : Array.isArray(v) && v.includes(c.id);
                 return (
@@ -82,14 +83,16 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
                     aria-pressed={selected}
                     onClick={() => (question.inputType === 'single' ? set(question.id, c.id) : toggle(question.id, c.id))}
                   >
-                    <span className="choice-token" aria-hidden="true">{String.fromCharCode(65 + choiceIndex)}</span>{c.label}<span className="choice-check" aria-hidden="true">✓</span>
+                    {c.label}
                   </button>
                 );
               })}
             </div>
           )}
           <div className="card-navigation">
-            {step > 0 && <button type="button" className="quest-back" onClick={() => setStep(step - 1)}>이전 카드</button>}
+            {step > 0 && <button type="button" className="link-button" onClick={() => setStep(step - 1)}>
+                이전 질문
+              </button>}
           </div>
         </div>
       </div>
@@ -98,7 +101,7 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
         loading={submitting}
         onClick={() => last ? onSubmit(toAnswerList(clarification.questions, answers), answers as Record<string, AnswerValue>) : setStep(step + 1)}
       >
-        {last ? '결과 리포트 열기' : '다음 카드 뒤집기'}
+        {last ? '분석 결과 보기' : '다음 질문'}
       </FixedBottomCTA>
     </Page>
   );
