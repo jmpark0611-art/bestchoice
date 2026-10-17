@@ -33,7 +33,6 @@ body {
 
 .page {
   min-height: 100vh;
-  padding-bottom: calc(120px + env(safe-area-inset-bottom));
   background: linear-gradient(180deg, #f7faff 0, #fff 320px);
 }
 
@@ -41,6 +40,9 @@ body {
   width: 100%;
   max-width: 560px;
   min-height: 100vh;
+  min-height: 100dvh;
+  /* 하단 고정 버튼 자리. .page가 아니라 여기 두어야 높이 100vh + 여백으로 늘 스크롤되는 문제가 없다 */
+  padding-bottom: calc(104px + env(safe-area-inset-bottom));
   margin: 0 auto;
   background: #fff;
   overflow: hidden;
@@ -405,7 +407,6 @@ body {
 }
 
 /* 2026-10-17 단순화: 짧은 문구, 결론 먼저, 자세한 내용은 눌러서 */
-.home-hero h1 { font-size: 44px; }
 .home-description { font-size: 18px; }
 .steps { display: flex; gap: 6px; margin: 20px 0 0; padding: 0; list-style: none; counter-reset: step; }
 .steps li { display: flex; align-items: center; gap: 6px; color: var(--bc-hint); font-size: 14px; }
@@ -434,3 +435,74 @@ details summary::-webkit-details-marker { display: none; }
 .card.more[open] summary::after { content: '−'; }
 .card.more[open] summary { margin-bottom: 8px; }
 .small { font-size: 12px; }
+
+/* 2026-10-17 귀여운 제목 글꼴(주아) + 폰 한 화면 비율 */
+:root { --bc-display: 'Jua', 'Toss Product Sans', -apple-system, 'Apple SD Gothic Neo', sans-serif; }
+.display, .home-hero h1, .question-title, .section-label, .group-title, .card h3, .result-kicker,
+.brand-pill, .steps b, .card.more summary, .center .big {
+  font-family: var(--bc-display);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* 홈: 하단 고정 버튼이 없으니 여백 대신 화면 높이에 맞춰 배치 */
+.page-inner:has(.home) { padding-bottom: env(safe-area-inset-bottom); }
+.home { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+.home > :last-child { padding-bottom: 12px; }
+/* 남는 높이는 제목+버튼 덩어리가 위아래로 나눠 가져 여백이 한쪽에 몰리지 않게 */
+.home-top { padding-top: 16px; }
+.home-main { flex: 1 0 auto; display: flex; flex-direction: column; justify-content: center; min-height: 360px; max-height: 520px; }
+.home-hero { padding: 0 24px 4px; background: none; }
+.hero-face { margin: 18px 0 2px; font-size: 52px; line-height: 1; animation: bob 2.6s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-6px) rotate(-4deg); } }
+@media (prefers-reduced-motion: reduce) { .hero-face { animation: none; } }
+.home-hero h1 { font-size: 46px; line-height: 1.2; }
+.home-description { margin: 8px 0 0; }
+.steps { margin-top: 14px; }
+.home-action { padding-top: 20px; }
+.section-label { margin-bottom: 10px; font-size: 18px; }
+
+/* 입력: 칩과 간격을 줄여 한 화면에 */
+.input-group { margin-top: 14px; }
+.group-title { margin-bottom: 8px; font-size: 17px; }
+.group-title .muted { font-family: inherit; font-size: 13px; }
+.chip-row { gap: 6px; }
+.chip-row.one-line { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.chip-row.one-line::-webkit-scrollbar { display: none; }
+.chip-row.one-line .chip { flex: 0 0 auto; }
+.chip { min-height: 36px; padding: 6px 13px; font-size: 14px; }
+.chip.subtle { min-height: 30px; }
+.counter { padding-top: 2px; }
+.quota-hint { margin: 0; font-size: 13px; }
+
+/* 질문 */
+.question-title { margin-bottom: 14px; font-size: 24px; line-height: 1.35; }
+.choice { min-height: 50px; padding: 12px 16px; }
+.progress-track { margin-bottom: 16px; }
+
+/* 결과: 기준은 한 줄씩 */
+.result-kicker { margin-top: 12px; }
+.card { padding: 16px 18px; }
+.axes { gap: 12px; }
+.axis > summary.axis-row { display: grid; grid-template-columns: 92px 1fr 18px; align-items: center; gap: 10px; }
+.axis-name { font-size: 14px; font-weight: 600; }
+.axis-row .axis-bar { margin: 0; height: 8px; }
+.axis-score { color: var(--bc-blue); font-size: 14px; font-weight: 700; text-align: right; }
+.axis[open] .axis-text { margin: 6px 0 2px; }
+.tap-hint { margin-top: 10px; }
+.card.more { padding-top: 14px; padding-bottom: 14px; }
+.question { padding-bottom: 12px; }
+.choice-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.choice.compact { min-height: 46px; justify-content: center; padding: 10px 6px; font-size: 14px; text-align: center; }
+
+@media (max-height: 700px) {
+  .hero-face { display: none; }
+  /* 작은 폰 입력 화면: 예시 칩은 숨기고(예시는 placeholder에 있음) 간격·입력칸을 줄인다 */
+  .input-group { margin-top: 8px; }
+  .group-title { margin-bottom: 6px; font-size: 16px; }
+  .chip { min-height: 32px; padding: 4px 12px; }
+  [aria-label='고민 예시'] { display: none; }
+  .input-group textarea { min-height: 84px !important; height: 84px; }
+  .home-hero h1 { font-size: 40px; }
+  .question-title { font-size: 21px; }
+}

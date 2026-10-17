@@ -11,10 +11,10 @@ import { parseMarkdown } from '../lib/markdown';
 import { rewardedAdAvailable, watchRewardedAd } from '../lib/rewardedAd';
 
 const CATEGORIES: [UserCategory, string][] = [
-  ['career', '일·커리어'],
-  ['money', '소비·돈'],
+  ['career', '일'],
+  ['money', '돈'],
   ['relationship', '관계'],
-  ['growth', '도전·성장'],
+  ['growth', '도전'],
   ['other', '기타'],
 ];
 const URGENCIES: [Urgency, string][] = [
@@ -119,7 +119,7 @@ export function InputScreen() {
       <PageTop title="무슨 고민이에요?" />
       <section className="input-group">
         <h2 className="section group-title">분야 <span className="muted">선택</span></h2>
-        <div className="chip-row section" role="radiogroup" aria-label="고민 분야">
+        <div className="chip-row one-line section" role="radiogroup" aria-label="고민 분야">
           {CATEGORIES.map(([value, label]) => (
             <button
               type="button"
@@ -153,7 +153,7 @@ export function InputScreen() {
       </section>
       <section className="input-group">
         <h2 className="section group-title">고민</h2>
-        <div className="chip-row section" aria-label="고민 예시">
+        <div className="chip-row one-line section" aria-label="고민 예시">
           {EXAMPLES.map(([label, value]) => (
             <button type="button" key={label} className="chip subtle" onClick={() => setText(value)}>
               {label}
@@ -163,7 +163,7 @@ export function InputScreen() {
         <TextArea
           variant="box"
           placeholder="예) 남을까, 옮길까? 연봉은 낮아도 배울 게 많은 곳이에요."
-          minHeight={180}
+          minHeight={112}
           maxLength={CONCERN_MAX}
           value={text}
           hasError={touched && !!error}
@@ -184,7 +184,7 @@ export function InputScreen() {
               : '오늘 분석을 모두 썼어요. 내일 다시 이용해주세요.'}
         </p>
       )}
-      <Gap size={24} />
+      <Gap size={8} />
       <details className="notice-box section">
         <summary>AI가 분석해요 · 민감한 개인정보는 적지 마세요</summary>
         <ul className="notice" aria-label="AI 이용 안내">

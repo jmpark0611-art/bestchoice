@@ -9,7 +9,7 @@ export function Page({ children }: { children: ReactNode }) {
 export function PageTop({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <Top
-      title={<Top.TitleParagraph>{title}</Top.TitleParagraph>}
+      title={<Top.TitleParagraph><span className="display">{title}</span></Top.TitleParagraph>}
       subtitleBottom={subtitle ? <Top.SubtitleParagraph>{subtitle}</Top.SubtitleParagraph> : undefined}
     />
   );

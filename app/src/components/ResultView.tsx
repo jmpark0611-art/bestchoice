@@ -36,14 +36,12 @@ export function ResultView({ analysis, highStakes }: { analysis: Analysis; highS
         <div className="axes">
           {analysis.axes.map((a) => (
             <details key={a.key} className="axis">
-              <summary>
-                <span className="axis-head">
-                  <span>{AXIS_LABELS[a.key]}</span>
-                  <span aria-label={`5점 중 ${a.score}점`}>{a.score}/5</span>
-                </span>
+              <summary className="axis-row">
+                <span className="axis-name">{AXIS_LABELS[a.key]}</span>
                 <span className="axis-bar" aria-hidden>
                   <span style={{ width: `${a.score * 20}%` }} />
                 </span>
+                <span className="axis-score" aria-label={`5점 중 ${a.score}점`}>{a.score}</span>
               </summary>
               <p className="axis-text">{a.rationale}</p>
               {a.uncertainty && <p className="axis-text muted">불확실: {a.uncertainty}</p>}
@@ -76,6 +74,9 @@ export function ResultView({ analysis, highStakes }: { analysis: Analysis; highS
   );
 }
 
+/** 한 줄에 3개가 들어가도록 짧게. 기록 화면은 문장형 CHOICE_LABELS를 그대로 쓴다 */
+const CHOICE_SHORT: Record<ChoiceType, string> = { followed: '추천대로', other: '다르게', undecided: '아직 고민 중' };
+
 type ChoiceProps = {
   saved: { type: ChoiceType; note: string } | null;
   saving: boolean;
@@ -90,24 +91,34 @@ export function ActualChoiceForm({ saved, saving, onSave }: ChoiceProps) {
   return (
     <section className="question">
       <p className="question-title">그래서, 어떻게 했어요?</p>
-      <div className="choices" role="radiogroup" aria-label="실제 선택">
+      <div className="choice-row" role="radiogroup" aria-label="실제 선택">
         {(Object.keys(CHOICE_LABELS) as ChoiceType[]).map((t) => (
-          <button type="button" key={t} className="choice" aria-pressed={type === t} onClick={() => setType(t)}>
-            {CHOICE_LABELS[t]}
+          <button
+            type="button"
+            key={t}
+            className="choice compact"
+            aria-label={CHOICE_LABELS[t]}
+            aria-pressed={type === t}
+            onClick={() => setType(t)}
+          >
+            {CHOICE_SHORT[t]}
           </button>
         ))}
       </div>
       <Gap size={8} />
-      <div className="bleed">
-        <TextArea
-          variant="box"
-          placeholder="메모 (선택)"
-          maxLength={NOTE_MAX}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          aria-label="메모"
-        />
-      </div>
+      {/* 메모는 선택한 뒤에만 보여 화면을 짧게 유지 */}
+      {(type || note) && (
+        <div className="bleed">
+          <TextArea
+            variant="box"
+            placeholder="메모 (선택)"
+            maxLength={NOTE_MAX}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            aria-label="메모"
+          />
+        </div>
+      )}
       <Gap size={8} />
       <Button
         display="block"

@@ -13,7 +13,7 @@ const quota = (remaining: number, canEarnBonus = true) => ({ freeLimit: 3, used:
 
 const long = '지금 회사에 남을지 새 회사로 옮길지 고민이에요. 연봉은 비슷해요.';
 const completeQuest = async (user: ReturnType<typeof userEvent.setup>) => {
-  await user.click(screen.getByRole('radio', { name: '일·커리어' }));
+  await user.click(screen.getByRole('radio', { name: '일' }));
   await user.click(screen.getByRole('radio', { name: '이번 주' }));
 };
 
