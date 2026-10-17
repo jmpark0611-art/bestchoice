@@ -13,7 +13,7 @@ describe('SettingsScreen', () => {
 
   it('운영자 정보와 문의 이메일을 보여준다', () => {
     renderAt('/settings', '/settings', <SettingsScreen />);
-    expect(screen.getByText(/에스케이컴퍼니/)).toBeInTheDocument();
+    expect(screen.getByText(/에스제이컴퍼니/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'jmpark0611@gmail.com' })).toHaveAttribute(
       'href',
       'mailto:jmpark0611@gmail.com',

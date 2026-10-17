@@ -5,7 +5,7 @@ import { deleteAccount, deleteAllDecisions } from '../lib/api';
 import { AppError, errorMessage } from '../lib/errors';
 import { ensureSession } from '../lib/supabase';
 
-export const OPERATOR = { company: '에스케이컴퍼니', ceo: '박지민', email: 'jmpark0611@gmail.com' };
+export const OPERATOR = { company: '에스제이컴퍼니', ceo: '박지민', email: 'jmpark0611@gmail.com' };
 
 export function SettingsScreen() {
   const navigate = useNavigate();
