@@ -29,7 +29,12 @@ const key = env.VITE_SUPABASE_PUBLISHABLE_KEY ?? '';
 if (url !== 'https://njrtcxohbkfgrgwhlvua.supabase.co') failures.push('VITE_SUPABASE_URL이 Bestchoice 프로젝트와 일치하지 않습니다.');
 if (!key.startsWith('sb_publishable_') || key.includes('xxx')) failures.push('VITE_SUPABASE_PUBLISHABLE_KEY가 실제 publishable 키가 아닙니다.');
 if (env.VITE_ENABLE_AI !== 'true') failures.push('VITE_ENABLE_AI=true가 아닙니다. AI가 꺼진 번들은 출시할 수 없습니다.');
-if (!env.VITE_AD_GROUP_REWARDED) failures.push('VITE_AD_GROUP_REWARDED(보상형 광고 그룹 ID)가 없습니다. 무료 3건 이후 사용자가 막힙니다.');
+// 광고 그룹 ID가 있으면 광고 버전, 없으면 광고 없는 버전. 정책 문서가 어느 쪽과 맞는지 함께 검사한다.
+const adsOn = Boolean(env.VITE_AD_GROUP_REWARDED);
+const terms = fs.readFileSync(path.resolve(cwd, '../docs/legal/terms-of-service.md'), 'utf8');
+const mentionsAds = /보상형 광고/.test(terms);
+if (adsOn && !mentionsAds) failures.push('광고 그룹 ID가 있는데 약관에 보상형 광고 조항이 없습니다. docs/legal/next/ 문서로 교체하세요.');
+if (!adsOn && mentionsAds) failures.push('광고 그룹 ID(VITE_AD_GROUP_REWARDED)가 없는데 약관에 보상형 광고 조항이 있습니다.');
 
 for (const file of ['../docs/legal/privacy-policy.md', '../docs/legal/terms-of-service.md']) {
   const content = fs.readFileSync(path.resolve(cwd, file), 'utf8');
@@ -44,4 +49,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('출시 사전점검 통과: Supabase 설정, AI 활성화, 광고 그룹 ID, 정책 시행일을 확인했습니다.');
+console.log(`출시 사전점검 통과: Supabase 설정, AI 활성화, 정책 시행일, 광고 ${adsOn ? '켜짐' : '꺼짐(무료 한도는 DB 설정값)'}을 확인했습니다.`);
