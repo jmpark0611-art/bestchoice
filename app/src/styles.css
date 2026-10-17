@@ -530,3 +530,6 @@ details summary::-webkit-details-marker { display: none; }
 .hero-face { margin-top: 0; font-size: 44px; }
 .home-hero h1 { font-size: 42px; }
 .home-examples .chip { font-size: 14px; }
+
+/* 10/17 앱 이름 "결정해지니Genie"(콘솔 앱 이름과 동일) */
+.brand-en { color: var(--bc-blue); }

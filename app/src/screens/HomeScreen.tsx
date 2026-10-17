@@ -24,7 +24,7 @@ export function HomeScreen() {
     <Page fixedCta={false}>
       <div className="home">
         <div className="section home-top">
-          <div className="brand-pill"><span className="brand-mark">✓</span> 결정해줘</div>
+          <div className="brand-pill"><span className="brand-mark">✓</span> <span>결정해지니<span className="brand-en">Genie</span></span></div>
         </div>
         {/* 제목과 시작 버튼을 한 덩어리로 세로 가운데에 둔다 */}
         <div className="home-main">
