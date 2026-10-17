@@ -24,7 +24,7 @@ export function HomeScreen() {
     <Page fixedCta={false}>
       <div className="home">
         <div className="section home-top">
-          <div className="brand-pill"><span className="brand-mark">✓</span> 결정해줘</div>
+          <div className="brand-pill"><span className="brand-mark">✓</span> 딱정해</div>
         </div>
         {/* 제목과 시작 버튼을 한 덩어리로 세로 가운데에 둔다 */}
         <div className="home-main">
@@ -47,7 +47,7 @@ export function HomeScreen() {
           </section>
           <div className="section home-action">
             <Button display="block" onClick={() => navigate('/input')}>
-              결정해줘
+              딱 정해줘
             </Button>
             {!aiEnabled() && (
               <>

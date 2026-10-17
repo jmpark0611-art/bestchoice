@@ -33,7 +33,7 @@ describe('HomeScreen', () => {
         </MemoryRouter>
       </TDSMobileAITProvider>,
     );
-    expect(screen.getByRole('button', { name: '결정해줘' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '딱 정해줘' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '이직할까?' }));
     expect(await screen.findByRole('textbox', { name: '고민 내용' })).toHaveValue(EXAMPLES[0][1]);
   });
