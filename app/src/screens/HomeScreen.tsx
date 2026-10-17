@@ -17,7 +17,7 @@ export function HomeScreen() {
   }, []);
 
   return (
-    <Page>
+    <Page fixedCta={false}>
       <div className="home">
         <div className="section home-top">
           <div className="brand-pill"><span className="brand-mark">✓</span> 결정해줘</div>

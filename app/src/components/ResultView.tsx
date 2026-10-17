@@ -36,12 +36,15 @@ export function ResultView({ analysis, highStakes }: { analysis: Analysis; highS
         <div className="axes">
           {analysis.axes.map((a) => (
             <details key={a.key} className="axis">
-              <summary className="axis-row">
-                <span className="axis-name">{AXIS_LABELS[a.key]}</span>
-                <span className="axis-bar" aria-hidden>
-                  <span style={{ width: `${a.score * 20}%` }} />
+              {/* iOS Safari 구버전은 summary 자체에 grid가 안 먹어 안쪽 span에 배치 */}
+              <summary>
+                <span className="axis-row">
+                  <span className="axis-name">{AXIS_LABELS[a.key]}</span>
+                  <span className="axis-bar" aria-hidden>
+                    <span style={{ width: `${a.score * 20}%` }} />
+                  </span>
+                  <span className="axis-score" aria-label={`5점 중 ${a.score}점`}>{a.score}</span>
                 </span>
-                <span className="axis-score" aria-label={`5점 중 ${a.score}점`}>{a.score}</span>
               </summary>
               <p className="axis-text">{a.rationale}</p>
               {a.uncertainty && <p className="axis-text muted">불확실: {a.uncertainty}</p>}
@@ -52,7 +55,7 @@ export function ResultView({ analysis, highStakes }: { analysis: Analysis; highS
       </Card>
       <Gap />
       <details className="card more">
-        <summary>놓치기 쉬운 점 {analysis.missedFactors.length}가지</summary>
+        <summary><span className="more-head">놓치기 쉬운 점 {analysis.missedFactors.length}가지</span></summary>
         <ul className="bullets">
           {analysis.missedFactors.map((m) => (
             <li key={m}>{m}</li>
@@ -61,7 +64,7 @@ export function ResultView({ analysis, highStakes }: { analysis: Analysis; highS
       </details>
       <Gap size={8} />
       <details className="card more">
-        <summary>이럴 땐 다른 선택이 나아요</summary>
+        <summary><span className="more-head">이럴 땐 다른 선택이 나아요</span></summary>
         <ul className="bullets">
           {analysis.switchConditions.map((s) => (
             <li key={s}>{s}</li>

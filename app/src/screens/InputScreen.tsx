@@ -152,7 +152,7 @@ export function InputScreen() {
         </div>
       </section>
       <section className="input-group">
-        <h2 className="section group-title">고민</h2>
+        <h2 className="section group-title concern">고민</h2>
         <div className="chip-row one-line section" aria-label="고민 예시">
           {EXAMPLES.map(([label, value]) => (
             <button type="button" key={label} className="chip subtle" onClick={() => setText(value)}>
@@ -186,7 +186,7 @@ export function InputScreen() {
       )}
       <Gap size={8} />
       <details className="notice-box section">
-        <summary>AI가 분석해요 · 민감한 개인정보는 적지 마세요</summary>
+        <summary>AI 분석 · 민감한 정보는 적지 마세요</summary>
         <ul className="notice" aria-label="AI 이용 안내">
           {noticeItems.map((item) => (
             <li key={item}>{item}</li>

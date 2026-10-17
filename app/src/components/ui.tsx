@@ -2,8 +2,13 @@ import { Button, Loader, Top } from '@toss/tds-mobile';
 import { useEffect, useState, type ReactNode } from 'react';
 import { errorMessage, RETRYABLE } from '../lib/errors';
 
-export function Page({ children }: { children: ReactNode }) {
-  return <main className="page"><div className="page-inner">{children}</div></main>;
+/** fixedCta=false: 하단 고정 버튼이 없는 화면(홈)은 그 자리 여백을 두지 않는다 */
+export function Page({ children, fixedCta = true }: { children: ReactNode; fixedCta?: boolean }) {
+  return (
+    <main className="page">
+      <div className={fixedCta ? 'page-inner' : 'page-inner no-cta'}>{children}</div>
+    </main>
+  );
 }
 
 export function PageTop({ title, subtitle }: { title: string; subtitle?: string }) {
