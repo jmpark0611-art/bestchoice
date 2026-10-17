@@ -14,15 +14,10 @@ import { Card, Gap, PageTop } from './ui';
 export function ResultView({ analysis, highStakes }: { analysis: Analysis; highStakes: boolean }) {
   return (
     <div className="result-report">
-      <PageTop title="이렇게 판단했어요" subtitle={analysis.summary} />
-      <Card title="추천 결과" highlight>
-        <p className="big">{recommendationLabel(analysis)}</p>
-        <Gap size={8} />
+      <p className="section result-kicker">결론</p>
+      <PageTop title={recommendationLabel(analysis)} subtitle={CONFIDENCE_LABELS[analysis.confidence]} />
+      <Card highlight>
         <p>{analysis.recommendation.rationale}</p>
-        <Gap size={8} />
-        <p className="muted">
-          {CONFIDENCE_LABELS[analysis.confidence]} · {analysis.confidenceReason}
-        </p>
       </Card>
       {highStakes && (
         <>
@@ -32,46 +27,51 @@ export function ResultView({ analysis, highStakes }: { analysis: Analysis; highS
           </Card>
         </>
       )}
-      <Gap size={24} />
-      <Card title="6가지 기준으로 본 추천안">
-        <div className="axes">
-          {analysis.axes.map((a) => (
-            <div key={a.key}>
-              <div className="axis-head">
-                <span>{AXIS_LABELS[a.key]}</span>
-                <span aria-label={`5점 중 ${a.score}점`}>{a.score}/5</span>
-              </div>
-              <div className="axis-bar" aria-hidden>
-                <span style={{ width: `${a.score * 20}%` }} />
-              </div>
-              <p className="axis-text">{a.rationale}</p>
-              {a.uncertainty && <p className="axis-text muted">불확실: {a.uncertainty}</p>}
-            </div>
-          ))}
-        </div>
-      </Card>
-      <Gap />
-      <Card title="놓치기 쉬운 점">
-        <ul className="bullets">
-          {analysis.missedFactors.map((m) => (
-            <li key={m}>{m}</li>
-          ))}
-        </ul>
-      </Card>
       <Gap />
       <Card title={`${analysis.nextAction.timeframeHours}시간 안에 해볼 일`}>
         <p>{analysis.nextAction.text}</p>
       </Card>
       <Gap />
-      <Card title="이럴 땐 다른 선택이 나아요">
+      <Card title="6가지 기준">
+        <div className="axes">
+          {analysis.axes.map((a) => (
+            <details key={a.key} className="axis">
+              <summary>
+                <span className="axis-head">
+                  <span>{AXIS_LABELS[a.key]}</span>
+                  <span aria-label={`5점 중 ${a.score}점`}>{a.score}/5</span>
+                </span>
+                <span className="axis-bar" aria-hidden>
+                  <span style={{ width: `${a.score * 20}%` }} />
+                </span>
+              </summary>
+              <p className="axis-text">{a.rationale}</p>
+              {a.uncertainty && <p className="axis-text muted">불확실: {a.uncertainty}</p>}
+            </details>
+          ))}
+        </div>
+        <p className="tap-hint">기준을 누르면 이유가 보여요</p>
+      </Card>
+      <Gap />
+      <details className="card more">
+        <summary>놓치기 쉬운 점 {analysis.missedFactors.length}가지</summary>
+        <ul className="bullets">
+          {analysis.missedFactors.map((m) => (
+            <li key={m}>{m}</li>
+          ))}
+        </ul>
+      </details>
+      <Gap size={8} />
+      <details className="card more">
+        <summary>이럴 땐 다른 선택이 나아요</summary>
         <ul className="bullets">
           {analysis.switchConditions.map((s) => (
             <li key={s}>{s}</li>
           ))}
         </ul>
-      </Card>
+      </details>
       <Gap />
-      <p className="section muted">{analysis.disclaimer}</p>
+      <p className="section muted small">{analysis.disclaimer}</p>
     </div>
   );
 }
@@ -89,7 +89,7 @@ export function ActualChoiceForm({ saved, saving, onSave }: ChoiceProps) {
 
   return (
     <section className="question">
-      <p className="question-title">실제로는 어떻게 했나요?</p>
+      <p className="question-title">그래서, 어떻게 했어요?</p>
       <div className="choices" role="radiogroup" aria-label="실제 선택">
         {(Object.keys(CHOICE_LABELS) as ChoiceType[]).map((t) => (
           <button type="button" key={t} className="choice" aria-pressed={type === t} onClick={() => setType(t)}>
@@ -115,7 +115,7 @@ export function ActualChoiceForm({ saved, saving, onSave }: ChoiceProps) {
         loading={saving}
         onClick={() => type && onSave(type, note)}
       >
-        {saved ? '기록 수정하기' : '기록하기'}
+        {saved ? '기록 수정' : '기록하기'}
       </Button>
     </section>
   );

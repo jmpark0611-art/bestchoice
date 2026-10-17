@@ -128,8 +128,8 @@ export function DecisionScreen() {
 
   const home = () => navigate('/', { replace: true });
 
-  if (busy === 'clarify') return <LoadingView message="고민을 정리하고 질문을 만들고 있어요" />;
-  if (busy === 'analyze') return <LoadingView message="6가지 기준으로 분석하고 있어요" />;
+  if (busy === 'clarify') return <LoadingView message={['고민을 읽고 있어요', '꼭 필요한 질문만 고르는 중', '거의 다 됐어요']} />;
+  if (busy === 'analyze') return <LoadingView message={['6가지 기준으로 따져보는 중', '놓친 점을 찾는 중', '결론을 정리하는 중']} />;
   if (error && !detail) return <ErrorView code={error} onRetry={reload} onHome={home} />;
   if (!detail || !view) return <LoadingView message="불러오는 중이에요" />;
 
@@ -145,7 +145,7 @@ export function DecisionScreen() {
         initial={loadAnswers(id)}
         submitting={false}
         notice={
-          detail.status === 'failed' ? '지난 분석이 끝나지 못했어요. 답변을 확인하고 다시 보내주세요.' : undefined
+          detail.status === 'failed' ? '지난 분석이 끝나지 못했어요. 다시 보내주세요.' : undefined
         }
         onSubmit={runAnalyze}
       />

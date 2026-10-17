@@ -7,7 +7,7 @@ import {
   type AnswerValue,
   type Clarification,
 } from '../lib/contract';
-import { Card, Gap, Page, PageTop } from './ui';
+import { Gap, Page } from './ui';
 
 type Props = {
   clarification: Clarification;
@@ -37,32 +37,28 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
 
   return (
     <Page>
-      <PageTop title="3가지만 더 알려주세요" subtitle="답에 따라 추천이 달라져요." />
-      <div className="progress-track" aria-label={`질문 ${answeredCount}개 답변 완료`}><span style={{ width: `${(answeredCount / clarification.questions.length) * 100}%` }} /></div>
       <p className="question-status section">
-        질문 {step + 1} / {clarification.questions.length}
+        <b>{step + 1}</b> / {clarification.questions.length}
       </p>
+      <div className="progress-track" aria-label={`질문 ${answeredCount}개 답변 완료`}><span style={{ width: `${(answeredCount / clarification.questions.length) * 100}%` }} /></div>
       {notice && (
         <>
           <p className="section muted">{notice}</p>
           <Gap />
         </>
       )}
-      <Card title="이렇게 이해했어요">
-        <p>{clarification.summary}</p>
-      </Card>
-      <Gap size={24} />
+      {step === 0 && <p className="section understood">“{clarification.summary}”</p>}
       <div key={question.id}>
         <div className="question">
           <p className="question-title">
             {question.text}
-            {question.inputType === 'multiple' && <span className="muted"> (여러 개 선택)</span>}
+            {question.inputType === 'multiple' && <span className="muted"> 여러 개</span>}
           </p>
           {question.inputType === 'text' ? (
             <div className="bleed">
               <TextArea
                 variant="box"
-                placeholder="자유롭게 적어주세요"
+                placeholder="짧게 적어도 돼요"
                 maxLength={TEXT_ANSWER_MAX}
                 value={(answers[question.id] as string | undefined) ?? ''}
                 onChange={(e) => set(question.id, e.target.value)}
@@ -91,7 +87,7 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
           )}
           <div className="card-navigation">
             {step > 0 && <button type="button" className="link-button" onClick={() => setStep(step - 1)}>
-                이전 질문
+                이전
               </button>}
           </div>
         </div>
@@ -101,7 +97,7 @@ export function QuestionsForm({ clarification, initial, submitting, notice, onSu
         loading={submitting}
         onClick={() => last ? onSubmit(toAnswerList(clarification.questions, answers), answers as Record<string, AnswerValue>) : setStep(step + 1)}
       >
-        {last ? '분석 결과 보기' : '다음 질문'}
+        {last ? '결론 보기' : '다음'}
       </FixedBottomCTA>
     </Page>
   );

@@ -20,29 +20,25 @@ export function HomeScreen() {
     <Page>
       <section className="home-hero">
         <div className="brand-pill"><span className="brand-mark">✓</span> 결정해줘</div>
-        <p className="home-kicker">생각이 복잡할 때</p>
-        <h1>선택의 기준을<br /><em>또렷하게.</em></h1>
-        <p className="home-description">고민을 들려주면 꼭 필요한 질문을 묻고<br />6가지 기준으로 차분하게 정리해 드려요.</p>
+        <h1>할까, <em>말까?</em></h1>
+        <p className="home-description">질문 3개면 답이 보여요</p>
+        <ol className="steps" aria-label="이용 순서">
+          <li>고민 적기</li>
+          <li>질문 3개</li>
+          <li><b>결론</b></li>
+        </ol>
       </section>
       <div className="section home-action">
         <Button display="block" onClick={() => navigate('/input')}>
-          내 고민 정리하기
+          고민 털어놓기
         </Button>
         {!aiEnabled() && (
           <>
             <Gap size={8} />
-            <p className="muted">AI 분석을 준비하고 있어요. 고민은 미리 적어둘 수 있어요.</p>
+            <p className="muted">AI 분석을 준비하고 있어요.</p>
           </>
         )}
       </div>
-      <section className="how-it-works">
-        <p className="section-label">이렇게 도와드려요</p>
-        <div className="process-grid">
-          <div><b>01</b><span>고민 입력</span><p>상황과 선택지를<br />편하게 적어요</p></div>
-          <div><b>02</b><span>핵심 질문</span><p>딱 3가지에<br />답해요</p></div>
-          <div><b>03</b><span>판단 정리</span><p>6가지 기준으로<br />비교해요</p></div>
-        </div>
-      </section>
       <Gap size={24} />
       {recent && recent.length > 0 && (
         <>
@@ -59,7 +55,7 @@ export function HomeScreen() {
           </ul>
           <div className="section">
             <Button display="block" variant="weak" onClick={() => navigate('/history')}>
-              전체 기록 보기
+              전체 기록
             </Button>
           </div>
         </>

@@ -116,9 +116,9 @@ export function InputScreen() {
 
   return (
     <Page>
-      <PageTop title="어떤 고민인가요?" subtitle="분야와 시급도는 골라도 되고 건너뛰어도 돼요. 고르면 분석에 반영돼요." />
+      <PageTop title="무슨 고민이에요?" />
       <section className="input-group">
-        <h2 className="section group-title">고민 분야 <span className="muted">(선택)</span></h2>
+        <h2 className="section group-title">분야 <span className="muted">선택</span></h2>
         <div className="chip-row section" role="radiogroup" aria-label="고민 분야">
           {CATEGORIES.map(([value, label]) => (
             <button
@@ -135,7 +135,7 @@ export function InputScreen() {
         </div>
       </section>
       <section className="input-group">
-        <h2 className="section group-title">언제까지 결정해야 하나요? <span className="muted">(선택)</span></h2>
+        <h2 className="section group-title">언제까지? <span className="muted">선택</span></h2>
         <div className="chip-row section" role="radiogroup" aria-label="결정 시급도">
           {URGENCIES.map(([value, label]) => (
             <button
@@ -152,17 +152,17 @@ export function InputScreen() {
         </div>
       </section>
       <section className="input-group">
-        <h2 className="section group-title">고민 내용</h2>
+        <h2 className="section group-title">고민</h2>
         <div className="chip-row section" aria-label="고민 예시">
           {EXAMPLES.map(([label, value]) => (
             <button type="button" key={label} className="chip subtle" onClick={() => setText(value)}>
-              예시: {label}
+              {label}
             </button>
           ))}
         </div>
         <TextArea
           variant="box"
-          placeholder="예) 지금 회사에 남을지, 연봉은 조금 낮지만 배울 게 많은 곳으로 옮길지 고민이에요."
+          placeholder="예) 남을까, 옮길까? 연봉은 낮아도 배울 게 많은 곳이에요."
           minHeight={180}
           maxLength={CONCERN_MAX}
           value={text}
@@ -185,11 +185,14 @@ export function InputScreen() {
         </p>
       )}
       <Gap size={24} />
-      <ul className="notice" aria-label="AI 이용 안내">
-        {noticeItems.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
+      <details className="notice-box section">
+        <summary>AI가 분석해요 · 민감한 개인정보는 적지 마세요</summary>
+        <ul className="notice" aria-label="AI 이용 안내">
+          {noticeItems.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </details>
       <FixedBottomCTA disabled={!!error || submitting} loading={submitting} onClick={submit}>
         질문 받기
       </FixedBottomCTA>

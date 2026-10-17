@@ -1,5 +1,5 @@
 import { Button, Loader, Top } from '@toss/tds-mobile';
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { errorMessage, RETRYABLE } from '../lib/errors';
 
 export function Page({ children }: { children: ReactNode }) {
@@ -28,11 +28,19 @@ export function Card({ title, children, highlight }: { title?: string; children:
   );
 }
 
-export function LoadingView({ message }: { message: string }) {
+/** 여러 문구를 주면 기다리는 동안 하나씩 바꿔 보여준다 */
+export function LoadingView({ message }: { message: string | string[] }) {
+  const messages = Array.isArray(message) ? message : [message];
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (messages.length < 2) return;
+    const timer = setInterval(() => setIndex((i) => Math.min(i + 1, messages.length - 1)), 2500);
+    return () => clearInterval(timer);
+  }, [messages.length]);
   return (
     <div className="center" role="status" aria-live="polite">
       <Loader />
-      <p className="muted">{message}</p>
+      <p className="muted">{messages[index]}</p>
     </div>
   );
 }
