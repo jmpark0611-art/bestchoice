@@ -81,7 +81,7 @@ describe('DecisionScreen', () => {
     expect(cta).toBeEnabled();
     await user.click(cta);
 
-    expect(await screen.findByText('결론')).toBeInTheDocument();
+    expect(await screen.findByText('결정했어요')).toBeInTheDocument();
     expect(api.requestAI).toHaveBeenLastCalledWith({
       decisionId: 'd1',
       stage: 'analyze',
@@ -164,7 +164,7 @@ describe('DecisionScreen', () => {
     api.saveActualChoice.mockResolvedValue(undefined);
     const user = userEvent.setup();
     open();
-    await screen.findByText('결론');
+    await screen.findByText('결정했어요');
     expect(analytics.logEvent).toHaveBeenCalledWith('result_viewed', expect.anything());
     expect(analytics.logEvent.mock.calls.filter(([n]) => n === 'result_viewed')).toHaveLength(1);
     await user.click(screen.getByRole('button', { name: '추천대로 했어요' }));

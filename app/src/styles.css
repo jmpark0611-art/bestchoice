@@ -411,10 +411,6 @@ body {
 
 /* 2026-10-17 단순화: 짧은 문구, 결론 먼저, 자세한 내용은 눌러서 */
 .home-description { font-size: 18px; }
-.steps { display: flex; gap: 6px; margin: 20px 0 0; padding: 0; list-style: none; counter-reset: step; }
-.steps li { display: flex; align-items: center; gap: 6px; color: var(--bc-hint); font-size: 14px; }
-.steps li + li::before { content: '→'; color: var(--bc-border); }
-.steps b { color: var(--bc-blue); }
 
 .understood { margin: 0 0 8px; color: var(--bc-sub); font-size: 14px; }
 .question-status b { color: var(--bc-blue); font-size: 16px; }
@@ -443,7 +439,7 @@ details summary::-webkit-details-marker { display: none; }
 /* 2026-10-17 귀여운 제목 글꼴(주아) + 폰 한 화면 비율 */
 :root { --bc-display: 'Jua', 'Toss Product Sans', -apple-system, 'Apple SD Gothic Neo', sans-serif; }
 .display, .home-hero h1, .question-title, .section-label, .group-title, .card h3, .result-kicker,
-.brand-pill, .steps b, .card.more summary, .more-head, .center .big {
+.brand-pill, .card.more summary, .more-head, .center .big {
   font-family: var(--bc-display);
   font-weight: 400;
   letter-spacing: 0;
@@ -462,7 +458,6 @@ details summary::-webkit-details-marker { display: none; }
 @media (prefers-reduced-motion: reduce) { .hero-face { animation: none; } }
 .home-hero h1 { font-size: 46px; line-height: 1.2; }
 .home-description { margin: 8px 0 0; }
-.steps { margin-top: 14px; }
 .home-action { padding-top: 20px; }
 .section-label { margin-bottom: 10px; font-size: 18px; }
 
@@ -523,8 +518,15 @@ details summary::-webkit-details-marker { display: none; }
   .group-title.concern { display: none; }
   .chip { min-height: 30px; }
   .home-hero h1 { font-size: 36px; }
-  .steps { display: none; }
   .home-action { padding-top: 14px; }
   .question-title { font-size: 20px; }
   .choice { min-height: 44px; padding: 10px 14px; }
 }
+
+/* 10/17 4차: 무슨 앱인지 한눈에 — 부제 강조 + 예시 칩 */
+.home-description b { color: var(--bc-blue); font-weight: 700; }
+.home-examples { margin-top: 14px; }
+/* 예시 칩이 들어간 만큼 이모지·제목을 줄여 한 화면 유지 */
+.hero-face { margin-top: 0; font-size: 44px; }
+.home-hero h1 { font-size: 42px; }
+.home-examples .chip { font-size: 14px; }

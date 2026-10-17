@@ -14,7 +14,7 @@ import { Card, Gap, PageTop } from './ui';
 export function ResultView({ analysis, highStakes }: { analysis: Analysis; highStakes: boolean }) {
   return (
     <div className="result-report">
-      <p className="section result-kicker">결론</p>
+      <p className="section result-kicker">결정했어요</p>
       <PageTop title={recommendationLabel(analysis)} subtitle={CONFIDENCE_LABELS[analysis.confidence]} />
       <Card highlight>
         <p>{analysis.recommendation.rationale}</p>

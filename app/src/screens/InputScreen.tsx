@@ -1,6 +1,6 @@
 import { FixedBottomCTA, TextArea, useDialog, useToast } from '@toss/tds-mobile';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import aiNotice from '../../../docs/legal/ai-notice.md?raw';
 import { Gap, Page, PageTop } from '../components/ui';
 import { createDecision, getQuota, grantAdBonus, type Quota, type Urgency, type UserCategory } from '../lib/api';
@@ -22,7 +22,8 @@ const URGENCIES: [Urgency, string][] = [
   ['week', '이번 주'],
   ['relaxed', '천천히'],
 ];
-const EXAMPLES = [
+/** [칩 이름, 채워 넣을 고민 문장]. 홈의 예시 칩도 같은 문장을 쓴다 */
+export const EXAMPLES = [
   ['이직', '지금 회사에 남을지 새로운 회사로 이직할지 고민이에요. 연봉과 성장 가능성 중 무엇을 우선해야 할지 모르겠어요.'],
   ['구매', '필요한 물건을 지금 구매할지 조금 더 기다릴지 고민이에요. 가격과 실제 사용 빈도를 함께 따져보고 싶어요.'],
   ['관계', '지금의 관계를 계속 이어갈지 거리를 둘지 고민이에요. 제 마음과 앞으로의 변화를 함께 생각하고 싶어요.'],
@@ -36,7 +37,9 @@ export function InputScreen() {
   const { openToast } = useToast();
   const { openConfirm } = useDialog();
   const [quota, setQuota] = useState<Quota | null>(null);
-  const [text, setText] = useState('');
+  // 홈에서 예시를 눌러 들어오면 그 문장으로 시작
+  const prefill = (useLocation().state as { text?: string } | null)?.text;
+  const [text, setText] = useState(prefill ?? '');
   const [touched, setTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [category, setCategory] = useState<UserCategory | ''>('');
@@ -116,7 +119,7 @@ export function InputScreen() {
 
   return (
     <Page>
-      <PageTop title="무슨 고민이에요?" />
+      <PageTop title="뭘 못 정하겠어요?" />
       <section className="input-group">
         <h2 className="section group-title">분야 <span className="muted">선택</span></h2>
         <div className="chip-row one-line section" role="radiogroup" aria-label="고민 분야">

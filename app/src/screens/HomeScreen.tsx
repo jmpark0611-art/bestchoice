@@ -5,6 +5,10 @@ import { Gap, Page } from '../components/ui';
 import { listDecisions, type DecisionSummary } from '../lib/api';
 import { aiEnabled } from '../lib/supabase';
 import { statusLabel } from './HistoryScreen';
+import { EXAMPLES } from './InputScreen';
+
+/** 홈 예시 칩: 어떤 고민에 쓰는 앱인지 바로 보이게. 누르면 해당 예시 문장으로 입력 화면을 연다 */
+const HOME_EXAMPLES = ['이직할까?', '살까 말까?', '연락할까?'];
 
 export function HomeScreen() {
   const navigate = useNavigate();
@@ -27,16 +31,23 @@ export function HomeScreen() {
           <section className="home-hero">
             <div className="hero-face" aria-hidden>🤔</div>
             <h1>할까, <em>말까?</em></h1>
-            <p className="home-description">질문 3개면 답이 보여요</p>
-            <ol className="steps" aria-label="이용 순서">
-              <li>고민 적기</li>
-              <li>질문 3개</li>
-              <li><b>결론</b></li>
-            </ol>
+            <p className="home-description">질문 3개만 답하면 <b>대신 정해드려요</b></p>
+            <div className="chip-row home-examples" aria-label="예시로 시작하기">
+              {HOME_EXAMPLES.map((label, i) => (
+                <button
+                  type="button"
+                  key={label}
+                  className="chip subtle"
+                  onClick={() => navigate('/input', { state: { text: EXAMPLES[i][1] } })}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </section>
           <div className="section home-action">
             <Button display="block" onClick={() => navigate('/input')}>
-              고민 털어놓기
+              결정해줘
             </Button>
             {!aiEnabled() && (
               <>
