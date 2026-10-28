@@ -2,6 +2,7 @@ import { Button, useToast } from '@toss/tds-mobile';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ActualChoiceForm, CrisisView, ResultView } from '../components/ResultView';
+import { ResultShareActions } from '../components/ResultShareActions';
 import { QuestionsForm } from '../components/QuestionsForm';
 import { ErrorView, Gap, LoadingView, Page } from '../components/ui';
 import { getDecision, requestAI, saveActualChoice, type DecisionDetail } from '../lib/api';
@@ -164,6 +165,7 @@ export function DecisionScreen() {
       return (
         <Page>
           <ResultView analysis={detail.analysis!} highStakes={detail.safetyMode === 'high_stakes'} />
+          <ResultShareActions analysis={detail.analysis!} />
           <Gap size={24} />
           <ActualChoiceForm
             saved={detail.choiceType ? { type: detail.choiceType, note: detail.choiceNote } : null}

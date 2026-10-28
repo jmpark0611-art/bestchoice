@@ -6,8 +6,16 @@ import { Analytics, Review } from '@apps-in-toss/web-framework';
  * - result_viewed: 6축 결과 리포트 열람 (전환 지표로 등록)
  * - actual_choice_saved: 실제 선택 기록
  * - ad_reward_earned: 보상형 광고 시청 완료
+ * - result_image_saved: 결과 카드 이미지 저장 시트 열기
+ * - app_link_shared: 앱 링크 공유 시트 열기
  */
-export type AppEvent = 'decision_submitted' | 'result_viewed' | 'actual_choice_saved' | 'ad_reward_earned';
+export type AppEvent =
+  | 'decision_submitted'
+  | 'result_viewed'
+  | 'actual_choice_saved'
+  | 'ad_reward_earned'
+  | 'result_image_saved'
+  | 'app_link_shared';
 
 export function logEvent(name: AppEvent, params: Record<string, string | number | boolean | undefined> = {}) {
   try {

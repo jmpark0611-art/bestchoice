@@ -533,3 +533,18 @@ details summary::-webkit-details-marker { display: none; }
 
 /* 10/17 앱 이름 "결정해지니Genie"(콘솔 앱 이름과 동일) */
 .brand-en { color: var(--bc-blue); }
+
+/* 결과 카드 저장/앱 링크 공유 */
+.result-share { margin-top: 8px; }
+.result-share .card { overflow: hidden; }
+.share-actions { display: grid; gap: 8px; margin-top: 14px; }
+.result-preview { margin-top: 14px; }
+.result-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--bc-border);
+  border-radius: 18px;
+  background: #f2f4f6;
+}
+.preview-confirm { margin: 14px 0 10px; color: var(--bc-text); font-weight: 700; text-align: center; }
