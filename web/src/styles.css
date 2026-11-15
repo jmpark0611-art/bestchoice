@@ -1,0 +1,180 @@
+/* 팝 디자인(2026-11-15 사용자 선택): 노랑 바탕 + 굵은 검은 테두리. 폰이 다크 모드면 블랙 팔레트.
+   A는 파랑(다크: 노랑), B는 주황빨강(다크: 분홍). 색각 이상에도 구분되는 조합만 쓴다 */
+:root {
+  --bg: #ffd93b;
+  --surface: #fffdf5;
+  --ink: #111111;
+  --sub: #333333;
+  --hint: #666666;
+  --a: #2f5bff;
+  --a-weak: #dfe6ff;
+  --b: #ff4d2e;
+  --b-weak: #ffe0d9;
+  --on-accent: #ffffff;
+  --display: 'Black Han Sans', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111111;
+    --surface: #1d1d1d;
+    --ink: #ffffff;
+    --sub: #cfcfcf;
+    --hint: #9a9a9a;
+    --a: #ffd93b;
+    --a-weak: #3a3410;
+    --b: #ff6fae;
+    --b-weak: #40202e;
+    --on-accent: #111111;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.55;
+  word-break: keep-all;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--a); outline-offset: 2px; }
+
+.wrap {
+  max-width: 440px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  display: flex;
+}
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 20px 20px;
+  background: var(--surface);
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 7px 7px 0 var(--ink);
+  margin: 0 7px 7px 0;
+}
+.grow { flex: 1; min-height: 4px; }
+
+.brand { font-family: var(--display); font-size: 15px; color: var(--sub); text-decoration: none; align-self: flex-start; }
+.brand b { color: var(--a); font-weight: 400; }
+h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 46px; line-height: 1.15; }
+h1 em { font-style: normal; color: var(--a); }
+h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 23px; line-height: 1.3; }
+h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 18px; }
+.lead { margin: 0; color: var(--sub); }
+.small { margin: 0; color: var(--hint); font-size: 13px; }
+.error { margin: 0; color: var(--b); font-weight: 700; }
+
+/* A vs B 입력 */
+.versus { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; }
+.side { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.side label { font-family: var(--display); font-size: 15px; }
+.side.a label { color: var(--a); }
+.side.b label { color: var(--b); }
+.side input {
+  width: 100%; min-width: 0; padding: 14px 10px;
+  border: 3px solid var(--ink); border-radius: 12px; background: var(--surface);
+  font-size: 17px; font-weight: 700; text-align: center;
+}
+.side input::placeholder, .field input::placeholder { color: var(--hint); font-weight: 400; opacity: .7; }
+.side.a input:focus { outline: none; background: var(--a-weak); }
+.side.b input:focus { outline: none; background: var(--b-weak); }
+.vs { align-self: end; padding-bottom: 16px; font-family: var(--display); font-size: 17px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 5px 11px; border: 2px solid var(--ink); border-radius: 99px; background: var(--surface); font-size: 13px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; color: var(--sub); }
+.field input { padding: 12px 14px; border: 2px solid var(--ink); border-radius: 12px; background: var(--surface); font-size: 16px; }
+
+.btn {
+  display: block; width: 100%; padding: 15px; text-align: center; text-decoration: none;
+  border: 3px solid var(--ink); border-radius: 12px; box-shadow: 4px 4px 0 var(--ink);
+  background: var(--a); color: var(--on-accent); font-family: var(--display); font-size: 19px;
+}
+.btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.ghost { background: var(--surface); color: var(--ink); font-size: 16px; padding: 12px; }
+.btn.text { border: 0; box-shadow: none; background: none; color: var(--sub); font-family: var(--body); font-size: 14px; text-decoration: underline; padding: 4px; }
+
+/* 결론 */
+.kicker { margin: 0; font-family: var(--display); font-size: 16px; color: var(--sub); }
+.pick { margin: 0; font-family: var(--display); font-size: 50px; line-height: 1.1; overflow-wrap: anywhere; }
+.pick.a { color: var(--a); }
+.pick.b { color: var(--b); }
+.loser { margin: -8px 0 0; color: var(--hint); text-decoration: line-through; }
+.reason, .genie { margin: 0; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 12px; }
+.genie { display: flex; gap: 10px; align-items: baseline; }
+.genie b { font-family: var(--display); font-weight: 400; }
+.sharebox { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 2px dashed var(--ink); border-radius: 12px; }
+.sharebox code { font-size: 12px; overflow-wrap: anywhere; user-select: all; color: var(--sub); }
+
+/* 투표 */
+.ballot { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vote {
+  min-width: 0; min-height: 140px; padding: 14px 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border: 3px solid var(--ink); border-radius: 14px; box-shadow: 4px 4px 0 var(--ink);
+  font-family: var(--display); font-size: 25px; line-height: 1.2; overflow-wrap: anywhere;
+}
+.vote span { font-family: var(--body); font-size: 12px; opacity: .8; }
+.vote.a { background: var(--a-weak); color: var(--a); }
+.vote.b { background: var(--b-weak); color: var(--b); }
+.vote:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.vote:disabled { opacity: .5; }
+
+.tally { display: flex; flex-direction: column; gap: 8px; }
+.tally-head { display: flex; justify-content: space-between; gap: 12px; font-family: var(--display); font-size: 18px; }
+.tally-head span { min-width: 0; overflow-wrap: anywhere; }
+.tally-head .a { color: var(--a); }
+.tally-head .b { color: var(--b); text-align: right; }
+.bar { display: flex; height: 48px; overflow: hidden; border: 3px solid var(--ink); border-radius: 12px; }
+.bar div {
+  display: flex; align-items: center; min-width: 52px; padding: 0 10px;
+  color: var(--on-accent); font-weight: 700; font-variant-numeric: tabular-nums; transition: width .5s ease;
+}
+.bar .a { background: var(--a); }
+.bar .b { background: var(--b); justify-content: flex-end; border-left: 3px solid var(--ink); }
+
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.three button { min-width: 0; padding: 11px 4px; border: 2px solid var(--ink); border-radius: 10px; background: var(--surface); font-size: 13px; overflow-wrap: anywhere; }
+.three button[aria-pressed='true'] { background: var(--ink); color: var(--surface); font-weight: 700; }
+
+.recent { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.recent-row {
+  display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px;
+  border: 2px solid var(--ink); border-radius: 10px; text-decoration: none; font-size: 14px;
+}
+.recent-row span { min-width: 0; overflow-wrap: anywhere; color: var(--sub); }
+.recent-row b { flex: none; font-family: var(--display); font-weight: 400; }
+.recent-row b.a { color: var(--a); }
+.recent-row b.b { color: var(--b); }
+
+.help { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+
+.thinking { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+.lamp { font-size: 60px; line-height: 1; animation: bob 1.4s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-8px) rotate(-6deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .lamp { animation: none; }
+  .bar div { transition: none; }
+}
+@media (max-height: 640px) {
+  h1 { font-size: 38px; }
+  .pick { font-size: 42px; }
+  .screen { gap: 10px; padding-top: 16px; }
+}
