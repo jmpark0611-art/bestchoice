@@ -178,3 +178,17 @@ h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 18px; 
   .pick { font-size: 42px; }
   .screen { gap: 10px; padding-top: 16px; }
 }
+
+
+/* Long vote URLs remain selectable and never overflow narrow mobile screens. */
+.share-url { display: block; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
+
+/* Narrow devices: long user options and share links must not force horizontal scrolling. */
+.screen, .sharebox, .three, .share-url { min-width: 0; }
+.share-url { white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+@media (max-width: 360px) {
+  .wrap { padding-left: 10px; padding-right: 10px; }
+  .screen { padding-left: 12px; padding-right: 12px; }
+  .three { grid-template-columns: minmax(0, 1fr); }
+  .three button { min-height: 42px; }
+}

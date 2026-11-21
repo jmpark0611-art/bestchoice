@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Brand, CrisisPanel, Screen, Thinking } from '../components/ui';
 import { decide, listMyPolls, type PollSummary } from '../lib/api';
@@ -15,6 +15,12 @@ const EXAMPLES: [string, string][] = [
 
 export function HomeScreen() {
   const navigate = useNavigate();
+  const active = useRef(true);
+  const submitting = useRef(false);
+  useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
   const [a, setA] = useState('');
   const [b, setB] = useState('');
   const [note, setNote] = useState('');
@@ -23,26 +29,45 @@ export function HomeScreen() {
   const [error, setError] = useState<string | null>(null);
   const [recent, setRecent] = useState<PollSummary[]>([]);
 
-  useEffect(() => {
-    listMyPolls()
-      .then(setRecent)
-      .catch(() => setRecent([]));
+  const [recentError, setRecentError] = useState(false);
+  const recentVersion = useRef(0);
+  const loadRecent = useCallback(async () => {
+    const version = ++recentVersion.current;
+    try {
+      const rows = await listMyPolls();
+      if (!active.current || version !== recentVersion.current) return;
+      setRecent(rows);
+      setRecentError(false);
+    } catch {
+      if (active.current && version === recentVersion.current) setRecentError(true);
+    }
   }, []);
+
+  useEffect(() => {
+    void loadRecent();
+  }, [loadRecent]);
 
   const ready = a.trim().length > 0 && b.trim().length > 0;
 
   const submit = async () => {
+    if (submitting.current || !ready) return;
     if (a.trim() === b.trim()) return setError(errorMessage('SAME_OPTIONS'));
+    submitting.current = true;
     setBusy(true);
     setError(null);
     try {
       const result = await decide({ a: a.trim(), b: b.trim(), note: note.trim() });
+      if (!active.current) return;
       if (result.kind === 'crisis') setCrisis(true);
       else navigate(`/p/${result.id}`);
     } catch (e) {
+      if (!active.current) return;
       setError(errorMessage(codeOf(e)));
+      // Read only: do not resubmit or guess which recent row belongs to this request.
+      void loadRecent();
     } finally {
-      setBusy(false);
+      submitting.current = false;
+      if (active.current) setBusy(false);
     }
   };
 
@@ -58,7 +83,8 @@ export function HomeScreen() {
       <Screen>
         <Brand />
         <CrisisPanel />
-        <div className="grow" />
+        <Link to="/history">결정 기록 전체 보기</Link>
+      <div className="grow" />
         <button type="button" className="btn ghost" onClick={() => setCrisis(false)}>
           돌아가기
         </button>
@@ -115,6 +141,7 @@ export function HomeScreen() {
           {error}
         </p>
       )}
+      <Link to="/history">결정 기록 전체 보기</Link>
       <div className="grow" />
       <button type="button" className="btn" disabled={!ready} onClick={submit}>
         딱 정해줘
@@ -122,6 +149,9 @@ export function HomeScreen() {
       <p className="small">
         AI가 골라요. 이름·연락처 같은 개인정보는 적지 마세요. <Link to="/about">안내 보기</Link>
       </p>
+      {recentError && (
+        <p className="small" role="status">최근 결정을 불러오지 못했어요. <button type="button" className="btn text" onClick={() => void loadRecent()}>다시 불러오기</button></p>
+      )}
       {recent.length > 0 && (
         <section className="recent" aria-label="최근 결정">
           <h3>최근 결정</h3>
@@ -138,3 +168,4 @@ export function HomeScreen() {
     </Screen>
   );
 }
+

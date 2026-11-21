@@ -22,3 +22,4 @@ const KNOWN_RPC = ['INVALID_INPUT', 'NOT_FOUND', 'OWNER_CANNOT_VOTE', 'VOTE_CLOS
 export const errorMessage = (code: string) => MESSAGES[code] ?? (code.startsWith('AI_') || code === 'MODEL_FORMAT' ? MESSAGES.AI_FAILED : MESSAGES.NETWORK);
 export const codeOf = (e: unknown) => (e instanceof AppError ? e.code : 'NETWORK');
 export const codeFromRpcMessage = (message?: string) => KNOWN_RPC.find((c) => message?.includes(c)) ?? 'NETWORK';
+
