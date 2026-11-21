@@ -4,3 +4,7 @@ dist
 .env.local
 .vercel
 *.tsbuildinfo
+
+*.jks
+*.keystore
+android/local.properties
