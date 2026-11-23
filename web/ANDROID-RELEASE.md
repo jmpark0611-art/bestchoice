@@ -1,8 +1,9 @@
 # 결정해지니 Android 출시 준비
 
 이 문서는 기존 기능 소스에 추가한 **로컬 Android 출시 경로**를 설명합니다.
-이 경로를 구현했다는 사실은 서명된 AAB 생성, 실제 서버 검증, 실기기 확인,
-Google Play 제출 또는 출시 완료를 뜻하지 않습니다.
+합성 설정과 일회용 키를 사용한 실제 Android 컴파일·서명·자산 대조는
+2026-11-23에 통과했습니다. 정식 출시용 AAB, 실제 서버 및 실기기 확인,
+Google Play 제출은 남아 있습니다. 상세 결과는 `ANDROID-NATIVE-CHECK.md`에 있습니다.
 
 ## 실행 명령
 
@@ -113,7 +114,8 @@ SHA-256을 저장합니다. 이 파일은 앱 웹 자산에 포함하지 않습�
 기존 Preview용 `native:preview`·`native:sync` 명령과 원본 앱 ID는 유지합니다.
 Java 코드의 namespace는 그대로 두고 release 출력의 application ID와 버전만
 별도로 적용합니다. 원본 프로젝트에서 준비 기록 없이 직접 release를 실행하면
-검증 단계가 중단하도록 연결했습니다. 이 Gradle 경로는 실제 SDK 환경의 검증이 필요합니다.
+검증 단계가 중단하도록 연결했습니다. 이 Gradle 경로는 표준 Ubuntu 24.04 실행기의
+Java 21·SDK 36 환경에서 합성 설정으로 실제 컴파일·임시 키 서명까지 통과했습니다.
 
 ## 이번 로컬 준비 이후 남는 출시 단계
 
@@ -135,14 +137,21 @@ variant를 컴파일합니다. 네이티브 의존성 다운로드는 이 별도
 검증이 성공하면 새 AAB의 서명과 포함된 자산을 확인한 뒤 임시 키와 AAB를 삭제하고
 `native-check-passed-not-a-release` 기록만 남깁니다. 실제 서버나 앱을 실행하지
 않습니다. 최종 binary Manifest의 package ID·버전 확인 및 실기기 검증은 별도로
-남습니다. 이 경로는 `.github/workflows/android-native-check.yml`에 연결해 두었으나
-원격 실행하지 않았습니다. 현재 금지된 원격 업로드·변경을 허용받은 뒤에만 지정한
-새 빌드 브랜치에 반영할 수 있습니다.
+남습니다. 이 경로는 `.github/workflows/android-native-check.yml`에 연결되어 있습니다.
+사용자가 새 빌드 전용 브랜치의 소스 반영과 검증을 승인한 뒤 실제 실행했습니다.
+최종 통과 커밋은 `9c88d192f26fd370e02186abad71d5794fabc961`이며,
+[실행 기록](https://github.com/jmpark0611-art/bestchoice/actions/runs/45114713986)과
+`ANDROID-NATIVE-VERIFICATION-2026-11-23.json`에 범위·결과를 기록했습니다.
+
+실제 빌드에서 Capacitor가 라이브러리 자산 `base/assets/native-bridge.js`를 병합하는
+것을 확인했습니다. 검증기는 빌드 전 해당 원본의 SHA-256을 기록하고 AAB의 같은
+경로와 대조하며, 빌드 후 원본이 바뀌어도 중단합니다. 다른 추가 파일, 누락,
+내용 변경 및 앱 자산과 라이브러리 자산의 경로 충돌은 계속 거부합니다.
 
 빌드 전용 브랜치 `codex/genie-android-native-check-20261123`의 Vercel 자동 배포는
 `web/vercel.json`의 `git.deploymentEnabled`에서 끄도록 준비했습니다. 다른 브랜치의
-설정은 지정하지 않습니다. 원격 반영 전 실제 연결 프로젝트와 root directory를
-읽기 전용으로 다시 확인해야 합니다. 이는 계정 설정 변경이나 배포 실행이 아닙니다.
+설정은 지정하지 않습니다. 반영 직전에 현재 연결된 계정과 팀을 이 저장소 ID로
+조회했고 연결 프로젝트가 반환되지 않았습니다. 계정 설정 변경이나 웹 배포는 하지 않았습니다.
 
 현재 준비 폴더 `.genie-release/run-*`를 다른 컴퓨터에 복사해서 재사용하지 않습니다.
 기록의 sourceRoot와 의존성 링크가 원본 절대 경로를 가리키므로, 대상 컴퓨터에서는

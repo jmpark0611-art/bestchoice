@@ -1,7 +1,6 @@
 name: Genie Android native check (synthetic configuration)
 
-# This branch does not exist remotely yet. Publishing it requires the user's
-# separate approval to lift the current restriction on remote changes.
+# Restricted to the user's approved, isolated native-verification branch.
 # No pull_request trigger, production secrets, deployment, or artifact upload.
 on:
   push:

@@ -1,88 +1,87 @@
-# Android 도구 차단점과 다음 실행 범위
+# 결정해지니 Android 실제 빌드 검증 결과
 
-작성일: 2026-11-23 (한국 시간)
+확인일: 2026-11-23 13:57 한국 시간
 
-## 이번에 실제로 해결한 것
+## 결과: 네이티브 검증 통과
 
-기본 PATH에 `javac`·`jarsigner` 실행 파일이 없었지만, 설치된 Java 21.0.13에는
-컴파일·서명 모듈이 남아 있었습니다. 새 설치 없이 작업 폴더에 실행 도구를 만들었고,
-실제 Java 클래스 컴파일·실행, JAR 생성, 일회용 키 생성, JAR 서명 및 검증을 통과했습니다.
-검증에 사용한 비공개 키는 삭제했습니다. 공백·따옴표·달러 기호가 있는 경로도
-명령 확장 없이 처리되는 것을 확인했습니다.
+사용자가 새 빌드 전용 브랜치의 소스 반영과 검증을 승인한 뒤, 실제 Android
+release variant를 컴파일하고 일회용 키로 서명한 새 AAB를 확인했습니다.
+최종 [GitHub Actions 실행 45114713986](https://github.com/jmpark0611-art/bestchoice/actions/runs/45114713986)은 성공으로 종료됐습니다.
 
-이 결과는 **기존 Java 모듈 실행 도구가 동작한다는 증거**입니다. 완전한 JDK 설치,
-Android Gradle Plugin 호환성, Android 앱 컴파일 또는 출시 서명을 완료한 것은 아닙니다.
-현재 Java에는 jmods와 JNI 헤더가 없습니다. Android SDK와 Gradle 배포/의존성 캐시도
-없습니다. 자식 프로세스에서만 로컬 도구 경로를 지정해 사전 점검했을 때,
-`javac`와 `jarsigner` 누락 항목은 해소되고 SDK·Gradle·정식 서명 입력 항목이 남았습니다.
+- 검증한 커밋: `9c88d192f26fd370e02186abad71d5794fabc961`
+- 브랜치: `codex/genie-android-native-check-20261123`
+- 환경: 표준 Ubuntu 24.04, Node 24.22.3, Java 21.0.13, SDK platform 36, Build Tools 35.0.0, Gradle 8.14.3
+- 실제 Gradle 결과: `BUILD SUCCESSFUL`, 1분 31초, 120개 task 실행
+- 새 AAB의 서명, 준비한 앱 자산의 경로·바이트, 필수 Capacitor 라이브러리 자산의 해시 대조 통과
+- 빌드 뒤 소스·공개 설정·복사 파일·검증 코드의 일치 확인 통과
+- 성공 기록을 남기기 전에 임시 서명키와 생성 AAB를 삭제했고, 업로드 artifact는 0개
 
-추가로 기존 Gradle 설치를 명시할 수 있게 했습니다. `GENIE_GRADLE_EXECUTABLE`,
-`GRADLE_HOME`, 기존 wrapper cache 순으로 찾으며, 잘못된 명시 값이 있으면 다른
-설치로 전환하지 않습니다. 실행 파일과 버전 표식을 읽는 검사이고 실제 Gradle
-실행이나 배포본 진위 검증은 아닙니다. Windows 배치 실행은 미지원으로 명확히 중단합니다.
+기계 판독용 결과와 정확한 실행 이력은
+[ANDROID-NATIVE-VERIFICATION-2026-11-23.json](./ANDROID-NATIVE-VERIFICATION-2026-11-23.json)에 있습니다.
+기록 상태는 `native-check-passed-not-a-release`입니다. 실제 서버에 연결하거나 앱을
+실행하지 않았으며, 정식 출시용 AAB를 보관한 결과는 아닙니다.
 
-도구·실행 흐름 관련 검사는 **26개가 통과**했습니다. 기존 앱 전체 테스트는 반복하지
-않았습니다. 이 중 Python ZIP 검사는 실제로 작은 로컬 ZIP을 읽어 정확한 자산만
-허용하고 추가 파일이나 변경된 바이트를 거부하는 것을 확인했습니다. 모의 AAB 흐름
-테스트를 실제 Android 빌드로 계산하지 않았습니다.
+## 실제 실행에서 발견하고 해결한 문제
 
-## 지금 가능한 다음 경로
+첫 실행은 컴파일·임시 서명까지 통과했지만 최종 자산 대조에서 멈췄습니다.
+진단을 추가한 두 번째 실행에서 누락·내용 변경은 없고,
+`base/assets/native-bridge.js` 한 파일만 기존 기대 목록에 없다는 사실을 확인했습니다.
+이 파일의 SHA-256은 설치된 `@capacitor/android` 8.6.2의 원본과 정확히 같았습니다.
 
-기존 저장소 `jmpark0611-art/bestchoice`는 읽기 전용 조회 결과 공개 저장소입니다.
-확인한 웹 후보 브랜치 `codex/genie-v7-release-candidate-20261120`의 현재 커밋은
-`6cb0b24748dae152e66f8f4639506dba53b618cf`입니다. 새로 준비한 빌드 브랜치는 아직
-원격에 만들지 않았습니다.
+```text
+02dfc17bd41d1e5d0748f7f6c48aa9f2a3e624bb3677df488db466fbc93f2246
+```
 
-| 항목 | 준비한 범위 |
-| --- | --- |
-| 새 브랜치 | `codex/genie-android-native-check-20261123` |
-| 시작 기준 | 위의 정확한 웹 후보 커밋에서 분기. 반영 직전 다시 확인 |
-| 반영 대상 | 이번까지의 최신 `web/` 변경분과 새 `.github/workflows/android-native-check.yml` |
-| 보존 대상 | 기본 브랜치, 기존 출시 후보 브랜치, 기존 `app/`, Supabase 함수·마이그레이션 |
-| 실행기 | 공개 저장소의 표준 `ubuntu-24.04`, 최대 25분 |
-| 도구 | 실행기에 이미 제공되는 Java 21, SDK platform 36, Build Tools 35.0.0. 없으면 중단 |
-| 의존성 | package-lock 기준 npm 설치; 공식 체크섬으로 고정한 Gradle 8.14.3 및 네이티브 빌드 의존성 다운로드 |
-| 앱 입력 | 합성 URL·공개 키·검증용 앱 ID만 사용. 실제 서버 접속이나 앱 실행 없음 |
-| 서명 | 실행 중 생성한 일회용 키. 계정·운영 서명키를 읽지 않음 |
-| 검사 | 새 Android 사본에서 실제 release 컴파일, AAB 서명, 패키지 내 웹 자산의 경로·바이트 대조 |
-| 결과 | 성공 시 임시 키와 AAB를 삭제하고 커밋·해시·확인 범위를 job summary에 기록 |
-| 원격 기록 | GitHub 코드와 빌드 로그·요약. 별도 artifact/cache 업로드 없음 |
+Android 빌드는 앱 입력 폴더와 라이브러리의 자산을 병합합니다.
+기존 검증기가 앱 입력 폴더만 기대 목록에 포함한 것이 원인이었습니다.
+검증기를 수정하여 이 정확한 파일의 빌드 전 원본 해시를 기록하고 AAB 안의 파일과
+대조하며, 빌드 뒤 원본이 바뀌거나 앱 자산과 경로가 충돌해도 실패하도록 했습니다.
+다른 추가 파일이나 누락·내용 변경을 허용하는 예외는 넣지 않았습니다.
 
-표준 GitHub 실행기의 공개 저장소 사용은 공식 문서상 무료입니다. 유료 실행기,
-새 유료 환경 또는 계정 결제 설정을 사용하지 않도록 구성했습니다. 저장소가 비공개면
-job 조건에서 실행하지 않습니다. 실제 원격 실행은 아직 하지 않았습니다.
+변경한 범위의 로컬 검사 4개가 통과했습니다. 실제 Python ZIP 검사는 정상,
+추가 파일, 앱 파일 변경·누락, bridge 파일 변경·누락의 여섯 경우를 확인했습니다.
+네이티브 명령을 주입한 정리·기록 검사는 실제 Android 빌드와 구분했습니다.
+수정본의 세 번째 원격 실행에서 전체 검증이 통과했습니다. 기존 앱 전체 테스트는
+반복하지 않았습니다.
 
-Vercel Git 연동이 있으면 브랜치 push가 웹 자동 배포로 이어질 수 있으므로,
-`web/vercel.json`에서 **위의 새 빌드 브랜치만** 자동 배포를 끄도록 준비했습니다.
-읽기 전용으로 확인한 현재 Vercel 계정/팀에서는 이 GitHub 저장소 ID로 연결된
-프로젝트가 반환되지 않았습니다. 이것은 다른 계정의 연결까지 없다는 증거는 아니므로,
-실제 반영 직전 연결 상태와 프로젝트 root directory를 다시 확인해야 합니다.
+| 실행 | 검증 커밋 | 결과 |
+| --- | --- | --- |
+| [첫 빌드](https://github.com/jmpark0611-art/bestchoice/actions/runs/45114017080) | `70d44c0` | 컴파일·서명 통과, 자산 기대 목록 불일치로 실패 |
+| [원인 진단](https://github.com/jmpark0611-art/bestchoice/actions/runs/45114434469) | `96a4256` | 추가 파일 경로·해시를 확인하고 실패 유지 |
+| [수정 검증](https://github.com/jmpark0611-art/bestchoice/actions/runs/45114713986) | `9c88d19` | 컴파일·서명·자산 대조·정리 모두 성공 |
 
-## 왜 아직 원격 실행하지 않았는가
+## 반영 범위와 보존한 기존 작업
 
-사용자의 기존 지시에는 **어디에도 업로드·푸시·병합·배포하지 말 것**이 포함되어
-있습니다. 로컬 코드와 실행 구성을 완성해 검토 가능한 상태로 만들었지만,
-위 공개 저장소의 새 브랜치에 소스를 올리는 작업은 그 제한을 바꾸는 것이므로 아직
-실행하지 않았습니다. 이 범위에 대한 허용이 있어야 다음 원격 빌드를 시작할 수 있습니다.
+기존 출시 후보 `6cb0b24748dae152e66f8f4639506dba53b618cf`의 원격 tree에
+검토한 파일 129개만 추가·수정하여 첫 검증 커밋을 만들었습니다. 원격에만 있던
+기존 파일 100개를 보존하고 해시·mode를 대조했습니다. 기본 브랜치와 기존
+출시 후보 및 다른 기존 브랜치의 HEAD도 변경되지 않았습니다.
 
-허용을 구하는 범위는 **위 새 빌드 브랜치에 필요한 소스를 반영하고 표준 실행기에서
-합성 설정으로 네이티브 빌드를 한 번 실행하는 것**입니다. 기본 브랜치 병합,
-운영 데이터·설정 쓰기, 웹 배포, 스토어 제출을 포함하지 않습니다. 공개 저장소에
-반영하는 코드와 그 빌드 로그는 공개될 수 있습니다.
+후속 수정과 결과 기록도 위 빌드 전용 브랜치의 `web/` 및 native workflow
+범위에만 반영했습니다. 기존 `app/`, Supabase 함수·마이그레이션과 기존
+release-candidate workflow는 보존했습니다. 병합, 웹 배포, 운영 데이터·계정·결제
+설정 변경, Google Play 제출은 수행하지 않았습니다.
 
-## 검증 성공 뒤에도 남는 것
+`web/vercel.json`에는 이 빌드 브랜치의 자동 배포 비활성화가 포함되어 있습니다.
+반영 전 현재 연결된 Vercel 계정과 팀에서 이 저장소 ID의 프로젝트가 반환되지
+않는 것을 다시 확인했습니다. 이것은 다른 계정의 모든 연결을 조사했다는 의미는 아닙니다.
 
-원격 네이티브 확인이 성공해도 정식 앱 패키지 ID·버전, 승인된 서버와 공유 웹 주소,
-정식 업로드 서명키가 자동으로 확정되는 것은 아닙니다. 최종 AAB의 binary Manifest
-식별자 확인, 별도 격리 서버의 두 세션 통합 확인, 실기기 확인도 남습니다.
-이후 정식 입력으로 `android:bundle`을 새로 실행해 보관할 출시용 AAB를 생성합니다.
+## 정식 출시까지 남는 단계
+
+1. 실제 앱 패키지 ID·버전, 승인된 서버의 공개 설정, 공유 링크를 열 웹 주소를 확정합니다.
+   이번 합성 앱 ID와 가짜 서버 설정은 출시 입력으로 쓰지 않습니다.
+2. 비공개 빌드 환경에서 정식 업로드 서명키를 연결하고 새 출시용 AAB를 만듭니다.
+   최종 binary Manifest의 앱 ID·버전도 확인해야 합니다. 이번 receipt의
+   `finalBinaryManifestIdentityVerified`는 `false`입니다.
+3. 이미 접근이 허용된 별도 격리 서버가 준비되면 합성 데이터·분리된 두 세션으로
+   결정→공유→투표→작성자 집계/삭제를 확인합니다. Android 실기기에서 시작,
+   뒤로가기, 공유 링크, 초안 복원, 투표·신고 흐름을 확인한 뒤 스토어 준비를 마무리합니다.
+
+현재 검증에는 실제 서버 접속, 실기기 실행, 정식 서명키, 스토어 제출이 포함되지
+않습니다. Android 출시 준비를 먼저 진행하고 iOS를 이어갑니다.
 
 ## 근거
 
-- 로컬 실행 기록: `JAVA-MODULE-ADAPTER-PROOF.json`, `android-unblock-prerequisites.json`, `android-unblock-focused-tests.log`.
-- [GitHub 표준 실행기와 공개 저장소 요금](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
-- [Ubuntu 24.04 제공 도구](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md).
-- [Gradle 8.14.3 공식 배포 체크섬](https://gradle.org/release-checksums/).
-- [AGP 8.13 호환성](https://developer.android.com/build/releases/agp-8-13-0-release-notes).
-- [Vercel 브랜치별 자동 배포 설정](https://vercel.com/docs/project-configuration/git-configuration).
-- Gradle 설치 표식은 [공식 v8.14.3 배포 생성 코드](https://github.com/gradle/gradle/blob/e5ee1df3d88b8ca3a8074787a94f373e3090e1db/build-logic/packaging/src/main/kotlin/gradlebuild.distributions.gradle.kts), [시작 스크립트 생성 코드](https://github.com/gradle/gradle/blob/e5ee1df3d88b8ca3a8074787a94f373e3090e1db/build-logic/jvm/src/main/kotlin/gradlebuild/startscript/tasks/GradleStartScriptGenerator.kt), [모듈 이름 규칙](https://github.com/gradle/gradle/blob/e5ee1df3d88b8ca3a8074787a94f373e3090e1db/build-logic-commons/module-identity/src/main/kotlin/gradlebuild.module-identity.gradle.kts)을 조합해 확인했습니다. 배포 바이너리를 실제 실행한 근거와 구분합니다.
+- 위의 세 GitHub Actions 실행과 성공 receipt, 해당 커밋의 native smoke 코드.
+- [AGP 8.13 ASSETS API](https://developer.android.com/reference/tools/gradle-api/8.13/com/android/build/api/artifact/SingleArtifact.ASSETS): 최종 APK/Bundle의 병합 자산.
+- 잠긴 설치의 `@capacitor/android/capacitor/src/main/assets/native-bridge.js`와 `JSExport.java`.

@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "status": "android-native-verification-passed-not-store-ready",
+  "verifiedAtKst": "2026-11-23T13:57:54+09:00",
+  "repository": "jmpark0611-art/bestchoice",
+  "branch": "codex/genie-android-native-check-20261123",
+  "testedCommit": "9c88d192f26fd370e02186abad71d5794fabc961",
+  "localSourceCommit": "1fe613b38df345a70d13d2c3b64db42301049fc9",
+  "workflowRuns": [
+    {
+      "id": 45114017080,
+      "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45114017080",
+      "headSha": "70d44c0358a8d01f39ad38cdf42ea7f4f4dad7ce",
+      "event": "push",
+      "runAttempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-11-23T04:48:26Z",
+      "updatedAt": "2026-11-23T04:50:07Z"
+    },
+    {
+      "id": 45114434469,
+      "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45114434469",
+      "headSha": "96a42564bc06d99673c8a64936e344b4ad945019",
+      "event": "push",
+      "runAttempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-11-23T04:52:59Z",
+      "updatedAt": "2026-11-23T04:54:33Z"
+    },
+    {
+      "id": 45114713986,
+      "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45114713986",
+      "headSha": "9c88d192f26fd370e02186abad71d5794fabc961",
+      "event": "push",
+      "runAttempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-23T04:56:01Z",
+      "updatedAt": "2026-11-23T04:57:54Z"
+    }
+  ],
+  "successfulRun": 45114713986,
+  "successfulJob": 137494796254,
+  "actualGradleBuild": {
+    "version": "8.14.3",
+    "result": "BUILD SUCCESSFUL",
+    "duration": "1m 31s",
+    "executedTasks": 120
+  },
+  "receipt": {
+    "status": "native-check-passed-not-a-release",
+    "sourceCommit": "9c88d192f26fd370e02186abad71d5794fabc961",
+    "node": "v24.22.3",
+    "javac": "javac 21.0.13",
+    "configuredApplicationId": "kr.synthfixture.genie",
+    "versionCode": 12,
+    "versionName": "1.2.0",
+    "aabSha256": "86b9a07936241b64fbc3cf1b581913929cef4bb443c149b66244c160b72f3eee",
+    "nativeCompilation": true,
+    "signatureVerified": true,
+    "packagedAssetsMatch": true,
+    "libraryAssetsVerified": {
+      "base/assets/native-bridge.js": "02dfc17bd41d1e5d0748f7f6c48aa9f2a3e624bb3677df488db466fbc93f2246"
+    },
+    "finalBinaryManifestIdentityVerified": false,
+    "syntheticConfigurationOnly": true,
+    "backendContacted": false,
+    "appOrDeviceLaunched": false,
+    "storeSubmission": false,
+    "productionSigningKeyUsed": false,
+    "generatedKeyAndAabDeleted": true
+  },
+  "uploadedArtifacts": 0,
+  "sourceScope": {
+    "baseCommit": "6cb0b24748dae152e66f8f4639506dba53b618cf",
+    "initialOverlayFiles": 129,
+    "preservedExistingFiles": 100,
+    "defaultAndExistingBranchesUnchanged": true,
+    "changedRemotePaths": [
+      "web/**",
+      ".github/workflows/android-native-check.yml"
+    ]
+  },
+  "correction": {
+    "cause": "The package expectation omitted the required Capacitor library asset.",
+    "confirmedPath": "base/assets/native-bridge.js",
+    "confirmedDependencyVersion": "8.6.2",
+    "confirmedSha256": "02dfc17bd41d1e5d0748f7f6c48aa9f2a3e624bb3677df488db466fbc93f2246",
+    "policy": "Require this exact path and pre-build source SHA-256, reject all other unexpected assets, and reject dependency source drift."
+  },
+  "focusedValidation": {
+    "executedTests": 4,
+    "scope": "Only changed native asset checks, cleanup and receipt behavior; six real Python ZIP scenarios, with injected native commands for orchestration."
+  },
+  "remaining": [
+    "Confirm real application ID/version, approved backend and public share origin.",
+    "Provide the release upload signing identity in a private build environment.",
+    "Verify final AAB binary Manifest identity/version.",
+    "Run the already-authorized isolated backend integration flow when such an environment is available.",
+    "Create the release AAB with real inputs, verify Android device behavior, and prepare Google Play review; no submission is authorized by this check."
+  ],
+  "productionChanges": false,
+  "webDeploymentPerformed": false,
+  "storeSubmission": false
+}
