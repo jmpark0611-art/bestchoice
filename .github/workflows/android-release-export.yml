@@ -3,6 +3,7 @@ name: Genie Android unsigned candidate export
 # A single short-lived unsigned export from the approved PUBLIC repository.
 # No signing secrets, backend interaction, cache, deployment or store submission.
 # Only edits to this workflow trigger a new export; app changes do not upload it.
+# Candidate revision: dedicated Genie launcher, launch background and web icon.
 on:
   push:
     branches:

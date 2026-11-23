@@ -5,14 +5,18 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createServer as createTcpServer, createConnection } from 'node:net';
 import { PINS, validateInvocation, localEnvironment, dockerPolicyArguments, validateNetwork,
   validateContainers, firewallPlan, stackConfig, readPinnedInputs, parseLocalStatus,
-  runLocalStackCheck, cleanupInterruptedRun, sanitizedFailureDiagnostic, startupContainerStates } from './local-stack-check.mjs';
+  runLocalStackCheck, cleanupInterruptedRun, sanitizedFailureDiagnostic, startupContainerStates,
+  validatedProxyTarget, OwnedLoopbackProxy, DockerStackRuntime } from './local-stack-check.mjs';
 
 const nonce = '123456abcdef';
 const network = 'genie-local-' + nonce;
 const projectId = 'genie_it_' + nonce;
 const workspace = '/tmp/genie-local-stack-work-fixture';
+const networkId = 'a'.repeat(64);
+const identity = { projectId, nonce, network, networkId, workspace };
 const approved = () => ({ GITHUB_ACTIONS: 'true', RUNNER_ENVIRONMENT: 'github-hosted', RUNNER_OS: 'Linux',
   GITHUB_REPOSITORY: 'jmpark0611-art/bestchoice', GITHUB_REF: 'refs/heads/codex/genie-android-native-check-20261123',
   GENIE_PUBLIC_REPOSITORY: 'true', GITHUB_RUN_ID: '123', GITHUB_RUN_ATTEMPT: '1', RUNNER_TEMP: '/tmp' });
@@ -28,11 +32,17 @@ function makeContainers(edge = false) {
     Config: { Image: 'public.ecr.aws/supabase/' + image,
       Labels: { 'com.supabase.cli.project': projectId, 'genie.local.integration': nonce }, Env: ['LOCAL_TEST=true'] },
     HostConfig: { NetworkMode: network, Privileged: false, Dns: ['127.0.0.1'], PidMode: '', IpcMode: 'private' },
-    NetworkSettings: { Networks: { [network]: { Aliases: [name] } },
-      Ports: name === 'kong' ? { '8000/tcp': [{ HostIp: '127.0.0.1', HostPort: '55321' }] } : {} },
+    NetworkSettings: { Networks: { [network]: { Aliases: [name], NetworkID: networkId,
+      IPAddress: '172.30.240.' + (i + 2), IPPrefixLen: 24, GlobalIPv6Address: '' } }, Ports: {} },
     Mounts: [{ Type: 'bind', Source: workspace + '/supabase/config.toml', Destination: '/test/config.toml' }],
   }));
 }
+const proxyProof = () => [
+  { service: 'db', host: '127.0.0.1', port: 55322, listening: true, forwardedConnections: 1,
+    target: { containerId: '1'.repeat(64), ip: '172.30.240.2', port: 5432 } },
+  { service: 'kong', host: '127.0.0.1', port: 55321, listening: true, forwardedConnections: 1,
+    target: { containerId: '4'.repeat(64), ip: '172.30.240.5', port: 8000 } },
+];
 
 test('invocation accepts only the explicitly approved public hosted Linux build branch', () => {
   assert.doesNotThrow(() => validateInvocation(approved(), true, 'linux', 'x64'));
@@ -155,15 +165,152 @@ test('network inspection rejects a merely named network without internal, IPv4 a
 });
 
 test('container inspection requires exact services, loopback publication, isolated DNS and local-only mounts', () => {
-  assert.equal(Object.keys(validateContainers(makeContainers(), { projectId, nonce, network, workspace })).length, 4);
-  assert.equal(Object.keys(validateContainers(makeContainers(true), { projectId, nonce, network, workspace, edge: true })).length, 5);
+  assert.equal(Object.keys(validateContainers(makeContainers(), { ...identity, loopbackProxies: proxyProof() })).length, 4);
+  assert.equal(Object.keys(validateContainers(makeContainers(true), { ...identity, edge: true, loopbackProxies: proxyProof() })).length, 5);
   for (const mutate of [v => { v[0].HostConfig.Dns = ['8.8.8.8']; }, v => { v[0].HostConfig.Privileged = true; },
     v => { v[0].NetworkSettings.Networks.other = {}; }, v => { v[0].Mounts[0].Source = '/var/run/docker.sock'; },
     v => { v[0].Mounts[0].Source = '/home/runner/.env'; }, v => { v[0].Config.Env.push('OPENAI_API_KEY=never-print'); },
-    v => { v[3].NetworkSettings.Ports['8000/tcp'][0].HostIp = '0.0.0.0'; }, v => { v.pop(); }]) {
+    v => { v[3].NetworkSettings.Ports['8000/tcp'] = [{ HostIp: '0.0.0.0', HostPort: '55321' }]; }, v => { v.pop(); }]) {
     const values = makeContainers(); mutate(values);
-    assert.throws(() => validateContainers(values, { projectId, nonce, network, workspace }));
+    assert.throws(() => validateContainers(values, { ...identity, loopbackProxies: proxyProof() }));
   }
+});
+
+test('internal Docker port intent cannot substitute for a verified, working owned loopback listener', () => {
+  const containers = makeContainers();
+  containers[3].NetworkSettings.Ports['8000/tcp'] = [{ HostIp: '127.0.0.1', HostPort: '55321' }];
+  assert.throws(() => validateContainers(containers, identity), /APPROVED_LISTENER_UNCONFIRMED/);
+  for (const mutate of [proof => { proof[0].listening = false; }, proof => { proof[1].host = '0.0.0.0'; },
+    proof => { proof[0].target.ip = '172.30.240.200'; }, proof => { proof[1].forwardedConnections = 0; }]) {
+    const proof = proxyProof(); mutate(proof);
+    assert.throws(() => validateContainers(containers, { ...identity, loopbackProxies: proof }), /APPROVED_LISTENER_UNCONFIRMED/);
+  }
+});
+
+test('loopback targets require exact run, service, image and single internal IPv4 network identity', () => {
+  assert.deepEqual(validatedProxyTarget(makeContainers()[0], 'db', identity), proxyProof()[0].target);
+  assert.deepEqual(validatedProxyTarget(makeContainers()[3], 'kong', identity), proxyProof()[1].target);
+  assert.throws(() => validatedProxyTarget(makeContainers()[1], 'auth', identity), /UNAPPROVED_LOOPBACK_SERVICE/);
+  for (const mutate of [v => { v.Config.Labels['genie.local.integration'] = 'other'; },
+    v => { v.Config.Labels['com.supabase.cli.project'] = 'other'; }, v => { v.Config.Image = 'untrusted/image'; },
+    v => { v.State.Running = false; }, v => { v.HostConfig.Dns = ['8.8.8.8']; },
+    v => { v.NetworkSettings.Networks.other = {}; }, v => { v.NetworkSettings.Networks[network].NetworkID = 'b'.repeat(64); },
+    v => { v.NetworkSettings.Networks[network].IPAddress = '127.0.0.1'; },
+    v => { v.NetworkSettings.Networks[network].IPAddress = '172.30.240.1'; },
+    v => { v.NetworkSettings.Networks[network].IPAddress = '172.30.240.255'; },
+    v => { v.NetworkSettings.Networks[network].IPPrefixLen = 16; }]) {
+    const item = makeContainers()[0]; mutate(item);
+    assert.throws(() => validatedProxyTarget(item, 'db', identity));
+  }
+});
+
+const listenLocal = server => new Promise((resolve, reject) => {
+  server.once('error', reject); server.listen({ host: '127.0.0.1', port: 0, exclusive: true }, resolve);
+});
+const stopLocal = server => new Promise(resolve => server.close(() => resolve()));
+
+test('owned loopback proxy rejects an unverified target, forwards actual TCP bytes only after approval, and closes its sockets', { timeout: 5000 }, async () => {
+  const backendSockets = new Set();
+  const backend = createTcpServer(socket => {
+    backendSockets.add(socket); socket.on('close', () => backendSockets.delete(socket));
+    socket.on('data', data => socket.write(data));
+  });
+  await listenLocal(backend);
+  let dialCount = 0, client;
+  const proxy = new OwnedLoopbackProxy('db', identity, { connect: options => {
+    assert.deepEqual(options, { host: '172.30.240.2', port: 5432, family: 4 }); dialCount++;
+    // Test transport is an owned random loopback echo endpoint, never a real DB.
+    return createConnection({ host: '127.0.0.1', port: backend.address().port });
+  } });
+  try {
+    await proxy.start();
+    const denied = createConnection({ host: '127.0.0.1', port: 55322 }); denied.on('error', () => {});
+    await new Promise(resolve => denied.once('close', resolve));
+    assert.equal(dialCount, 0);
+    proxy.setTarget(makeContainers()[0]);
+    client = createConnection({ host: '127.0.0.1', port: 55322 }); client.on('error', () => {});
+    const reply = new Promise((resolve, reject) => { client.once('data', data => resolve(data.toString())); client.once('error', reject); });
+    client.write('synthetic-proxy-check');
+    assert.equal(await reply, 'synthetic-proxy-check');
+    assert.equal(proxy.proof().forwardedConnections, 1);
+    proxy.clearTarget();
+    const revoked = createConnection({ host: '127.0.0.1', port: 55322 }); revoked.on('error', () => {});
+    await new Promise(resolve => revoked.once('close', resolve));
+    assert.equal(dialCount, 1); assert.equal(proxy.proof().target, null);
+    proxy.setTarget(makeContainers()[0]);
+    const changed = makeContainers()[0]; changed.Id = 'b'.repeat(64);
+    assert.throws(() => proxy.setTarget(changed), /LOOPBACK_TARGET_CHANGED/);
+    const ended = new Promise(resolve => client.once('close', resolve));
+    assert.equal(await proxy.close(), true); await ended;
+    assert.equal(proxy.proof().listening, false); assert.equal(await proxy.close(), true);
+    assert.throws(() => proxy.setTarget(makeContainers()[0]), /LOOPBACK_PROXY_UNAVAILABLE/);
+  } finally {
+    client?.destroy(); await proxy.close();
+    for (const socket of backendSockets) socket.destroy(); await stopLocal(backend);
+  }
+});
+
+test('owned loopback proxy fails on an occupied port without closing or replacing that listener', { timeout: 5000 }, async () => {
+  const blocker = createTcpServer(socket => socket.end('existing-owner'));
+  await new Promise((resolve, reject) => { blocker.once('error', reject); blocker.listen(55322, '127.0.0.1', resolve); });
+  const proxy = new OwnedLoopbackProxy('db', identity);
+  try {
+    await assert.rejects(proxy.start(), /APPROVED_LOOPBACK_PORT_UNAVAILABLE/);
+    assert.equal(await proxy.close(), true); assert.equal(blocker.listening, true);
+    const client = createConnection({ host: '127.0.0.1', port: 55322 });
+    assert.equal(await new Promise((resolve, reject) => { client.once('data', data => resolve(data.toString())); client.once('error', reject); }), 'existing-owner');
+    client.destroy();
+  } finally { await proxy.close(); await stopLocal(blocker); }
+});
+
+test('startup inspection revokes previous proxy targets on missing, malformed or failed evidence', async () => {
+  const runtime = new DockerStackRuntime({ repoRoot: workspace, env: approved() });
+  runtime.state = { ...runtime.state, ...identity, networkName: network };
+  runtime.proxies = ['db', 'kong'].map(service => new OwnedLoopbackProxy(service, identity));
+  const valid = () => {
+    runtime.docker = async () => ({ stdout: makeContainers().map(item => item.Id).join('\n') });
+    runtime.inspect = async () => makeContainers();
+  };
+  try {
+    for (const breakInspection of [
+      () => { runtime.docker = async () => ({ stdout: '' }); },
+      () => { runtime.docker = async () => ({ stdout: 'invalid-container-id' }); },
+      () => { runtime.docker = async () => { throw new Error('DOCKER_OPERATION_FAILED'); }; },
+      () => { runtime.inspect = async () => { throw new Error('DOCKER_INSPECTION_INVALID'); }; },
+      () => { runtime.inspect = async () => ({}); },
+      () => { runtime.inspect = async () => []; },
+    ]) {
+      valid(); await runtime.captureStartupStates();
+      assert.ok(runtime.proxies.every(proxy => proxy.proof().target));
+      breakInspection(); await runtime.captureStartupStates();
+      assert.ok(runtime.proxies.every(proxy => proxy.proof().target === null));
+    }
+    valid(); await runtime.captureStartupStates();
+    const wrongRun = makeContainers(); wrongRun[3].Config.Labels['genie.local.integration'] = 'other';
+    runtime.inspect = async () => wrongRun;
+    await assert.rejects(runtime.captureStartupStates(), /STACK_CONTAINER_IDENTITY_UNCONFIRMED/);
+    assert.ok(runtime.proxies.every(proxy => proxy.proof().target === null));
+  } finally { await Promise.all(runtime.proxies.map(proxy => proxy.close())); }
+});
+
+test('core API readiness explicitly reads only the owned loopback health route before synthetic sessions', async () => {
+  const calls = []; let status = 200;
+  const runtime = new DockerStackRuntime({ repoRoot: workspace, env: approved(), send: async (url, options) => {
+    calls.push({ url, options }); return new Response('', { status });
+  } });
+  runtime.keys = { anon: jwt('anon') };
+  runtime.proxies = [{ service: 'kong', proof: () => proxyProof()[1] }];
+  await runtime.verifyLoopbackApi();
+  assert.equal(calls.length, 1); assert.equal(calls[0].url, 'http://127.0.0.1:55321/auth/v1/health');
+  assert.equal(calls[0].options.method, 'GET'); assert.equal(calls[0].options.redirect, 'error');
+  assert.deepEqual(calls[0].options.headers, { apikey: jwt('anon') });
+  assert.ok(calls[0].options.signal instanceof AbortSignal); assert.equal(calls[0].options.body, undefined);
+  for (status of [201, 302, 503]) await assert.rejects(runtime.verifyLoopbackApi(), /LOCAL_CORE_API_READINESS_UNCONFIRMED/);
+  runtime.send = async () => { throw new Error('untrusted connection failure'); };
+  await assert.rejects(runtime.verifyLoopbackApi(), /LOCAL_CORE_API_READINESS_UNCONFIRMED/);
+  runtime.proxies[0].proof = () => ({ ...proxyProof()[1], target: null });
+  runtime.send = async () => assert.fail('an unverified target must not receive a request');
+  await assert.rejects(runtime.verifyLoopbackApi(), /APPROVED_LISTENER_UNCONFIRMED/);
 });
 
 test('firewall plan touches only this bridge and CIDR and records exact inverse operations', () => {

@@ -19,6 +19,8 @@
 
 승인된 공개 저장소의 전용 브랜치, 표준 `ubuntu-24.04` GitHub runner에서만 실행됩니다. 실행기와 필요한 이미지를 내려받는 단계 이후, 모든 Supabase 컨테이너는 새 `--internal` 네트워크에 생성됩니다. API와 DB 포트는 `127.0.0.1`에만 바인딩됩니다. 원래 승인된 API 주소는 `http://127.0.0.1:55321`입니다.
 
+Docker 내부망에서는 `-p`만으로 호스트 포트 연결을 기대하지 않습니다. 실행 프로세스가 소유하는 TCP listener 두 개가 `127.0.0.1:55322`에서 이번 DB의 내부 IP·5432로, `127.0.0.1:55321`에서 이번 Kong의 내부 IP·8000으로 연결합니다. listener를 먼저 독점 바인딩하고, 실행 nonce·project 라벨, 정확한 이미지, 실행 상태, 단일 내부 네트워크 ID와 IPv4 주소를 inspect로 확인한 뒤에만 전달합니다. 확인 전 연결, 교체된 컨테이너, 다른 주소는 거부하며 inspect가 실패하거나 컨테이너가 사라지면 기존 전달 대상도 비웁니다. CLI 시작 후에는 위 로컬 API의 `/auth/v1/health`를 GET으로 확인합니다. 이 요청은 세션이나 데이터를 만들지 않으며 외부 리다이렉트를 따라가지 않습니다. 이미 사용 중인 포트를 뺏거나 다른 프로세스를 종료하지 않습니다. 정리 시 이 프로세스의 listener와 열린 연결을 먼저 닫습니다.
+
 호스트 전체 방화벽 정책은 바꾸지 않습니다. 새 Docker 브리지와 `172.30.240.0/24`에만 적용되는 INPUT 및 DOCKER-USER 규칙으로 컨테이너가 호스트나 다른 네트워크로 새 연결을 만드는 것을 거부합니다. CLI 전용 임시 Docker wrapper는 컨테이너 생성마다 같은 네트워크와 `--dns 127.0.0.1`을 강제합니다. Docker 내부 이름 해석은 유지하고 외부 DNS의 상위 주소를 각 컨테이너 자신의 loopback으로 제한합니다. 실제 inspect 결과도 확인합니다.
 
 핵심 서비스 시작 후 Kong의 네트워크 namespace에서, 함수 시작 후 Edge Runtime의 namespace에서 다시 확인합니다. 내부 Kong에 연결되는지, 살아 있는 호스트 HTTP 대상과 별도 내부 네트워크의 HTTP 대상에 연결할 수 없는지 검사합니다. `.invalid` DNS 실패는 고정 DNS 설정을 보조하는 확인이며, 그 실패만으로 외부 차단을 증명하지 않습니다. 검사용 HTTP 대상은 이번 실행에서만 생성되며 운영 URL이나 모델 API에 접속하지 않습니다. fixture의 기존 허용 origin 세 개와 API 경로 목록은 넓히지 않았습니다.
@@ -33,7 +35,7 @@
 
 ## 실행과 검증 범위
 
-로컬의 네트워크 없는 집중 검사:
+로컬 집중 검사(외부 연결 없음, proxy lifecycle 검사는 소유한 loopback echo 서버만 사용):
 
 ```sh
 node --test web/scripts/local-stack-check.test.mjs web/qa/local-stack-fixture/fixture.test.mjs
@@ -47,5 +49,8 @@ node --test web/scripts/local-stack-check.test.mjs web/qa/local-stack-fixture/fi
 - [고정 CLI의 서비스 이미지 목록](https://github.com/supabase/cli/blob/c3c7a586b11b6605358177efabbc1b1cb7589b23/apps/cli/src/shared/services/Dockerfile)
 - [고정 CLI Docker 생성 인자](https://github.com/supabase/cli/blob/c3c7a586b11b6605358177efabbc1b1cb7589b23/apps/cli/src/command-internal/db-bootstrap/docker-create-args.ts)
 - [고정 CLI functions serve](https://github.com/supabase/cli/blob/c3c7a586b11b6605358177efabbc1b1cb7589b23/apps/cli/src/shared/functions/serve.ts)
+- [고정 CLI의 host DB 준비 확인](https://github.com/supabase/cli/blob/c3c7a586b11b6605358177efabbc1b1cb7589b23/apps/cli/src/command-internal/db-bootstrap/start-database.ts)
+- [고정 CLI의 오류 형식 인자 `--output-format`](https://github.com/supabase/cli/blob/c3c7a586b11b6605358177efabbc1b1cb7589b23/apps/cli/src/shared/cli/agent-output.ts)
+- [Docker 내부망의 port mapping 경로](https://github.com/moby/moby/blob/v28.5.2/libnetwork/endpoint.go)
 - [Docker internal network 동작](https://docs.docker.com/reference/cli/docker/network/create/#internal)
 - [Docker DNS 및 network namespace](https://docs.docker.com/engine/network/)

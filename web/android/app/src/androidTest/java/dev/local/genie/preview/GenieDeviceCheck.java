@@ -5,14 +5,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import android.accessibilityservice.AccessibilityService;
 import android.app.Instrumentation;
+import android.app.UiAutomation;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.view.KeyEvent;
+import android.webkit.WebBackForwardList;
 import android.webkit.WebView;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -86,6 +88,35 @@ public class GenieDeviceCheck {
         instrumentation.sendStatus(2, status);
     }
 
+    private JSONObject nativeBackState() throws Exception {
+        AtomicReference<JSONObject> state = new AtomicReference<>();
+        AtomicReference<Exception> failure = new AtomicReference<>();
+        instrumentation.runOnMainSync(() -> {
+            try {
+                WebView webView = activity.getBridge().getWebView();
+                WebBackForwardList history = webView.copyBackForwardList();
+                state.set(new JSONObject().put("focused", activity.hasWindowFocus())
+                    .put("finishing", activity.isFinishing()).put("destroyed", activity.isDestroyed())
+                    .put("canGoBack", webView.canGoBack()).put("historyIndex", history.getCurrentIndex())
+                    .put("historySize", history.getSize()));
+            } catch (Exception error) { failure.set(error); }
+        });
+        if (failure.get() != null) throw failure.get();
+        return state.get();
+    }
+
+    private JSONObject awaitNativeBackReady() throws Exception {
+        long deadline = SystemClock.elapsedRealtime() + 20_000;
+        JSONObject state;
+        do {
+            state = nativeBackState();
+            if (state.getBoolean("focused") && state.getBoolean("canGoBack")
+                && !state.getBoolean("finishing") && !state.getBoolean("destroyed")) return state;
+            SystemClock.sleep(100);
+        } while (SystemClock.elapsedRealtime() < deadline);
+        throw new AssertionError("Native Back input/history was not ready: " + state);
+    }
+
     private JSONObject layout() throws Exception {
         awaitTrue("document.fonts.status === 'loaded'", "Local fonts did not finish loading");
         JSONObject measured = new JSONObject(evaluate("(() => {"
@@ -130,9 +161,21 @@ public class GenieDeviceCheck {
         assertEquals("About navigation link is missing", "true", evaluate("(() => {"
             + "const a=document.querySelector('a[href=\"/about\"]'); if(!a)return false; a.click(); return true; })()"));
         awaitTrue("location.pathname==='/about' && !!document.querySelector('h2')", "About did not open");
-        instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
-        awaitTrue("location.pathname==='/' && !!document.getElementById('in-a')", "Native Android Back did not return Home");
-        report("native-back", new JSONObject().put("from", "/about").put("to", "/").put("keyCode", "KEYCODE_BACK"));
+        UiAutomation automation = instrumentation.getUiAutomation();
+        assertNotNull("Android system UI automation is unavailable", automation);
+        JSONObject beforeBack = awaitNativeBackReady();
+        // Exercise the OS Back action once; never invoke the app's dispatcher,
+        // WebView.goBack or JavaScript history directly as a passing fallback.
+        assertTrue("The Android system rejected the Back action: " + beforeBack,
+            automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK));
+        try {
+            awaitTrue("location.pathname==='/' && !!document.getElementById('in-a')", "Native Android Back did not return Home");
+        } catch (AssertionError failure) {
+            throw new AssertionError("Native Android Back did not return Home; before=" + beforeBack
+                + "; after=" + nativeBackState() + "; path=" + evaluate("location.pathname.slice(0,80)"), failure);
+        }
+        report("native-back", new JSONObject().put("from", "/about").put("to", "/")
+            .put("systemAction", "GLOBAL_ACTION_BACK").put("before", beforeBack));
         report("narrow-screen", layout());
 
         enter("in-a", A); enter("in-b", B); enter("in-note", NOTE);

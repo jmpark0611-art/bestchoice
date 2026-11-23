@@ -9,7 +9,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync,
   realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { createServer as createTcpServer } from 'node:net';
+import { createServer as createTcpServer, createConnection, isIP } from 'node:net';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { verifyLocalIntegration } from './verify-local-integration.mjs';
@@ -40,6 +40,7 @@ const IMAGES = Object.freeze({
   edge_runtime: 'public.ecr.aws/supabase/edge-runtime:v1.79.1',
 });
 const EXCLUDE = 'realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,logflare,vector,supavisor,edge-runtime';
+const LOOPBACK_SERVICES = Object.freeze({ db: { listen: 55322, target: 5432 }, kong: { listen: 55321, target: 8000 } });
 const defaultRepo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const digest = value => createHash('sha256').update(value).digest('hex');
 const regular = file => { try { return lstatSync(file).isFile() && !lstatSync(file).isSymbolicLink(); } catch { return false; } };
@@ -145,32 +146,122 @@ export function validateNetwork(value, name, cidr = PINS.networkCidr) {
   return { id: value.Id, bridge: 'br-' + value.Id.slice(0, 12), cidr, gateway: value.IPAM.Config[0].Gateway };
 }
 
-export function validateContainers(values, { projectId, nonce, network, workspace, edge = false }) {
+function validateOwnedContainer(item, suffix, { projectId, nonce, network, workspace }) {
+  ensure(item && item.Name === `/supabase_${suffix}_${projectId}` && /^[0-9a-f]{64}$/.test(item.Id ?? '') && item.State?.Running === true &&
+    item.Config?.Labels?.[PROJECT_LABEL] === projectId && item.Config?.Labels?.[RUN_LABEL] === nonce &&
+    item.Config?.Image === IMAGES[suffix], 'STACK_CONTAINER_IDENTITY_UNCONFIRMED');
+  ensure(item.HostConfig?.NetworkMode === network && item.HostConfig?.Privileged === false &&
+    JSON.stringify(item.HostConfig?.Dns) === '["127.0.0.1"]' &&
+    Object.keys(item.NetworkSettings?.Networks ?? {}).length === 1 && item.NetworkSettings.Networks[network] &&
+    !item.HostConfig?.PidMode && !item.HostConfig?.IpcMode?.startsWith('host'), 'STACK_CONTAINER_ISOLATION_UNCONFIRMED');
+  for (const bindings of Object.values(item.NetworkSettings?.Ports ?? {})) {
+    for (const binding of bindings ?? []) ensure(binding.HostIp === '127.0.0.1' &&
+      ['55321', '55322'].includes(binding.HostPort), 'NONLOOPBACK_OR_UNEXPECTED_PORT');
+  }
+  for (const mount of item.Mounts ?? []) {
+    ensure(!String(mount.Source).endsWith('docker.sock') && !String(mount.Destination).endsWith('docker.sock'), 'DOCKER_SOCKET_MOUNT_REFUSED');
+    if (mount.Type === 'bind') ensure(path.resolve(mount.Source).startsWith(workspace + path.sep), 'EXTERNAL_CONTAINER_BIND_REFUSED');
+  }
+  ensure(!(item.Config.Env ?? []).some(line => /^(?:OPENAI_|ANTHROPIC_|VITE_|GENIE_ANDROID_)/.test(line)), 'UNEXPECTED_CONTAINER_CREDENTIAL');
+}
+
+export function validatedProxyTarget(item, service, identity) {
+  ensure(Object.hasOwn(LOOPBACK_SERVICES, service), 'UNAPPROVED_LOOPBACK_SERVICE');
+  validateOwnedContainer(item, service, identity);
+  const attachment = item.NetworkSettings.Networks[identity.network];
+  const ip = attachment.IPAddress;
+  ensure(/^[0-9a-f]{64}$/.test(identity.networkId ?? '') && attachment.NetworkID === identity.networkId &&
+    attachment.IPPrefixLen === 24 && isIP(ip ?? '') === 4 && /^172\.30\.240\./.test(ip) &&
+    Number(ip.split('.')[3]) >= 2 && Number(ip.split('.')[3]) <= 254 && !attachment.GlobalIPv6Address,
+  'LOOPBACK_TARGET_NETWORK_UNCONFIRMED');
+  return Object.freeze({ containerId: item.Id, ip, port: LOOPBACK_SERVICES[service].target });
+}
+
+/** The listener belongs to this process; it never steals a port or runs a proxy subprocess. */
+export class OwnedLoopbackProxy {
+  constructor(service, identity, { serverFactory = createTcpServer, connect = createConnection } = {}) {
+    ensure(Object.hasOwn(LOOPBACK_SERVICES, service), 'UNAPPROVED_LOOPBACK_SERVICE');
+    this.service = service; this.identity = identity; this.connect = connect;
+    this.sockets = new Set(); this.forwarded = 0; this.missingTarget = 0; this.connectFailures = 0;
+    this.server = serverFactory(client => this.accept(client));
+    this.server.on('error', () => { this.listenerError = true; });
+  }
+  async start() {
+    ensure(!this.closing && !this.server.listening, 'LOOPBACK_PROXY_LIFECYCLE_INVALID');
+    try {
+      await new Promise((resolve, reject) => {
+        const error = () => { this.server.off('listening', listening); reject(new Error('APPROVED_LOOPBACK_PORT_UNAVAILABLE')); };
+        const listening = () => { this.server.off('error', error); resolve(); };
+        this.server.once('error', error); this.server.once('listening', listening);
+        this.server.listen({ host: '127.0.0.1', port: LOOPBACK_SERVICES[this.service].listen, exclusive: true });
+      });
+    } catch { fail('APPROVED_LOOPBACK_PORT_UNAVAILABLE'); }
+    const address = this.server.address();
+    ensure(address?.address === '127.0.0.1' && address.port === LOOPBACK_SERVICES[this.service].listen, 'LOOPBACK_BIND_UNCONFIRMED');
+  }
+  setTarget(item) {
+    ensure(!this.closing && !this.listenerError, 'LOOPBACK_PROXY_UNAVAILABLE');
+    const next = validatedProxyTarget(item, this.service, this.identity);
+    ensure(!this.pinnedTarget || JSON.stringify(this.pinnedTarget) === JSON.stringify(next), 'LOOPBACK_TARGET_CHANGED');
+    this.pinnedTarget = next; this.target = next;
+  }
+  clearTarget() { this.target = undefined; }
+  accept(client) {
+    if (this.closing || this.listenerError || !this.target || client.remoteAddress !== '127.0.0.1') {
+      this.missingTarget++; client.destroy(); return;
+    }
+    this.sockets.add(client); client.pause();
+    let upstream;
+    try { upstream = this.connect({ host: this.target.ip, port: this.target.port, family: 4 }); }
+    catch { this.connectFailures++; this.sockets.delete(client); client.destroy(); return; }
+    this.sockets.add(upstream);
+    const close = () => { client.destroy(); upstream.destroy(); };
+    const timeout = setTimeout(() => { this.connectFailures++; close(); }, 5000);
+    for (const socket of [client, upstream]) {
+      socket.once('error', () => { this.connectFailures++; close(); });
+      socket.once('close', () => { clearTimeout(timeout); this.sockets.delete(socket); close(); });
+    }
+    upstream.once('connect', () => {
+      clearTimeout(timeout);
+      if (this.closing || !this.target) { close(); return; }
+      this.forwarded++; client.pipe(upstream); upstream.pipe(client); client.resume();
+    });
+  }
+  proof() {
+    const address = this.server.address();
+    return { service: this.service, host: '127.0.0.1', port: LOOPBACK_SERVICES[this.service].listen,
+      listening: !this.closing && !this.listenerError && this.server.listening && address?.address === '127.0.0.1' && address.port === LOOPBACK_SERVICES[this.service].listen,
+      target: this.target ?? null, forwardedConnections: this.forwarded, missingTargetConnections: this.missingTarget,
+      connectFailures: this.connectFailures };
+  }
+  async close() {
+    if (this.closePromise) return this.closePromise;
+    this.closing = true; this.clearTarget();
+    for (const socket of this.sockets) socket.destroy();
+    this.closePromise = new Promise(resolve => {
+      if (!this.server.listening) { resolve(true); return; }
+      const timeout = setTimeout(() => resolve(false), 3000);
+      this.server.close(error => { clearTimeout(timeout); resolve(!error && !this.server.listening); });
+    });
+    return this.closePromise;
+  }
+}
+
+export function validateContainers(values, { projectId, nonce, network, networkId, workspace, edge = false, loopbackProxies = [] }) {
   const suffixes = edge ? [...CORE_SUFFIXES, 'edge_runtime'] : CORE_SUFFIXES;
   ensure(Array.isArray(values) && values.length === suffixes.length, 'UNEXPECTED_STACK_CONTAINERS');
   const bySuffix = {};
   for (const suffix of suffixes) {
     const item = values.find(value => value.Name === `/supabase_${suffix}_${projectId}`);
-    ensure(item && /^[0-9a-f]{64}$/.test(item.Id ?? '') && item.State?.Running === true &&
-      item.Config?.Labels?.[PROJECT_LABEL] === projectId && item.Config?.Labels?.[RUN_LABEL] === nonce &&
-      item.Config?.Image === IMAGES[suffix], 'STACK_CONTAINER_IDENTITY_UNCONFIRMED');
-    ensure(item.HostConfig?.NetworkMode === network && item.HostConfig?.Privileged === false &&
-      JSON.stringify(item.HostConfig?.Dns) === '["127.0.0.1"]' &&
-      Object.keys(item.NetworkSettings?.Networks ?? {}).length === 1 && item.NetworkSettings.Networks[network] &&
-      !item.HostConfig?.PidMode && !item.HostConfig?.IpcMode?.startsWith('host'), 'STACK_CONTAINER_ISOLATION_UNCONFIRMED');
-    for (const bindings of Object.values(item.NetworkSettings?.Ports ?? {})) {
-      for (const binding of bindings ?? []) ensure(binding.HostIp === '127.0.0.1' &&
-        ['55321', '55322'].includes(binding.HostPort), 'NONLOOPBACK_OR_UNEXPECTED_PORT');
-    }
-    for (const mount of item.Mounts ?? []) {
-      ensure(!String(mount.Source).endsWith('docker.sock') && !String(mount.Destination).endsWith('docker.sock'), 'DOCKER_SOCKET_MOUNT_REFUSED');
-      if (mount.Type === 'bind') ensure(path.resolve(mount.Source).startsWith(workspace + path.sep), 'EXTERNAL_CONTAINER_BIND_REFUSED');
-    }
-    ensure(!(item.Config.Env ?? []).some(line => /^(?:OPENAI_|ANTHROPIC_|VITE_|GENIE_ANDROID_)/.test(line)), 'UNEXPECTED_CONTAINER_CREDENTIAL');
+    validateOwnedContainer(item, suffix, { projectId, nonce, network, workspace });
     bySuffix[suffix] = item;
   }
-  const api = bySuffix.kong.NetworkSettings?.Ports?.['8000/tcp'];
-  ensure(api?.length === 1 && api[0].HostIp === '127.0.0.1' && api[0].HostPort === '55321', 'APPROVED_LISTENER_UNCONFIRMED');
+  for (const service of Object.keys(LOOPBACK_SERVICES)) {
+    const target = validatedProxyTarget(bySuffix[service], service, { projectId, nonce, network, networkId, workspace });
+    const proxy = loopbackProxies.find(value => value.service === service);
+    ensure(proxy?.listening === true && proxy.host === '127.0.0.1' && proxy.port === LOOPBACK_SERVICES[service].listen &&
+      JSON.stringify(proxy.target) === JSON.stringify(target) && proxy.forwardedConnections > 0, 'APPROVED_LISTENER_UNCONFIRMED');
+  }
   ensure(bySuffix.kong.NetworkSettings.Networks[network].Aliases?.includes('kong'), 'LOCAL_GATEWAY_ALIAS_UNCONFIRMED');
   return bySuffix;
 }
@@ -341,11 +432,22 @@ export function startupContainerStates(values, projectId, nonce) {
     const service = [...CORE_SUFFIXES, 'edge_runtime'].find(name => item.Name === `/supabase_${name}_${projectId}`);
     if (!service || item.Config?.Labels?.[PROJECT_LABEL] !== projectId) return [];
     const state = item.State ?? {}, health = state.Health;
+    const projectNetwork = item.NetworkSettings?.Networks?.['genie-local-' + nonce];
+    const ports = bindings => Object.entries(bindings ?? {}).filter(([port]) => /^(?:5432|8000)\/tcp$/.test(port)).map(([port, values]) => ({
+      containerPort: port, bindings: (values ?? []).slice(0, 3).map(value => ({
+        host: value.HostIp === '' ? 'network-default' : isIP(value.HostIp ?? '') ? value.HostIp : 'invalid',
+        port: /^[0-9]{1,5}$/.test(value.HostPort ?? '') ? Number(value.HostPort) : null,
+      })),
+    }));
     return [{ service, wrapperLabelPresent: item.Config.Labels[RUN_LABEL] === nonce,
       status: ['created', 'running', 'paused', 'restarting', 'removing', 'exited', 'dead'].includes(state.Status) ? state.Status : 'unknown',
       running: state.Running === true, exitCode: Number.isInteger(state.ExitCode) ? state.ExitCode : null,
       oomKilled: state.OOMKilled === true, stateError: errorName(state.Error),
       health: ['starting', 'healthy', 'unhealthy'].includes(health?.Status) ? health.Status : 'none',
+      networkCount: Object.keys(item.NetworkSettings?.Networks ?? {}).length,
+      networkId: /^[0-9a-f]{64}$/.test(projectNetwork?.NetworkID ?? '') ? projectNetwork.NetworkID : null,
+      ipv4: isIP(projectNetwork?.IPAddress ?? '') === 4 ? projectNetwork.IPAddress : null,
+      requestedPorts: ports(item.HostConfig?.PortBindings), publishedPorts: ports(item.NetworkSettings?.Ports),
       recentHealth: (Array.isArray(health?.Log) ? health.Log : []).slice(-3).map(entry => ({
         exitCode: Number.isInteger(entry.ExitCode) ? entry.ExitCode : null,
         errorName: entry.ExitCode === 0 ? null : errorName(entry.Output),
@@ -361,9 +463,9 @@ async function portIsFree(port) {
 
 function statePath(env) { return path.join(env.RUNNER_TEMP, `genie-local-stack-${env.GITHUB_RUN_ID}-${env.GITHUB_RUN_ATTEMPT}.json`); }
 
-class DockerStackRuntime {
-  constructor({ repoRoot, env, signal }) {
-    this.repoRoot = repoRoot; this.env = env; this.signal = signal;
+export class DockerStackRuntime {
+  constructor({ repoRoot, env, signal, send = fetch }) {
+    this.repoRoot = repoRoot; this.env = env; this.signal = signal; this.send = send;
     this.state = { schemaVersion: 1, nonce: randomBytes(6).toString('hex'), firewallRemovals: [], networks: [] };
     this.state.projectId = 'genie_it_' + this.state.nonce;
     this.state.networkName = 'genie-local-' + this.state.nonce;
@@ -416,7 +518,7 @@ class DockerStackRuntime {
     this.cli = path.join(bin, 'supabase'); ensure(regular(this.cli), 'CLI_EXECUTABLE_MISSING'); chmodSync(this.cli, 0o700);
     ensure((await this.command('CLI_VERSION_FAILED', this.cli, ['--version'])).stdout.trim() === PINS.cliVersion, 'CLI_VERSION_MISMATCH');
     const help = (await this.command('CLI_HELP_FAILED', this.cli, ['--help'])).stdout;
-    ensure(help.includes('--workdir') && help.includes('--network-id'), 'CLI_REQUIRED_FLAGS_MISSING');
+    ensure(help.includes('--workdir') && help.includes('--network-id') && help.includes('--output-format'), 'CLI_REQUIRED_FLAGS_MISSING');
     const startHelp = (await this.command('CLI_HELP_FAILED', this.cli, ['start', '--help'])).stdout;
     ensure(startHelp.includes('--exclude'), 'CLI_REQUIRED_FLAGS_MISSING');
     await this.command('CLI_HELP_FAILED', this.cli, ['functions', 'serve', '--help']);
@@ -466,49 +568,98 @@ class DockerStackRuntime {
       ['-C', 'DOCKER-USER', '-i', this.network.bridge, '-s', this.network.cidr, '-j', plan.forward]]) {
       await this.command('SCOPED_FIREWALL_UNCONFIRMED', this.tools.sudo, ['-n', this.tools.iptables, '-w', '5', ...args]);
     }
+    // Docker internal networks do not program published ports. These listeners
+    // bind exclusively before the CLI's host-readiness probe can begin. Until a
+    // matching running container is inspected they reject every connection.
+    const identity = { ...this.state, network: this.state.networkName, networkId: this.network.id };
+    this.proxies = Object.keys(LOOPBACK_SERVICES).map(service => new OwnedLoopbackProxy(service, identity));
+    for (const proxy of this.proxies) await proxy.start();
   }
   async captureStartupStates() {
+    const clearTargets = () => { for (const proxy of this.proxies ?? []) proxy.clearTarget(); };
+    let values;
     try {
       const ids = (await this.docker(['ps', '-aq', '--filter', `label=${PROJECT_LABEL}=${this.state.projectId}`],
         { timeout: 10_000 })).stdout.trim().split(/\s+/).filter(Boolean);
-      if (!ids.length || !ids.every(id => /^[0-9a-f]{12,64}$/.test(id))) return;
-      const states = startupContainerStates(await this.inspect('container', ids, { timeout: 10_000 }), this.state.projectId, this.state.nonce);
+      if (!ids.length || !ids.every(id => /^[0-9a-f]{12,64}$/.test(id))) { clearTargets(); return; }
+      values = await this.inspect('container', ids, { timeout: 10_000 });
+      ensure(Array.isArray(values), 'DOCKER_INSPECTION_INVALID');
+      const states = startupContainerStates(values, this.state.projectId, this.state.nonce);
       if (states.length && JSON.stringify(states) !== JSON.stringify(this.startupStates.at(-1))) {
         this.startupStates.push(states); this.startupStates = this.startupStates.slice(-2);
       }
-    } catch { /* Diagnostic sampling cannot turn a failed startup into a pass. */ }
+    } catch { clearTargets(); return; /* A failed inspect also revokes previous forwarding targets. */ }
+    try {
+      for (const proxy of this.proxies ?? []) {
+        const item = values.find(value => value.Name === `/supabase_${proxy.service}_${this.state.projectId}`);
+        if (item?.State?.Running === true) proxy.setTarget(item);
+        else proxy.clearTarget();
+      }
+    } catch (error) { clearTargets(); throw error; }
   }
   async startCore() {
     // The CLI rolls back failed containers. Sample safe state while it starts so
     // rollback does not erase the evidence before our finally cleanup executes.
-    let pending = Promise.resolve(), busy = false, failure;
+    let pending = Promise.resolve(), busy = false, failure, proxyFailure;
+    const startupAbort = new AbortController();
     const sample = () => {
       if (busy) return; busy = true;
-      pending = this.captureStartupStates().finally(() => { busy = false; });
+      pending = this.captureStartupStates().catch(error => {
+        proxyFailure = fixedCode(error); startupAbort.abort();
+      }).finally(() => { busy = false; });
     };
-    const timer = setInterval(sample, 10_000); sample();
+    const timer = setInterval(sample, 2000); sample();
     try {
       await this.command('LOCAL_CORE_START_FAILED', this.cli, ['start', '--workdir', this.state.workspace,
-        '--network-id', this.state.networkName, '--exclude', EXCLUDE, '-o', 'json'], { env: this.cliEnv, timeout: 480_000 });
+        '--network-id', this.state.networkName, '--exclude', EXCLUDE, '--output-format', 'json'],
+      { env: this.cliEnv, timeout: 480_000,
+        signal: this.signal ? AbortSignal.any([this.signal, startupAbort.signal]) : startupAbort.signal });
     } catch (error) { failure = error; }
     finally { clearInterval(timer); await pending; }
+    if (proxyFailure && !failure) {
+      failure = new Error(proxyFailure);
+      this.recordFailure('LOCAL_CORE_START_FAILED', { status: 1, stderr: 'Error: ' + proxyFailure });
+    }
     if (failure) {
       const diagnostic = this.diagnostics.at(-1);
       if (diagnostic?.stage === 'LOCAL_CORE_START_FAILED') {
         diagnostic.containerStates = this.startupStates;
+        diagnostic.dockerVersion = this.dockerVersion;
+        diagnostic.loopbackProxies = this.proxies.map(proxy => proxy.proof());
+        if (proxyFailure) diagnostic.proxyGuard = proxyFailure;
         diagnostic.wrapperRefusals = existsSync(this.policyRefusals)
           ? readFileSync(this.policyRefusals, 'utf8').split('\n').filter(value => value === 'refused').length : 0;
       }
       throw failure;
     }
+    await this.captureStartupStates();
     this.keys = parseLocalStatus(JSON.parse((await this.command('LOCAL_STATUS_FAILED', this.cli,
       ['status', '--workdir', this.state.workspace, '-o', 'json'], { env: this.cliEnv })).stdout));
+    await this.verifyLoopbackApi();
+  }
+  async verifyLoopbackApi() {
+    const proof = this.proxies.find(proxy => proxy.service === 'kong')?.proof();
+    ensure(proof?.listening === true && proof.host === '127.0.0.1' && proof.port === 55321 && proof.target,
+      'APPROVED_LISTENER_UNCONFIRMED');
+    // Do not assume the CLI's own status/health implementation dialed Kong from
+    // the host. This explicit read creates no session or synthetic application data.
+    let ready = false;
+    try {
+      const timeout = AbortSignal.timeout(3000);
+      const response = await this.send(ORIGIN + '/auth/v1/health', { method: 'GET',
+        headers: { apikey: this.keys.anon }, redirect: 'error',
+        signal: this.signal ? AbortSignal.any([timeout, this.signal]) : timeout });
+      ready = response.status === 200;
+      await response.body?.cancel();
+    } catch {}
+    ensure(ready, 'LOCAL_CORE_API_READINESS_UNCONFIRMED');
   }
   async stackContainers(edge) {
     const ids = (await this.docker(['ps', '-aq', '--filter', `label=${PROJECT_LABEL}=${this.state.projectId}`])).stdout.trim().split(/\s+/).filter(Boolean);
     ensure(ids.length > 0, 'LOCAL_STACK_CONTAINERS_MISSING');
     const values = await this.inspect('container', ids);
-    return validateContainers(values, { ...this.state, network: this.state.networkName, edge });
+    return validateContainers(values, { ...this.state, network: this.state.networkName, networkId: this.network.id, edge,
+      loopbackProxies: this.proxies.map(proxy => proxy.proof()) });
   }
   async probeNamespace(container, phase) {
     const nonce = this.state.nonce;
@@ -595,6 +746,7 @@ class DockerStackRuntime {
   async verifyEdge() {
     const containers = await this.stackContainers(true);
     await this.probeNamespace(containers.edge_runtime, 'edge-network');
+    this.verifiedProxyProof = this.proxies.map(proxy => proxy.proof());
     this.edgeVerified = true;
   }
   async verifyIntegration() {
@@ -615,6 +767,7 @@ class DockerStackRuntime {
       cliVersion: PINS.cliVersion, cliArchiveSha256: PINS.cliSha256, dockerVersion: this.dockerVersion,
       node: process.version, approvedOrigin: ORIGIN, schemaSha256: PINS.schemaSha256,
       fixtureHashes: this.inputs.hashes, serviceImages: this.imageProof, networkProof: this.probeProof,
+      loopbackProxies: this.verifiedProxyProof, loopbackProxiesClosed: true,
       realLocalAuthPostgrestAndEdge: true, twoSessionFlowVerified: this.integrationVerified === true,
       modelCalled: false, hostedProjectContacted: false, productionFilesChanged: false,
       nativeDeviceVerified: false, storeSubmitted: false, disposableResourcesDeleted: true };
@@ -622,6 +775,9 @@ class DockerStackRuntime {
   async cleanup() {
     if (!this.state.workspace) return true;
     let okay = true;
+    for (const result of await Promise.allSettled((this.proxies ?? []).map(proxy => proxy.close()))) {
+      if (result.status !== 'fulfilled' || result.value !== true) okay = false;
+    }
     try { await this.serving?.stop(); } catch { okay = false; }
     if (this.tools?.docker) {
       try {
