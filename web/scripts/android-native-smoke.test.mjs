@@ -233,7 +233,7 @@ nativeTest('the actual Python ZIP guard accepts exact assets and rejects extra f
   const setup = runPython([
     'import pathlib,sys,zipfile\n' +
     'root,output=map(pathlib.Path,sys.argv[1:])\n' +
-    'for kind in ("exact","extra","changed"):\n' +
+    'for kind in ("exact","extra","changed","missing"):\n' +
     ' with zipfile.ZipFile(output/(kind+".zip"),"w") as z:\n' +
     '  z.writestr("base/manifest/AndroidManifest.xml",b"INERT_NOT_A_BINARY_MANIFEST")\n' +
     '  z.writestr("base/dex/classes.dex",b"INERT_NOT_DEX_BYTECODE")\n' +
@@ -241,6 +241,7 @@ nativeTest('the actual Python ZIP guard accepts exact assets and rejects extra f
     '  for p in sorted(root.rglob("*")):\n' +
     '   if p.is_file():\n' +
     '    relative=p.relative_to(root).as_posix()\n' +
+    '    if kind=="missing" and relative=="public/index.html": continue\n' +
     '    data=p.read_bytes()\n' +
     '    if kind=="changed" and relative=="public/index.html": data+=b"CHANGED_BYTES"\n' +
     '    z.writestr("base/assets/"+relative,data)\n' +
@@ -248,14 +249,18 @@ nativeTest('the actual Python ZIP guard accepts exact assets and rejects extra f
     assets, archives,
   ]);
   assert.equal(setup.status, 0, setup.stderr);
-  for (const kind of ['exact', 'extra', 'changed']) {
+  for (const kind of ['exact', 'extra', 'changed', 'missing']) {
     const checked = runPython([program, path.join(archives, `${kind}.zip`), assets]);
     if (kind === 'exact') {
       assert.equal(checked.status, 0, checked.stderr);
       assert.match(checked.stdout, /^AAB_ASSETS_MATCH\s*$/);
     } else {
       assert.notEqual(checked.status, 0);
-      assert.match(checked.stderr, /AssertionError/);
+      const diagnostic = JSON.parse(checked.stdout.trim().replace(/^AAB_PACKAGE_DIAGNOSTICS /, ''));
+      assert.deepEqual(diagnostic.missing, kind === 'missing' ? ['base/assets/public/index.html'] : []);
+      assert.deepEqual(diagnostic.unexpected, kind === 'extra' ? ['base/assets/public/unexpected.js'] : []);
+      assert.deepEqual(diagnostic.changed, kind === 'changed' ? ['base/assets/public/index.html'] : []);
+      if (kind === 'extra') assert.match(diagnostic.unexpectedSha256['base/assets/public/unexpected.js'], /^[a-f0-9]{64}$/);
       assert.equal(checked.stdout.includes('AAB_ASSETS_MATCH'), false);
     }
   }

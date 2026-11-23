@@ -102,20 +102,26 @@ export async function runNativeSmoke({ webRoot = webRootDefault, env = process.e
     // Read only the new AAB. Compare every packaged web asset with the prepared
     // copy, including the exact runtime identity config; never glob old AABs.
     const archive = await run({ stage: 'verify-package', command: tools.python3, args: ['-c',
-      'import pathlib,sys,zipfile\n' +
+      'import hashlib,json,pathlib,sys,zipfile\n' +
       'aab,root=sys.argv[1:]\nroot=pathlib.Path(root)\n' +
       'with zipfile.ZipFile(aab) as z:\n' +
-      ' names=z.namelist()\n assert len(names)==len(set(names))\n' +
-      ' assert "base/manifest/AndroidManifest.xml" in names\n' +
-      ' assert any(n.startswith("base/dex/") and n.endswith(".dex") for n in names)\n' +
+      ' names=z.namelist()\n' +
       ' files=[p for p in root.rglob("*") if p.is_file()]\n' +
       ' expected={"base/assets/"+str(p.relative_to(root)) for p in files}\n' +
       ' actual={n for n in names if n.startswith("base/assets/") and not n.endswith("/")}\n' +
-      ' assert actual==expected\n' +
-      ' for p in files:\n' +
-      '  assert z.read("base/assets/"+str(p.relative_to(root)))==p.read_bytes()\n' +
+      ' changed=["base/assets/"+str(p.relative_to(root)) for p in files if "base/assets/"+str(p.relative_to(root)) in actual and z.read("base/assets/"+str(p.relative_to(root)))!=p.read_bytes()]\n' +
+      ' report={"duplicateEntries":len(names)!=len(set(names)),"manifestPresent":"base/manifest/AndroidManifest.xml" in names,"dexPresent":any(n.startswith("base/dex/") and n.endswith(".dex") for n in names),"missing":sorted(expected-actual),"unexpected":sorted(actual-expected),"changed":sorted(changed)}\n' +
+      ' report["unexpectedSha256"]={n:hashlib.sha256(z.read(n)).hexdigest() for n in report["unexpected"]}\n' +
+      ' if report["duplicateEntries"] or not report["manifestPresent"] or not report["dexPresent"] or actual!=expected or changed:\n' +
+      '  print("AAB_PACKAGE_DIAGNOSTICS "+json.dumps(report,ensure_ascii=True))\n' +
+      '  sys.exit(1)\n' +
       'print("AAB_ASSETS_MATCH")\n', artifact, path.join(androidDir, 'app/src/main/assets')], cwd: androidDir, env: buildEnv, capture: true });
-    if (archive.status !== 0 || !archive.stdout.includes('AAB_ASSETS_MATCH')) return fail('AAB_PACKAGED_ASSETS_MISMATCH');
+    if (archive.status !== 0 || !archive.stdout.includes('AAB_ASSETS_MATCH')) {
+      // File names and structural checks only; never log file bytes or signing inputs.
+      const diagnostic = archive.stdout.split('\n').find(line => line.startsWith('AAB_PACKAGE_DIAGNOSTICS '));
+      if (diagnostic) console.error(diagnostic);
+      return fail('AAB_PACKAGED_ASSETS_MISMATCH');
+    }
     const checked = verify({ androidDir, env: buildEnv });
     if (!checked.ok) return fail('SOURCE_OR_ASSETS_CHANGED_DURING_NATIVE_BUILD');
     const receipt = { status: 'native-check-passed-not-a-release',
@@ -142,5 +148,8 @@ export async function runNativeSmoke({ webRoot = webRootDefault, env = process.e
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   const result = await runNativeSmoke({ allowDownloads: process.argv.length === 3 && process.argv[2] === '--allow-dependency-downloads' });
   if (!result.ok) { console.error(`Android native check stopped: ${result.code}`); process.exitCode = 1; }
-  else console.log('Android native compilation and temporary-signature check passed. Temporary key and AAB deleted; this is not a store release.');
+  else {
+    console.log('Android native compilation and temporary-signature check passed. Temporary key and AAB deleted; this is not a store release.');
+    console.log(`GENIE_NATIVE_CHECK_RECEIPT ${JSON.stringify(result.receipt)}`);
+  }
 }
