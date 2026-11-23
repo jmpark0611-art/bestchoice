@@ -88,14 +88,21 @@ function assertRecordedGuest(value,owner){
   assertSameVisibleResult(value,owner);
 }
 
+export async function deniesExpectedLocalError(r,message){
+  if(r.status<400||r.status>500)return false;
+  const body=await r.json().catch(()=>({}));
+  if(!record(body))return false;
+  // The preserved SQL raises NOT_FOUND with P0002. PostgREST maps P0* (except
+  // P0001) to HTTP 500: https://docs.postgrest.org/en/stable/references/errors.html
+  // Accept only that exact canonical tuple; other server failures remain failures.
+  if(r.status===500)return message==='NOT_FOUND'&&body.code==='P0002'&&body.message==='NOT_FOUND';
+  return body.code===message||body.message===message;
+}
+
 export async function verifyLocalIntegration(env,mode,{send=fetch,log=console.log,warn=console.error}={}){
   const req=transport(guard(env,mode),send);
   const json=async(r,label)=>{must(r.ok,label+' HTTP '+r.status);return r.json();};
-  const denies=async(r,message)=>{
-    if(r.status<400||r.status>=500)return false;
-    const body=await r.json().catch(()=>({}));
-    return body.code===message||body.message===message;
-  };
+  const denies=deniesExpectedLocalError;
   const signup=async()=>json(await req('POST','/auth/v1/signup',{data:{}}),'Anonymous Auth');
   const rpc=(name,body,t)=>req('POST','/rest/v1/rpc/vs_'+name,body,t);
   const read=async(name,body,t)=>json(await rpc(name,body,t),name);

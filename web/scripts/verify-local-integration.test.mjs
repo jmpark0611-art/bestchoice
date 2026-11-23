@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   assertBeforeVoteResponse, assertOwnerResponse, assertSharedResponse, assertVoteResponse, guard, transport,
-  verifyLocalIntegration,
+  verifyLocalIntegration, deniesExpectedLocalError,
 } from './verify-local-integration.mjs';
 
 const id='11111111-1111-4111-8111-111111111111';
@@ -146,6 +146,27 @@ test('transport still permits every original smoke operation with a fake sender'
   assert.ok(calls.every(call=>call.url.origin===origin&&call.options.redirect==='error'));
 });
 
+test('canonical NOT_FOUND accepts only P0002 with its exact message at HTTP 500, never arbitrary server failures',async()=>{
+  const response=(body,status=500)=>Response.json(body,{status});
+  assert.equal(await deniesExpectedLocalError(response({code:'P0002',message:'NOT_FOUND'}),'NOT_FOUND'),true);
+  for(const [status,body,expected] of [
+    [500,{code:'P0001',message:'NOT_FOUND'},'NOT_FOUND'],
+    [500,{code:'P0002',message:'backend unavailable'},'NOT_FOUND'],
+    [500,{code:'P0002'},'NOT_FOUND'],
+    [500,{message:'NOT_FOUND'},'NOT_FOUND'],
+    [500,{code:'XX000',message:'NOT_FOUND'},'NOT_FOUND'],
+    [500,{code:'P0002',message:'NOT_FOUND'},'OWNER_CANNOT_VOTE'],
+    [500,null,'NOT_FOUND'],
+    [500,[],'NOT_FOUND'],
+    [502,{code:'P0002',message:'NOT_FOUND'},'NOT_FOUND'],
+    [503,{code:'P0002',message:'NOT_FOUND'},'NOT_FOUND'],
+    [200,{code:'P0002',message:'NOT_FOUND'},'NOT_FOUND'],
+  ])assert.equal(await deniesExpectedLocalError(response(body,status),expected),false);
+  assert.equal(await deniesExpectedLocalError(new Response('not-json',{status:500}),'NOT_FOUND'),false);
+  assert.equal(await deniesExpectedLocalError(response({code:'42501'},403),'42501'),true);
+  assert.equal(await deniesExpectedLocalError(response({code:'P0001',message:'OWNER_CANNOT_VOTE'},400),'OWNER_CANNOT_VOTE'),true);
+});
+
 // This fixture implements only in-memory HTTP responses. No listener, Supabase
 // service, external fetch, account, or database is used by these flow tests.
 function flowFixture(fault={}){
@@ -156,7 +177,7 @@ function flowFixture(fault={}){
   const reply=(value,status=200)=>new Response(value===undefined?null:JSON.stringify(value),{
     status,headers:{'Content-Type':'application/json'},
   });
-  const notFound=()=>reply({code:'P0001',message:'NOT_FOUND'},404);
+  const notFound=()=>reply({code:'P0002',message:'NOT_FOUND'},500);
   const ownerPayload=()=>({
     id,a:state.a,b:state.b,isOwner:true,myVote:null,pick:'a',reason:'합성 이유',
     votes:{a:state.vote==='a'?1:0,b:state.vote==='b'?1:0},
