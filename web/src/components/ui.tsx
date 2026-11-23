@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { MouseEventHandler, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { Poll } from '../lib/api';
 import { errorMessage } from '../lib/errors';
@@ -11,9 +11,9 @@ export function Screen({ children }: { children: ReactNode }) {
   );
 }
 
-export function Brand() {
+export function Brand({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> } = {}) {
   return (
-    <Link to="/" className="brand">
+    <Link to="/" className="brand" onClick={onClick}>
       결정해지니<b>Genie</b>
     </Link>
   );

@@ -1,0 +1,118 @@
+import groovy.json.JsonSlurper
+
+// Preview keeps the checked-in namespace and debug identity. Release identity and
+// assets must come from a fresh workspace prepared by scripts/android-release.mjs.
+def genieManifestFile = rootProject.file('genie-release-manifest.json')
+String genieManifestJson = null
+def genieReleaseIdentity = null
+String genieManifestFailure = 'Android release preparation is missing. Prepare a new isolated release workspace first.'
+
+if (genieManifestFile.isFile()) {
+    try {
+        genieManifestJson = genieManifestFile.getText('UTF-8')
+        def manifest = new JsonSlurper().parseText(genieManifestJson)
+        def forbiddenSegments = ['preview', 'debug', 'test', 'demo', 'staging', 'localhost', 'example']
+        if (!(manifest instanceof Map) || manifest.schemaVersion != 1 || manifest.profile != 'android-release' ||
+                manifest.appName != '결정해지니' || !(manifest.applicationId instanceof String) ||
+                manifest.applicationId.length() > 255 ||
+                !(manifest.applicationId ==~ /[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+/) ||
+                manifest.applicationId.tokenize('.').any { forbiddenSegments.contains(it) } ||
+                manifest.applicationId == 'dev.local' || manifest.applicationId.startsWith('dev.local.') ||
+                !(manifest.versionCode instanceof Integer) || manifest.versionCode < 1 || manifest.versionCode > 2100000000 ||
+                !(manifest.versionName instanceof String) || !(manifest.versionName ==~ /[\x21-\x7e]{1,40}/) ||
+                manifest.versionName.toLowerCase(Locale.ROOT).contains('preview') ||
+                manifest.versionName.toLowerCase(Locale.ROOT).contains('test')) {
+            throw new IllegalArgumentException('INVALID_RELEASE_IDENTITY')
+        }
+        genieReleaseIdentity = [
+            applicationId: manifest.applicationId,
+            versionCode: manifest.versionCode,
+            versionName: manifest.versionName,
+        ]
+        genieManifestFailure = null
+    } catch (Exception ignored) {
+        // Never include manifest or environment values in build diagnostics.
+        genieManifestFailure = 'Android release preparation is invalid. Prepare a new isolated release workspace.'
+    }
+}
+
+def genieSigningVariableNames = [
+    'GENIE_ANDROID_KEYSTORE_PATH',
+    'GENIE_ANDROID_KEYSTORE_PASSWORD',
+    'GENIE_ANDROID_KEY_ALIAS',
+    'GENIE_ANDROID_KEY_PASSWORD',
+]
+def genieSigningValues = genieSigningVariableNames.collectEntries { name ->
+    [(name): providers.environmentVariable(name).orNull]
+}
+def genieKeystorePath = genieSigningValues.GENIE_ANDROID_KEYSTORE_PATH
+def genieKeystore = genieKeystorePath ? new File(genieKeystorePath) : null
+def genieSigningConfig = android.signingConfigs.create('genieRelease')
+genieSigningConfig.storeFile = genieKeystore
+genieSigningConfig.storePassword = genieSigningValues.GENIE_ANDROID_KEYSTORE_PASSWORD
+genieSigningConfig.keyAlias = genieSigningValues.GENIE_ANDROID_KEY_ALIAS
+genieSigningConfig.keyPassword = genieSigningValues.GENIE_ANDROID_KEY_PASSWORD
+android.buildTypes.getByName('release').signingConfig = genieSigningConfig
+
+// AGP 8.13 exposes the full applicationId only on the variant API; buildTypes
+// provide a suffix. Keep Java/R namespace stable and change only release outputs.
+androidComponents.onVariants(androidComponents.selector().withBuildType('release')) { variant ->
+    if (genieReleaseIdentity != null) {
+        variant.applicationId.set(genieReleaseIdentity.applicationId)
+        variant.outputs.each { output ->
+            output.versionCode.set(genieReleaseIdentity.versionCode)
+            output.versionName.set(genieReleaseIdentity.versionName)
+        }
+    }
+}
+
+def genieWorkspace = rootProject.projectDir.parentFile
+def genieVerifier = new File(genieWorkspace, 'scripts/verify-android-release.mjs')
+def genieNodeBinary = providers.environmentVariable('GENIE_NODE_BINARY').orNull ?: 'node'
+
+def verifyGenieRelease = tasks.register('verifyGenieRelease', Exec) {
+    group = 'verification'
+    description = 'Checks fresh release source, assets, public configuration and required signing inputs.'
+    workingDir genieWorkspace
+    executable genieNodeBinary
+    args genieVerifier.absolutePath, '--android-dir', rootProject.projectDir.absolutePath
+    // The verifier needs public configuration, never the signing credentials.
+    setEnvironment(System.getenv().findAll { name, value -> !genieSigningVariableNames.contains(name) })
+    ignoreExitValue = true
+    outputs.upToDateWhen { false }
+
+    doFirst {
+        if (genieManifestFailure != null) throw new GradleException(genieManifestFailure)
+        try {
+            if (!genieManifestFile.isFile() || genieManifestFile.getText('UTF-8') != genieManifestJson) {
+                throw new IllegalStateException('RELEASE_RECORD_CHANGED')
+            }
+        } catch (Exception ignored) {
+            throw new GradleException('Android release preparation changed or became unreadable. Prepare a new isolated release workspace.')
+        }
+        if (!genieSigningValues.values().every { it != null && !it.trim().isEmpty() } ||
+                genieKeystore == null || !genieKeystore.isAbsolute() || !genieKeystore.isFile() || !genieKeystore.canRead() ||
+                genieKeystore.name.equalsIgnoreCase('debug.keystore') ||
+                genieSigningValues.GENIE_ANDROID_KEY_ALIAS.trim().equalsIgnoreCase('androiddebugkey')) {
+            throw new GradleException('Android release requires all four nonblank GENIE_ANDROID signing environment variables and a readable absolute, non-debug keystore path and alias.')
+        }
+        if (!genieVerifier.isFile()) {
+            throw new GradleException('Android release verifier is missing. Prepare a new isolated release workspace.')
+        }
+    }
+    doLast {
+        if (executionResult.get().exitValue != 0) {
+            throw new GradleException('Android release source, configuration or assets did not pass verification. Prepare a new isolated release workspace.')
+        }
+    }
+}
+
+// Also protect direct artifact/signing task invocations, including bundleRelease.
+// No outputs are declared by the verifier, so every release invocation checks anew.
+tasks.configureEach { candidate ->
+    def directReleaseArtifact = candidate.name.contains('Release') &&
+        ['bundle', 'package', 'sign'].any { candidate.name.startsWith(it) }
+    if (candidate.name in ['preReleaseBuild', 'validateSigningRelease', 'assembleRelease'] || directReleaseArtifact) {
+        candidate.dependsOn(verifyGenieRelease)
+    }
+}

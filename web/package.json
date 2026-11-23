@@ -11,7 +11,13 @@
     "typecheck": "tsc -b",
     "verify": "npm run test && npm run typecheck",
     "native:preview": "node scripts/build-native-preview.mjs",
-    "native:sync": "npm run native:preview && cap sync"
+    "native:sync": "npm run native:preview && cap sync",
+    "android:check": "node scripts/android-release.mjs check",
+    "android:prepare": "node scripts/android-release.mjs prepare",
+    "android:bundle": "node scripts/android-release.mjs bundle",
+    "android:jdk": "node scripts/prepare-local-jdk.mjs",
+    "android:native-check": "node scripts/android-native-smoke.mjs",
+    "test:android-release": "node --test scripts/android-release*.test.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.2",

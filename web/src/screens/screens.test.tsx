@@ -35,6 +35,7 @@ function open(path: string) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  localStorage.clear();
   api.listMyPolls.mockResolvedValue([]);
 });
 

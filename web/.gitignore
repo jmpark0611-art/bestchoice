@@ -2,9 +2,15 @@ node_modules
 dist
 .env
 .env.local
+.env.*
+!.env.*.example
+.genie-release/
 .vercel
 *.tsbuildinfo
 
 *.jks
 *.keystore
+*.p12
+*.pfx
 android/local.properties
+android/genie-release-manifest.json

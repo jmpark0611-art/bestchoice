@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { Brand, ErrorPanel, Screen, Tally, Thinking } from '../components/ui';
+import { DecisionComparison } from '../components/DecisionComparison';
+import { DecisionReport } from '../components/DecisionReport';
 import { getSharedPoll, vote, type Poll, type Side } from '../lib/api';
 import { codeOf, errorMessage } from '../lib/errors';
+const PENDING_REPORT_NOTICE = '신고 접수 확인이 끝나지 않았어요. 신고 화면에서 같은 신고를 다시 보내거나 접수 확인 없이 나가기를 허용해 주세요.';
 
 /** 링크를 받은 친구 화면. 가입 없이 한 표를 던지고, 던진 뒤에만 집계와 지니의 선택을 본다 */
 export function VoteScreen() {
@@ -11,9 +14,26 @@ export function VoteScreen() {
   const [pollCode, setPollCode] = useState<string | null>(null);
   const generation = useRef(0);
   const casting = useRef(false);
+  const reportPending = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [voting, setVoting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const reportChanged = useCallback((pending: boolean) => {
+    reportPending.current = pending;
+    if (!pending) setNotice(current => current === PENDING_REPORT_NOTICE ? null : current);
+  }, []);
+  const leave = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!reportPending.current) return;
+    event.preventDefault(); setNotice(PENDING_REPORT_NOTICE);
+  };
+  useEffect(() => {
+    const warnOnExit = (event: BeforeUnloadEvent) => {
+      if (!reportPending.current) return;
+      event.preventDefault(); event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warnOnExit);
+    return () => window.removeEventListener('beforeunload', warnOnExit);
+  }, []);
 
   const load = useCallback(async () => {
     const current = ++generation.current;
@@ -55,17 +75,16 @@ export function VoteScreen() {
   if (poll.myVote && poll.pick) {
     return (
       <Screen>
-        <Brand />
+        <Brand onClick={leave} />
         <h2>투표했어요. 지금까지 이래요.</h2>
         <Tally poll={poll} />
-        <div className="genie">
-          <b>지니의 선택</b>
-          <span>{poll.pick === 'a' ? poll.a : poll.b}</span>
-        </div>
-        <p className="reason">{poll.reason}</p>
+        <DecisionComparison poll={poll} />
+        {typeof poll.reason === 'string' && <DecisionReport target={{ kind: 'voter', shareCode: code }}
+          choiceLabel={poll.pick === 'a' ? poll.a : poll.b} reason={poll.reason} disabled={voting} onRequestPendingChange={reportChanged} />}
+        {notice && <p className="small" role="status">{notice}</p>}
         <div className="grow" />
         <p className="lead">나도 못 정한 게 있다면</p>
-        <Link to="/" className="btn">
+        <Link to="/" className="btn" onClick={leave}>
           나도 결정 받기
         </Link>
       </Screen>
@@ -80,7 +99,7 @@ export function VoteScreen() {
         <br />
         뭐가 낫다고 생각해요?
       </h2>
-      {poll.note && <p className="lead">“{poll.note}”</p>}
+      {poll.note && <p className="lead context-text">“{poll.note}”</p>}
       <div className="ballot">
         <button type="button" className="vote a" disabled={voting} onClick={() => cast('a')}>
           {poll.a}
