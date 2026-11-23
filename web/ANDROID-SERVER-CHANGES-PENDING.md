@@ -1,0 +1,120 @@
+# Android 서버 변경 대기안
+
+**상태: 검토용 변경안. 운영에 적용하지 않음.** 이 문서는 Android CORS 허용과 미배포 신고·작성자 차단 API를 출시 전에 어떻게 추가할지 정리합니다. 운영 설정·기존 함수·마이그레이션·계정·결제·스토어를 변경하는 실행 문서나 실행 완료 기록은 아닙니다.
+
+## 1. 실제로 확인된 차단
+
+2026-11-23T13:23:23.788Z의 [고정 OPTIONS 검사](qa/native-cors-read-2026-11-23.md)에서 `https://localhost`는 403/`ORIGIN_DENIED`, 기존 웹 `https://genie-web-rosy.vercel.app`는 204/정확한 Origin 허용을 받았습니다. Android preflight는 현재 거부됩니다. 이 검사는 POST·인증·DB 쓰기·모델 호출을 수행하지 않았습니다.
+
+[운영 읽기 감사](qa/operational-readiness-2026-11-23.md)에서 기존 결정·공유·투표 함수 9개의 본문 해시·길이와 catalog 계약은 canonical SQL과 맞았습니다. 기존 원문을 교체해서 해결할 근거는 없습니다. 운영 `vs_report_result` 및 신고 private schema는 존재하지 않았습니다. 질문 신고·차단 제안도 운영 적용 대상이 아닌 별도 로컬 제안입니다.
+
+| 변경 단위 | 지금의 상태 | 준비할 정확한 변경 |
+|---|---|---|
+| Android CORS | `https://localhost` 거부; 실제 전체 설정값 미확인 | 현재 항목을 유지하고 이 Origin 한 개 추가 |
+| AI 결과 신고 | 로컬 제안/격리 검증 근거 있음, 운영 API 없음 | 제안에서 검토한 새 migration 생성 |
+| 공유 질문 신고·차단 | 별도 로컬 제안과 실제 격리 HTTP 통과 근거 있음, 운영 미적용 | 새 5개 RPC·private 객체를 추가하는 별도 migration |
+| 기존 서버 계약 | canonical과 검사 범위 일치 | 기존 `vs_*`, `vs-decide`, 기존 migration 보존 |
+
+## 2. CORS의 정확한 설정 변경
+
+변경 대상은 **`VS_ALLOWED_ORIGINS` 한 설정**입니다. 추가할 값은 포트나 경로가 없는 **`https://localhost`**입니다. `*`, `null`, `file://`, 임의 포트·도메인을 넓게 허용하지 않습니다. API key, service role key, 모델, DB 설정은 이 변경 대상이 아닙니다.
+
+### 적용 전 확보할 자료
+
+승인된 운영 설정 경로에서 해당 변수의 현재 유효 상태만 읽어, 기존 항목 목록과 복구용 이전 값을 비공개로 보관합니다. 전체 secrets/env dump, 키값 출력, 공개 저장소에 환경값 저장은 하지 않습니다. 설정 도구가 값 자체를 제공하지 않으면 기존의 승인된 설정 원본으로 확인해야 합니다. 값을 확인할 수 없는 상태에서는 변경을 보류합니다.
+
+최종 검토 자료에는 전체 비밀값 대신 다음 차이만 기록할 수 있습니다.
+
+```text
+대상: VS_ALLOWED_ORIGINS
+기존 항목: 모두 유지
+추가 항목: https://localhost
+삭제 항목: 없음
+새 wildcard: 없음
+이전값 복구본: 비공개 보관 위치 확인
+적용 직전: 읽었던 현재값이 바뀌지 않았는지 확인
+```
+
+실제 환경변수가 비어 있거나 없다는 사실을 권한 있는 읽기로 확인한 경우에는 배포된 함수 소스의 **현재 fallback 전체**가 기존 유효 목록입니다. 이때도 fallback의 모든 항목을 유지한 명시적 목록에 Android Origin을 더해야 합니다. 단지 코드에 fallback이 보이거나 기존 웹 한 곳이 통과했다는 이유만으로 실제 override가 없다고 추정하면 안 됩니다.
+
+현재 설정에 이미 `https://localhost`가 있는데도 403이라면 중복 항목 추가로 끝내지 않습니다. 읽은 설정의 실제 프로젝트·적용 범위와 응답한 배포 함수가 같은지 확인한 뒤 수정안을 다시 검토합니다. 이번 근거만으로는 환경값, 런타임 적용 상태, override 유무 중 원인을 더 세분화하지 못했습니다.
+
+### 승인된 변경 후의 최소 확인 조건
+
+나중에 운영 변경이 승인되어 적용된 뒤에는 같은 고정 OPTIONS 두 건으로 결과를 비교합니다. Android와 기존 웹 **각각** 2xx, 요청 Origin과 정확히 같은 ACAO, POST 및 요청한 세 헤더가 모두 허용돼야 합니다. 200만 받거나 wildcard를 받는 것으로 성공 처리하지 않습니다. 실패하면 실제 POST·계정 생성·모델 요청으로 확대하지 않습니다.
+
+이 확인은 CORS 설정 결과만 입증합니다. Auth 활성·실제 모델 가용성·데이터 API·출시 앱의 종단 간 성공은 다른 근거와 구분합니다. `vs-decide` 원문을 덮어쓰거나 다시 작성하는 작업은 이 CORS 변경안에 없습니다.
+
+## 3. 두 서버 제안은 신규 migration으로만 준비
+
+검토 원본은 다음과 같이 고정돼 있습니다.
+
+| 제안 원본 | SHA-256 | 추가되는 public API |
+|---|---|---|
+| `supabase/proposals/vs-report-result.sql` | `c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c` | `vs_report_result` |
+| `supabase/proposals/vs-question-safety.sql` | `b1394b91284d6882238570afa28f2b8c8290652679cd63564ac81f651c855dba` | `vs_report_question`, `vs_set_question_author_block`, `vs_clear_question_author_blocks`, `vs_shared_poll_guarded`, `vs_vote_guarded` |
+
+기존 proposal 파일은 그대로 보존합니다. 향후 승인된 준비 단계에서 설치된 CLI로 새 migration 파일을 생성하고 실제 생성된 이름·시각을 기록해야 합니다. 이 문서는 migration timestamp나 배포 이력을 만들어 내지 않습니다.
+
+두 제안에는 명시적인 **LOCAL session opt-in guard**가 있습니다. 운영에서 이 opt-in을 켜고 로컬 제안을 그대로 실행하는 식으로 우회하면 안 됩니다. 새 migration은 로컬 guard를 운영 변경 절차로 전환하는 부분을 명확히 표시해 별도 검토하고, 나머지 검증된 함수·제약·RLS·GRANT 계약을 대조해야 합니다. 원본 proposal과 실행용 fixture는 수정하지 않습니다.
+
+최종 migration diff의 범위는 다음으로 제한합니다.
+
+- 새 `genie_reporting_private` 및 `genie_question_safety_private` 객체와 위 public wrapper들.
+- `auth.uid()` 검사, 빈 `search_path`, 적절한 invoker/definer 구분, anon/PUBLIC 실행 거부.
+- private 테이블의 RLS와 일반 클라이언트 직접 읽기·쓰기 거부.
+- 동의·idempotency·내용 충돌·rate limit·원본 삭제 cascade·quota 유지·차단 범위.
+- 기존 의존 객체의 존재 확인과 새 이름 충돌 시 중단. 기존 객체를 `CREATE OR REPLACE`나 `IF NOT EXISTS`로 조용히 덮거나 건너뛰지 않음.
+
+기존 `vs_claim`, `vs_poll_json`, `vs_my_poll`, `vs_share`, `vs_shared_poll`, `vs_vote`, `vs_set_did`, `vs_delete_poll`, `vs_purge_expired`, 기존 cron·migration·`vs-decide`는 변경 대상이 아닙니다. 기존 신고/질문 기능의 빈 상태가 현재도 맞는지 적용 직전에는 제한된 catalog 확인으로 판별해야 합니다. 사용자 행을 조회해서 충돌을 판단하지 않습니다.
+
+새 migration 검토 전에는 각 원본 SHA에 연결된 실제 격리 Auth/PostgREST 결과를 사용합니다. AI 결과 신고의 실제 격리 성공 근거는 [run 45166205966](https://github.com/jmpark0611-art/bestchoice/actions/runs/45166205966)입니다. 질문 안전 기능도 [run 45183793270 / job 137724044227](https://github.com/jmpark0611-art/bestchoice/actions/runs/45183793270/job/137724044227), 소스 `eeb87ed8dd5a05800aba5eb4c49fdc701b64151d`에서 실제 통과했습니다. 정확한 결과는 [별도 HTTP receipt](qa/question-safety-http-2026-11-23.json)에 보관합니다. 기존 앱 83개나 같은 전체 검사를 다시 돌리는 것이 이 준비의 목적은 아닙니다.
+
+해당 실행은 guard 49개 통과 후 실제 3세션·2질문으로 투표 전 신고와 AI 비공개 유지, 동일 요청 두 건의 병렬 전송에 같은 접수증·1행·1quota, 사용자 10회 한도와 cap에서의 재시도, 다른 링크 차단·차단 시 투표 쓰기 없음·다른 사용자 무영향, 삭제 cascade·quota/차단 유지·자기 차단 해제를 확인했습니다. receipt 시각은 `2026-11-23T13:26:37.4770233Z`, 별도 cleanup 확인은 `2026-11-23T13:26:37.5410725Z`입니다. 실제 HTTP로 global 500·block 200 경계를 검사한 것은 아니며 기존 RPC 수정, 모델 호출, hosted 프로젝트 호출, 운영 파일 변경은 없었습니다. 이 성공은 **일회용 격리 서버의 제안 검증**이며 운영 배포 근거가 아닙니다.
+
+운영 신고를 접수한 뒤 처리할 담당자·접근 권한·처리 절차도 함께 정해야 합니다. private 저장과 접수증을 추가하는 것만으로 실제 검토·조치가 운영되는 것은 아닙니다. 관리자 앱이나 사용자 목록 API를 이번 변경에 끼워 넣지 않습니다.
+
+## 4. 웹과 Android를 함께 보존하는 적용 순서
+
+아래는 **추후 별도 승인 후에만 실행할 순서**입니다.
+
+1. 원본 SHA, 실제 격리 결과, 최종 신규 migration diff, CORS의 이전값과 추가 한 항목을 한 번에 검토할 수 있게 준비합니다. 기존 배포 파일과 운영 설정의 복구 기준을 보존합니다.
+2. AI 결과 신고 migration, 질문 안전 migration 순으로 새 객체를 추가합니다. 두 번째 단계가 실패하면 새 클라이언트 배포로 진행하지 않습니다. 기존 API는 계속 유지합니다.
+3. `VS_ALLOWED_ORIGINS`에 기존 항목을 보존한 Android Origin 추가를 적용합니다. CORS와 DB 변경을 다른 변경 단위로 기록합니다.
+4. 새 객체의 함수 서명·권한·RLS, 배포 이력 및 두 Origin의 고정 OPTIONS 결과를 확인합니다. 이 확인을 위해 운영 합성 사용자나 질문·투표·신고를 만들지 않습니다.
+5. 서버 준비가 확인된 뒤 해당 계약을 쓰는 웹 버전과 Android 빌드를 출시 후보로 고정합니다. 실제 게시·배포·스토어 제출은 별도 승인 범위입니다.
+
+기존 웹은 원래 API가 남아 있어 기존 계약을 유지할 수 있습니다. 새 웹/Android는 공유 조회·투표에 `_guarded`를 사용하고 미설치 상태에서는 `SHARING_UNAVAILABLE`로 안내하며 구 RPC로 fallback하지 않습니다. 따라서 **새 클라이언트를 서버보다 먼저 배포하면 공유가 닫힌 상태가 되는 것이 예상 동작**이고, 이를 출시 성공으로 판단하면 안 됩니다.
+
+구버전 웹/앱 또는 직접 호출은 원래 API를 사용하여 개인 차단 선호를 우회할 수 있습니다. 작성자 차단은 새 클라이언트 경로에서 적용되는 개인 표시·투표 제어이며 기존 데이터 접근 권한 전체를 교체하지 않습니다. 이 호환성 한계는 배포와 안내에 명시합니다.
+
+신고 기능 역시 실제 접수증을 받은 경우에만 접수로 표시해야 합니다. API가 없거나 오류·timeout인 상태를 접수 완료로 표시하면 안 됩니다.
+
+## 5. 실패 조건과 역순 복구
+
+복구는 **클라이언트 의존성부터 확인한 뒤 CORS, 신규 DB 변경 순**으로 판단합니다. 단순히 모든 새 객체를 역순 DROP하는 스크립트는 만들지 않습니다.
+
+| 실패 또는 복구 단계 | 구체 조건과 처리 |
+|---|---|
+| 새 migration 적용 전/도중 실패 | 신규 클라이언트 배포로 진행하지 않음. 해당 migration의 transaction 실패·부분 적용 여부를 metadata로 확인. 기존 원본을 덮어씌워 복구하지 않음. |
+| CORS에서 기존 웹이 거부됨 | 보관한 정확한 이전 설정으로 복구하는 변경을 검토. 다른 기존 Origin도 제거하지 않음. Android가 이미 배포됐으면 아래 의존성 조건을 먼저 평가. |
+| 새 클라이언트 출시를 되돌려야 함 | 우선 새 웹 버전·Android 출시 확대를 중단하고 이전 호환 버전 복구 가능성을 판단. 이미 설치된 Android는 서버에서 즉시 되돌릴 수 없음을 고려. 실제 스토어 조작은 별도 승인. |
+| Android Origin 제거 | 해당 Origin을 사용하는 배포/설치 클라이언트가 더 이상 의존하지 않거나, 명시적으로 장애 영향을 수용한 경우에만 이전값으로 복구. 제거하면 설치된 앱의 결정 요청도 차단됨. |
+| 새 API를 비활성화해야 함 | 사용 중인 새 클라이언트에 공유/신고 오류가 발생함을 먼저 평가. 구 API fallback으로 개인 차단을 우회시키지 않음. 호환 backend를 남긴 채 forward fix하는 방안을 우선 검토. |
+| DB 추가를 역순 철회해야 함 | 질문 안전, AI 결과 신고 순으로 의존성을 검토하되 private 데이터·접수증·quota·차단을 자동 삭제하지 않음. public 권한/노출 조정과 데이터 보존은 별도 승인된 새 migration으로 처리. |
+
+이미 실제 신고가 접수되었다면 접수 후 처리·보관 책임이 있으므로 보고 테이블을 `DROP CASCADE`로 지우거나 quota를 되돌리는 복구는 허용 가능한 기본안이 아닙니다. 설치된 클라이언트가 남아 있다면 additive backend와 CORS를 유지하고 앱만 되돌리는 편이 호환성을 보존할 수 있습니다. 구체적인 비활성화가 필요하면 데이터 보존과 사용자 영향이 보이는 새 diff를 먼저 검토해야 합니다.
+
+각 복구 후에도 기존 웹 Origin, 기본 API의 정의·권한, 변경된 신규 객체 범위를 metadata와 고정 preflight로 재확인합니다. 운영 사용자 행을 시험 삼아 수정하거나 삭제하지 않습니다.
+
+## 6. 현재 남은 입력·결정
+
+| 필요한 것 | 지금의 상태 |
+|---|---|
+| `VS_ALLOWED_ORIGINS`의 실제 유효 목록과 복구용 이전값 | 미확보. 이번 OPTIONS 결과만으로 전체값을 추정하지 않음. |
+| 두 proposal에서 생성할 최종 신규 migration 파일·diff | 아직 생성·적용하지 않음. 원본 proposal 보존. |
+| 질문 안전 제안의 실제 격리 HTTP receipt | [run 45183793270](https://github.com/jmpark0611-art/bestchoice/actions/runs/45183793270) 통과·cleanup 확인. 로컬 WASM/주입 검사 및 운영 배포와 구분. |
+| 실제 신고 검토 담당·운영 처리 절차 | 결정 필요. 접수 API 배포만으로 확정되지 않음. |
+| 운영 적용·출시 승인의 정확한 범위 | 이 문서는 변경안만 준비. 운영 쓰기·원격 commit·스토어 제출 없음. |
+
+익명 Auth 설정, 실제 모델 식별자·제공자 처리 설명 및 스토어 입력은 별도 운영/출시 기록의 남은 항목입니다. CORS 수정이나 이 문서 작성만으로 전체 출시가 완료됐다고 판단하지 않습니다.

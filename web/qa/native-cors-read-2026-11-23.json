@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "kind": "production-read-only-cors-preflight-evidence",
+  "project": {
+    "name": "bestchoice",
+    "ref": "njrtcxohbkfgrgwhlvua",
+    "environment": "production; not a synthetic test target"
+  },
+  "source": {
+    "repository": "jmpark0611-art/bestchoice",
+    "workflow": ".github/workflows/genie-native-cors-read.yml",
+    "branch": "codex/genie-android-native-check-20261123",
+    "sourceCommit": "d9ffb9ad80783e7cec01e6ff8b772e021f91e38d",
+    "runId": 45183387009,
+    "jobId": 137722656206,
+    "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45183387009",
+    "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45183387009/job/137722656206",
+    "receiptMarker": "GENIE_NATIVE_CORS_READ",
+    "provenance": "Exact result supplied by the root agent after observing this CI run; the local workflow request and output filtering source was read. This documentation task did not repeat requests or independently fetch raw logs."
+  },
+  "receipt": {
+    "sourceCommit": "d9ffb9ad80783e7cec01e6ff8b772e021f91e38d",
+    "checkedAtUtc": "2026-11-23T13:23:23.788Z",
+    "method": "OPTIONS",
+    "bodySent": false,
+    "authenticationSent": false,
+    "applicationDataWritten": false,
+    "modelCalled": false,
+    "invocationScope": "deployed-preflight-only-not-an-integration-test",
+    "results": [
+      {
+        "client": "android",
+        "origin": "https://localhost",
+        "httpStatus": 403,
+        "allowedOrigin": null,
+        "postAllowed": true,
+        "requiredHeadersAllowed": true,
+        "knownError": "ORIGIN_DENIED",
+        "preflightAllowed": false
+      },
+      {
+        "client": "existing-web",
+        "origin": "https://genie-web-rosy.vercel.app",
+        "httpStatus": 204,
+        "allowedOrigin": "https://genie-web-rosy.vercel.app",
+        "postAllowed": true,
+        "requiredHeadersAllowed": true,
+        "knownError": null,
+        "preflightAllowed": true
+      }
+    ]
+  },
+  "requestDefinition": {
+    "endpoint": "https://njrtcxohbkfgrgwhlvua.supabase.co/functions/v1/vs-decide",
+    "requestCount": 2,
+    "method": "OPTIONS",
+    "redirect": "error",
+    "timeoutMilliseconds": 15000,
+    "fixedOrigins": [
+      "https://localhost",
+      "https://genie-web-rosy.vercel.app"
+    ],
+    "accessControlRequestMethod": "POST",
+    "accessControlRequestHeaders": [
+      "authorization",
+      "apikey",
+      "content-type"
+    ],
+    "actualAuthorizationHeaderSent": false,
+    "actualApiKeyHeaderSent": false,
+    "requestBodySent": false,
+    "note": "Access-Control-Request-Headers carries header names only, not credentials.",
+    "responseOutputFilter": "Only status, exact requested origin / wildcard / absent / different-origin classification, POST/required-header booleans and the allowlisted ORIGIN_DENIED error are recorded. For a 403 body, one stream chunk is read and the stream is cancelled; only a chunk of at most 1024 bytes is parsed for error recognition. No raw response body is recorded."
+  },
+  "interpretation": {
+    "android": "Confirmed rejected at the observed time: HTTP 403, no ACAO, fixed ORIGIN_DENIED. Advertised POST/header support alone does not make the preflight pass.",
+    "existingWeb": "Confirmed preflight acceptance for exactly https://genie-web-rosy.vercel.app and the three requested header names at the observed time.",
+    "actionNeeded": "Read the actual effective VS_ALLOWED_ORIGINS configuration through an authorized private channel, preserve every existing entry and add exactly https://localhost. No configuration was changed by this task.",
+    "sourceContext": "The previously inspected deployed source returns an allowed OPTIONS at line 105 or origin rejection at line 104 before database client creation, Auth checks, quota RPC and provider invocation."
+  },
+  "limits": [
+    "No actual POST, signup, decision, sharing, voting, reporting, deletion or model call was performed.",
+    "A successful existing-web preflight does not establish a functioning web application, Auth settings, model availability or database behavior.",
+    "Only two origins and three requested header names were checked; no conclusion about all origins, additional SDK headers, WebView behavior or physical devices.",
+    "The exact VS_ALLOWED_ORIGINS environment value and whether the fallback list or an override produced the result remain unknown.",
+    "No keys, environment values, user rows, questions, votes, reports or raw request logs were read or persisted.",
+    "Platform access/monitoring logs may record these OPTIONS requests; no claim that every platform layer produced zero logs.",
+    "Results are a point-in-time observation and do not apply after a subsequent configuration or function change without new evidence."
+  ],
+  "earlierEvidence": {
+    "json": "operational-readiness-2026-11-23.json",
+    "markdown": "operational-readiness-2026-11-23.md",
+    "preserved": true,
+    "delta": "The earlier Android CORS unknown is now a confirmed native-origin rejection at the later observation time. The earlier catalog, source and cron observations are not rewritten."
+  },
+  "changesPerformed": {
+    "productionConfiguration": false,
+    "database": false,
+    "edgeDeployment": false,
+    "existingSqlOrProposal": false,
+    "remoteCommit": false
+  },
+  "plannedChangeDocument": "../ANDROID-SERVER-CHANGES-PENDING.md"
+}
