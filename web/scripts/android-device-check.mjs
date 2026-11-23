@@ -80,9 +80,15 @@ async function checked(run, job) {
   return result.stdout;
 }
 
-// Android License.getLicenseHash hashes the exact decoded UTF-8 value, without
-// trimming. No accepting or writing of licenses is implemented here.
-// https://android.googlesource.com/platform/tools/base/+/mirror-goog-studio-main/repository/src/main/java/com/android/repository/api/License.java
+// Android's generated LicenseType value is bound through TrimStringAdapter
+// before License.getLicenseHash hashes its UTF-8 value. Match that adapter's
+// paragraph-preserving normalization, then require an exact existing accepted
+// hash; never accept/write licenses. Preserve the decoded literal hash too.
+// AOSP implementation and generated binding, in JetBrains' Android tools vendor:
+// https://github.com/JetBrains/adt-tools-base/blob/master/repository/src/main/java/com/android/repository/impl/meta/TrimStringAdapter.java
+// https://github.com/JetBrains/adt-tools-base/blob/master/repository/src/main/java/com/android/repository/impl/generated/v1/LicenseType.java
+// Independently checked against official sdkmanager (EOF, no acceptance), run
+// 45157021103: raw efa68a6b... normalizes to existing accepted 24333f8a... .
 // ElementTree does not load external resources. Reject declarations outright,
 // so neither external entities nor internal expansion can enter the parser.
 const metadataParser = String.raw`
@@ -151,9 +157,18 @@ license_id=refs[0].get('ref','')
 if not re.fullmatch(r'[a-z0-9-]{1,100}',license_id): raise ValueError('INVALID_LICENSE_ID')
 licenses=[value for value in root.findall('license') if value.get('id')==license_id]
 if len(licenses)!=1 or len(licenses[0]) or not licenses[0].text: raise ValueError('LICENSE_TEXT_MISSING')
+license_literal=licenses[0].text
+# Java Pattern's default \\s is ASCII. String.trim removes code points <= U+0020.
+# Do not use split/join: TrimStringAdapter deliberately preserves blank lines.
+license_value=re.sub(r'(?<=\s)[ \t]*','',license_literal,flags=re.ASCII)
+license_value=re.sub(r'(?<!\n)\n(?!\n)',' ',license_value)
+license_value=re.sub(r' +',' ',license_value).strip(''.join(chr(i) for i in range(33)))
+if not license_value: raise ValueError('LICENSE_TEXT_MISSING')
 result=archives[0]
 result.update(package=target,revision='.'.join(str(v) for v in rev),licenseId=license_id,
- licenseSha1=hashlib.sha1(licenses[0].text.encode('utf-8')).hexdigest(),
+ licenseSha1=hashlib.sha1(license_value.encode('utf-8')).hexdigest(),
+ licenseLiteralSha1=hashlib.sha1(license_literal.encode('utf-8')).hexdigest(),
+ licenseNormalization='android-TrimStringAdapter',
  metadataSha256=hashlib.sha256(raw.encode('utf-8')).hexdigest())
 print(json.dumps(result))
 `;

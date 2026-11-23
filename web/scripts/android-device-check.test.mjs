@@ -44,18 +44,40 @@ test('rejects release/server inputs before commands, filesystem writes or downlo
   }
 });
 
-test('resolves one stable image using exact decoded license and raw metadata hashes', () => {
+test('resolves one stable image using Android license normalization and raw metadata hashes', () => {
   const xml = metadataXml().replaceAll('\n', '\r\n');
   const pin = parseSdkMetadata(xml, 'image');
   assert.equal(pin.package, 'system-images;android-36;google_apis;x86_64');
   assert.equal(pin.revision, '17.0.0');
   assert.equal(pin.url, 'https://dl.google.com/android/repository/sys-img/google_apis/x86_64-36_r17.zip');
   assert.equal(pin.checksumAlgorithm, 'sha1');
-  assert.equal(pin.licenseSha1, hash('sha1', '  Synthetic\nlicense & terms.  '));
+  assert.equal(pin.licenseSha1, hash('sha1', 'Synthetic license & terms.'));
+  assert.equal(pin.licenseLiteralSha1, hash('sha1', '  Synthetic\nlicense & terms.  '));
+  assert.equal(pin.licenseNormalization, 'android-TrimStringAdapter');
   assert.equal(pin.metadataSha256, hash('sha256', xml));
   const emulator = parseSdkMetadata(metadataXml(packageXml('emulator')), 'emulator');
   assert.equal(emulator.url, EMULATOR_PIN.url);
   assert.equal(emulator.revision, EMULATOR_PIN.revision);
+});
+
+test('normalizes with the SDK adapter while preserving paragraph breaks and exact acceptance', t => {
+  const literal = ' \tClause   one\nwraps.\n \t\nClause two.\n\nJanuary 16, 2019 \t\n';
+  const canonical = 'Clause one wraps.\n\nClause two.\n\nJanuary 16, 2019';
+  const xml = metadataXml().replace('  Synthetic\nlicense &amp; terms.  ', literal);
+  const pin = parseSdkMetadata(xml, 'image');
+  assert.equal(pin.licenseSha1, hash('sha1', canonical));
+  assert.equal(pin.licenseLiteralSha1, hash('sha1', literal));
+  const sdk = temp(t), file = path.join(sdk, 'licenses/android-sdk-license');
+  mkdirSync(path.dirname(file));
+  writeFileSync(file, pin.licenseLiteralSha1 + '\n');
+  assert.throws(() => requireAcceptedLicense(pin, sdk), { code: 'SDK_LICENSE_ACCEPTANCE_REQUIRED' });
+  const accepted = pin.licenseSha1 + '\n';
+  writeFileSync(file, accepted);
+  assert.doesNotThrow(() => requireAcceptedLicense(pin, sdk));
+  for (const altered of [xml.replace('Clause two.', 'Changed clause.'), xml.replace('wraps.\n \t\nClause', 'wraps.\nClause')]) {
+    assert.throws(() => requireAcceptedLicense(parseSdkMetadata(altered, 'image'), sdk), { code: 'SDK_LICENSE_ACCEPTANCE_REQUIRED' });
+  }
+  assert.equal(readFileSync(file, 'utf8'), accepted);
 });
 
 test('rejects ambiguous stable images, wrong API/ABI and preview-only selections', () => {
