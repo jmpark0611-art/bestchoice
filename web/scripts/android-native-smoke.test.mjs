@@ -29,6 +29,7 @@ function fixture(t, options = {}) {
   const javaHome = path.join(base, 'fixture-jdk');
   const toolDirectory = path.join(base, 'fixture-tools');
   const sdk = path.join(base, 'fixture-sdk');
+  const nativeBridge = put(webRoot, 'node_modules/@capacitor/android/capacitor/src/main/assets/native-bridge.js', 'globalThis.syntheticNativeBridge = true;\n');
   for (const tool of ['java', 'javac', 'jarsigner', 'keytool']) put(javaHome, `bin/${tool}`, 'INERT_MUST_NOT_EXECUTE\n', true);
   put(toolDirectory, 'python3', 'INERT_MUST_NOT_EXECUTE\n', true);
   put(sdk, 'platforms/android-36/android.jar', 'INERT_NOT_AN_ANDROID_PLATFORM\n');
@@ -82,7 +83,7 @@ function fixture(t, options = {}) {
     state.verifications.push(input);
     return { ok: !options.proofFailure };
   };
-  return { base, webRoot, env, releaseRoot, receiptPath, state, run, prepare, verify };
+  return { base, webRoot, env, releaseRoot, receiptPath, nativeBridge, state, run, prepare, verify };
 }
 
 const invoke = (f, overrides = {}) => runNativeSmoke({ webRoot: f.webRoot, env: f.env,
@@ -212,12 +213,13 @@ nativeTest('source/proof drift after the injected native build invalidates the r
   assert.equal(f.state.verifications.length, 1);
 });
 
-nativeTest('the actual Python ZIP guard accepts exact assets and rejects extra files or changed required bytes', async t => {
+nativeTest('the actual Python ZIP guard accepts exact app/library assets and rejects extra, missing, or changed bytes', async t => {
   const f = fixture(t);
   assert.equal((await invoke(f)).ok, true);
   const job = f.state.calls.find(call => call.stage === 'verify-package');
   assert.equal(job.args[0], '-c');
   const program = job.args[1];
+  const libraryHashes = job.args[4];
   const python = findExecutable('python3', process.env);
   assert.ok(python, 'The focused ZIP regression requires an existing local Python interpreter.');
   const assets = path.join(f.base, 'zip-fixture-assets');
@@ -232,11 +234,12 @@ nativeTest('the actual Python ZIP guard accepts exact assets and rejects extra f
   });
   const setup = runPython([
     'import pathlib,sys,zipfile\n' +
-    'root,output=map(pathlib.Path,sys.argv[1:])\n' +
-    'for kind in ("exact","extra","changed","missing"):\n' +
+    'root,output,bridge=map(pathlib.Path,sys.argv[1:])\n' +
+    'for kind in ("exact","extra","changed","missing","bridge-changed","bridge-missing"):\n' +
     ' with zipfile.ZipFile(output/(kind+".zip"),"w") as z:\n' +
     '  z.writestr("base/manifest/AndroidManifest.xml",b"INERT_NOT_A_BINARY_MANIFEST")\n' +
     '  z.writestr("base/dex/classes.dex",b"INERT_NOT_DEX_BYTECODE")\n' +
+    '  if kind!="bridge-missing": z.writestr("base/assets/native-bridge.js",bridge.read_bytes()+(b"CHANGED_BRIDGE" if kind=="bridge-changed" else b""))\n' +
     '  z.writestr("base/assets/public/",b"")\n' +
     '  for p in sorted(root.rglob("*")):\n' +
     '   if p.is_file():\n' +
@@ -246,22 +249,36 @@ nativeTest('the actual Python ZIP guard accepts exact assets and rejects extra f
     '    if kind=="changed" and relative=="public/index.html": data+=b"CHANGED_BYTES"\n' +
     '    z.writestr("base/assets/"+relative,data)\n' +
     '  if kind=="extra": z.writestr("base/assets/public/unexpected.js",b"UNEXPECTED_ASSET")\n',
-    assets, archives,
+    assets, archives, f.nativeBridge,
   ]);
   assert.equal(setup.status, 0, setup.stderr);
-  for (const kind of ['exact', 'extra', 'changed', 'missing']) {
-    const checked = runPython([program, path.join(archives, `${kind}.zip`), assets]);
+  for (const kind of ['exact', 'extra', 'changed', 'missing', 'bridge-changed', 'bridge-missing']) {
+    const checked = runPython([program, path.join(archives, `${kind}.zip`), assets, libraryHashes]);
     if (kind === 'exact') {
       assert.equal(checked.status, 0, checked.stderr);
       assert.match(checked.stdout, /^AAB_ASSETS_MATCH\s*$/);
     } else {
       assert.notEqual(checked.status, 0);
       const diagnostic = JSON.parse(checked.stdout.trim().replace(/^AAB_PACKAGE_DIAGNOSTICS /, ''));
-      assert.deepEqual(diagnostic.missing, kind === 'missing' ? ['base/assets/public/index.html'] : []);
+      assert.deepEqual(diagnostic.missing, kind === 'missing' ? ['base/assets/public/index.html'] : kind === 'bridge-missing' ? ['base/assets/native-bridge.js'] : []);
       assert.deepEqual(diagnostic.unexpected, kind === 'extra' ? ['base/assets/public/unexpected.js'] : []);
-      assert.deepEqual(diagnostic.changed, kind === 'changed' ? ['base/assets/public/index.html'] : []);
+      assert.deepEqual(diagnostic.changed, kind === 'changed' ? ['base/assets/public/index.html'] : kind === 'bridge-changed' ? ['base/assets/native-bridge.js'] : []);
       if (kind === 'extra') assert.match(diagnostic.unexpectedSha256['base/assets/public/unexpected.js'], /^[a-f0-9]{64}$/);
       assert.equal(checked.stdout.includes('AAB_ASSETS_MATCH'), false);
     }
   }
+});
+
+nativeTest('the library bridge is required before building and cannot drift after its fingerprint is captured', async t => {
+  const missing = fixture(t);
+  rmSync(missing.nativeBridge);
+  assertCleanFailure(missing, await invoke(missing), 'CAPACITOR_NATIVE_BRIDGE_REQUIRED');
+  assert.equal(missing.state.calls.length, 0);
+  const changed = fixture(t);
+  const run = async job => {
+    const result = await changed.run(job);
+    if (job.stage === 'native-build') writeFileSync(changed.nativeBridge, 'CHANGED_DURING_BUILD\n');
+    return result;
+  };
+  assertCleanFailure(changed, await invoke(changed, { run }), 'CAPACITOR_NATIVE_BRIDGE_CHANGED_DURING_BUILD');
 });

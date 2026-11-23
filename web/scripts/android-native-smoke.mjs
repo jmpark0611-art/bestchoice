@@ -62,6 +62,11 @@ export async function runNativeSmoke({ webRoot = webRootDefault, env = process.e
   let temporary;
   let workspace;
   try {
+    // AGP merges this required Capacitor library asset into the app bundle.
+    // Snapshot its bytes before preparation/build; do not accept arbitrary extras.
+    const nativeBridge = path.join(webRoot, 'node_modules/@capacitor/android/capacitor/src/main/assets/native-bridge.js');
+    if (!regular(nativeBridge)) return fail('CAPACITOR_NATIVE_BRIDGE_REQUIRED');
+    const libraryAssets = { 'base/assets/native-bridge.js': digest(readFileSync(nativeBridge)) };
     const java = await run({ stage: 'java-version', command: tools.javac, args: ['-version'], cwd: webRoot, env: buildEnv, capture: true });
     if (java.status !== 0 || !/^javac 21(?:\.|\s|$)/m.test(java.stdout)) return fail('JAVA_21_COMPILER_REQUIRED');
     const prepared = await prepare({ command: 'prepare', webRoot, env: buildEnv });
@@ -99,28 +104,34 @@ export async function runNativeSmoke({ webRoot = webRootDefault, env = process.e
     if (signature.status !== 0 || !/jar verified\./i.test(signature.stdout) || /jar is unsigned|unsigned entries|invalid signature/i.test(signature.stdout)) {
       return fail('AAB_SIGNATURE_UNCONFIRMED');
     }
-    // Read only the new AAB. Compare every packaged web asset with the prepared
-    // copy, including the exact runtime identity config; never glob old AABs.
+    // Read only the new AAB. Compare the exact combined set of prepared app assets
+    // and the pinned dependency's bridge, including every byte/fingerprint.
     const archive = await run({ stage: 'verify-package', command: tools.python3, args: ['-c',
       'import hashlib,json,pathlib,sys,zipfile\n' +
-      'aab,root=sys.argv[1:]\nroot=pathlib.Path(root)\n' +
+      'aab,root,library_json=sys.argv[1:]\nroot=pathlib.Path(root)\nlibrary=json.loads(library_json)\n' +
       'with zipfile.ZipFile(aab) as z:\n' +
       ' names=z.namelist()\n' +
       ' files=[p for p in root.rglob("*") if p.is_file()]\n' +
-      ' expected={"base/assets/"+str(p.relative_to(root)) for p in files}\n' +
+      ' app_expected={"base/assets/"+str(p.relative_to(root)) for p in files}\n' +
+      ' expected=app_expected|set(library)\n' +
       ' actual={n for n in names if n.startswith("base/assets/") and not n.endswith("/")}\n' +
       ' changed=["base/assets/"+str(p.relative_to(root)) for p in files if "base/assets/"+str(p.relative_to(root)) in actual and z.read("base/assets/"+str(p.relative_to(root)))!=p.read_bytes()]\n' +
+      ' changed += [n for n,h in library.items() if n in actual and hashlib.sha256(z.read(n)).hexdigest()!=h]\n' +
       ' report={"duplicateEntries":len(names)!=len(set(names)),"manifestPresent":"base/manifest/AndroidManifest.xml" in names,"dexPresent":any(n.startswith("base/dex/") and n.endswith(".dex") for n in names),"missing":sorted(expected-actual),"unexpected":sorted(actual-expected),"changed":sorted(changed)}\n' +
+      ' report["sourceAssetCollision"]=sorted(app_expected&set(library))\n' +
       ' report["unexpectedSha256"]={n:hashlib.sha256(z.read(n)).hexdigest() for n in report["unexpected"]}\n' +
-      ' if report["duplicateEntries"] or not report["manifestPresent"] or not report["dexPresent"] or actual!=expected or changed:\n' +
+      ' if report["duplicateEntries"] or not report["manifestPresent"] or not report["dexPresent"] or report["sourceAssetCollision"] or actual!=expected or changed:\n' +
       '  print("AAB_PACKAGE_DIAGNOSTICS "+json.dumps(report,ensure_ascii=True))\n' +
       '  sys.exit(1)\n' +
-      'print("AAB_ASSETS_MATCH")\n', artifact, path.join(androidDir, 'app/src/main/assets')], cwd: androidDir, env: buildEnv, capture: true });
+      'print("AAB_ASSETS_MATCH")\n', artifact, path.join(androidDir, 'app/src/main/assets'), JSON.stringify(libraryAssets)], cwd: androidDir, env: buildEnv, capture: true });
     if (archive.status !== 0 || !archive.stdout.includes('AAB_ASSETS_MATCH')) {
       // File names and structural checks only; never log file bytes or signing inputs.
       const diagnostic = archive.stdout.split('\n').find(line => line.startsWith('AAB_PACKAGE_DIAGNOSTICS '));
       if (diagnostic) console.error(diagnostic);
       return fail('AAB_PACKAGED_ASSETS_MISMATCH');
+    }
+    if (!regular(nativeBridge) || digest(readFileSync(nativeBridge)) !== libraryAssets['base/assets/native-bridge.js']) {
+      return fail('CAPACITOR_NATIVE_BRIDGE_CHANGED_DURING_BUILD');
     }
     const checked = verify({ androidDir, env: buildEnv });
     if (!checked.ok) return fail('SOURCE_OR_ASSETS_CHANGED_DURING_NATIVE_BUILD');
@@ -129,7 +140,7 @@ export async function runNativeSmoke({ webRoot = webRootDefault, env = process.e
       node: process.version, javac: java.stdout.trim(), configuredApplicationId: config.applicationId,
       versionCode: config.versionCode, versionName: config.versionName,
       aabSha256: digest(readFileSync(artifact)), nativeCompilation: true, signatureVerified: true,
-      packagedAssetsMatch: true, finalBinaryManifestIdentityVerified: false,
+      packagedAssetsMatch: true, libraryAssetsVerified: libraryAssets, finalBinaryManifestIdentityVerified: false,
       syntheticConfigurationOnly: true, backendContacted: false, appOrDeviceLaunched: false,
       storeSubmission: false, productionSigningKeyUsed: false,
       generatedKeyAndAabDeleted: true };
