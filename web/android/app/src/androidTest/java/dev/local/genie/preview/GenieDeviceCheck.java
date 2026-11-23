@@ -13,7 +13,11 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.os.SystemClock;
+import android.system.Os;
+import android.system.OsConstants;
+import android.system.StructPollfd;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.webkit.WebBackForwardList;
@@ -24,7 +28,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.json.JSONObject;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 
 /**
@@ -42,6 +49,35 @@ public class GenieDeviceCheck {
     private static final String DRAFT_KEY = "genie:decision-drafts:v1";
     private Instrumentation instrumentation;
     private MainActivity activity;
+
+    @Rule
+    public final TestWatcher failureScreenshot = new TestWatcher() {
+        @Override
+        protected void failed(Throwable originalFailure, Description description) {
+            // Capture while the failed Activity still exists; the runner may
+            // finish it before host-side adb receives the instrumentation result.
+            if (instrumentation == null || activity == null) return;
+            try {
+                UiAutomation automation = instrumentation.getUiAutomation();
+                if (automation == null) return;
+                try (ParcelFileDescriptor output = automation.executeShellCommand(
+                        "screencap -p /data/local/tmp/genie-device-failure.png")) {
+                    StructPollfd pipe = new StructPollfd();
+                    pipe.fd = output.getFileDescriptor();
+                    pipe.events = (short) (OsConstants.POLLIN | OsConstants.POLLHUP);
+                    if (Os.poll(new StructPollfd[] {pipe}, 5_000) > 0
+                        && (pipe.revents & OsConstants.POLLHUP) != 0) {
+                        Bundle status = new Bundle();
+                        status.putString("stream", "\nGENIE_FAILURE_SCREENSHOT_BEFORE_TEST_EXIT\n");
+                        instrumentation.sendStatus(2, status);
+                    }
+                }
+            } catch (Exception ignored) {
+                // Keep the original assertion. The host validates any image and
+                // records capture failure separately; no test is turned into PASS.
+            }
+        }
+    };
 
     private void launch() {
         instrumentation = InstrumentationRegistry.getInstrumentation();
@@ -142,16 +178,21 @@ public class GenieDeviceCheck {
         instrumentation.waitForIdleSync();
     }
 
-    private void tapWebElement(String selector) throws Exception {
+    private JSONObject tapWebElement(String selector) throws Exception {
         String target = "document.querySelector(" + JSONObject.quote(selector) + ")";
+        awaitTrue("document.fonts.status==='loaded'", "Fonts were not ready before system touch");
         assertEquals("The touch target is missing", "true", evaluate("(() => {const e=" + target
-            + ";if(!e)return false;e.scrollIntoView({behavior:'instant',block:'center',inline:'center'});return true;})()"));
+            + ";if(!e)return false;e.scrollIntoView({behavior:'instant',block:'center',inline:'center'});"
+            + "window.__genieTapReady=false;requestAnimationFrame(()=>requestAnimationFrame(()=>window.__genieTapReady=true));"
+            + "return true;})()"));
+        awaitTrue("window.__genieTapReady===true", "The scrolled touch target did not finish rendering");
         awaitTrue("(() => {const e=" + target + ";if(!e)return false;const r=e.getBoundingClientRect();"
             + "return r.width>0 && r.height>0 && r.left>=0 && r.right<=innerWidth"
             + " && r.top>=0 && r.bottom<=innerHeight;})()", "The touch target is not fully visible");
         JSONObject css = new JSONObject(evaluate("(() => {const e=" + target + ",r=e.getBoundingClientRect();"
             + "const x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);"
-            + "return {x,y,width:innerWidth,height:innerHeight,hit:hit===e||e.contains(hit)};})()"));
+            + "return {x,y,width:innerWidth,height:innerHeight,dpr:devicePixelRatio,"
+            + "left:r.left,top:r.top,right:r.right,bottom:r.bottom,hit:hit===e||e.contains(hit)};})()"));
         assertTrue("Another element covers the touch target", css.getBoolean("hit"));
         double cssX = css.getDouble("x"), cssY = css.getDouble("y");
         double cssWidth = css.getDouble("width"), cssHeight = css.getDouble("height");
@@ -164,12 +205,26 @@ public class GenieDeviceCheck {
             float scaleX = (float) (webView.getWidth() / cssWidth);
             float scaleY = (float) (webView.getHeight() / cssHeight);
             point.set(new float[] {(float) (origin[0] + cssX * scaleX),
-                (float) (origin[1] + cssY * scaleY), scaleX, scaleY});
+                (float) (origin[1] + cssY * scaleY), scaleX, scaleY, origin[0], origin[1],
+                webView.getScrollX(), webView.getScrollY()});
         });
         float[] nativePoint = point.get();
         assertNotNull("The app WebView is not ready for system touch", nativePoint);
         assertTrue("CSS/native coordinate scales disagree", nativePoint[2] > 0
             && Math.abs(nativePoint[2] - nativePoint[3]) < 0.02f);
+        JSONObject plan = new JSONObject().put("css", css).put("screenX", nativePoint[0])
+            .put("screenY", nativePoint[1]).put("scaleX", nativePoint[2]).put("scaleY", nativePoint[3])
+            .put("originX", nativePoint[4]).put("originY", nativePoint[5])
+            .put("nativeScrollX", nativePoint[6]).put("nativeScrollY", nativePoint[7]);
+        // Temporary instrumentation-only trace: no input values, body text,
+        // URL queries, local storage, or production code is recorded/changed.
+        assertEquals("The bounded touch trace could not be installed", "true", evaluate("(() => {"
+            + "window.__genieTapEvents=[];for(const type of ['pointerdown','pointerup','pointercancel','click']){"
+            + "document.addEventListener(type,e=>{if(window.__genieTapEvents.length>=4)return;"
+            + "const t=e.target instanceof Element?e.target:null,a=t?.closest('a');"
+            + "window.__genieTapEvents.push({type:e.type,trusted:e.isTrusted,tag:t?.tagName??'',"
+            + "id:(t?.id??'').slice(0,40),anchorPath:a?new URL(a.href).pathname.slice(0,80):null,"
+            + "x:e.clientX,y:e.clientY});},{capture:true,once:true,passive:true});}return true;})()"));
         long downAt = SystemClock.uptimeMillis();
         MotionEvent down = MotionEvent.obtain(downAt, downAt, MotionEvent.ACTION_DOWN, nativePoint[0], nativePoint[1], 0);
         MotionEvent up = null;
@@ -185,6 +240,7 @@ public class GenieDeviceCheck {
             if (up != null) up.recycle();
         }
         instrumentation.waitForIdleSync();
+        return plan;
     }
 
     private String valuesMatch() {
@@ -207,8 +263,14 @@ public class GenieDeviceCheck {
 
         // A real OS touch supplies user activation. A synthetic JS click makes
         // Chromium skip the resulting history entry in native Back navigation.
-        tapWebElement("a[href=\"/about\"]");
-        awaitTrue("location.pathname==='/about' && !!document.querySelector('h2')", "About did not open");
+        JSONObject aboutTap = tapWebElement("a[href=\"/about\"]");
+        try {
+            awaitTrue("location.pathname==='/about' && !!document.querySelector('h2')", "About did not open");
+        } catch (AssertionError failure) {
+            throw new AssertionError("About did not open; planned=" + aboutTap + "; observed="
+                + evaluate("({path:location.pathname.slice(0,80),activation:navigator.userActivation.hasBeenActive,"
+                    + "events:window.__genieTapEvents??[]})"), failure);
+        }
         assertEquals("The About link did not receive real user activation", "true",
             evaluate("navigator.userActivation.hasBeenActive"));
         UiAutomation automation = instrumentation.getUiAutomation();
@@ -225,7 +287,7 @@ public class GenieDeviceCheck {
                 + "; after=" + nativeBackState() + "; path=" + evaluate("location.pathname.slice(0,80)"), failure);
         }
         report("native-back", new JSONObject().put("from", "/about").put("to", "/")
-            .put("systemAction", "GLOBAL_ACTION_BACK").put("before", beforeBack));
+            .put("systemAction", "GLOBAL_ACTION_BACK").put("before", beforeBack).put("aboutTap", aboutTap));
         report("narrow-screen", layout());
 
         enter("in-a", A); enter("in-b", B); enter("in-note", NOTE);

@@ -4,7 +4,8 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, 
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { checkFixtureEnvironment, copyFixture, downloadArchive, EMULATOR_PIN, fixtureEnvironment,
+import { deflateSync } from 'node:zlib';
+import { captureFailureEvidence, checkFixtureEnvironment, copyFixture, downloadArchive, EMULATOR_PIN, fixtureEnvironment, inspectFailurePng,
   instrumentationArgs, parseInstrumentation, parseSdkMetadata, PHASES, prepareDeviceCheck,
   requireAcceptedLicense, validateNamespace } from './android-device-check.mjs';
 
@@ -198,4 +199,74 @@ test('adb exit zero cannot turn failed, missing, duplicate or crashed tests into
     good.split('\n').slice(1).join('\n'),
   ]) assert.throws(() => parseInstrumentation({ status: 0, stdout }, 'first'));
   assert.throws(() => parseInstrumentation({ status: 1, stdout: good }, 'first'), { code: 'INSTRUMENTATION_DID_NOT_PASS' });
+});
+
+const syntheticPng = (width = 640, height = 1280) => {
+  const chunk = (type, data) => {
+    const payload = Buffer.concat([Buffer.from(type, 'ascii'), data]);
+    let crc = 0xffffffff;
+    for (const byte of payload) {
+      crc ^= byte;
+      for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+    }
+    const size = Buffer.alloc(4), checksum = Buffer.alloc(4);
+    size.writeUInt32BE(data.length); checksum.writeUInt32BE((crc ^ 0xffffffff) >>> 0);
+    return Buffer.concat([size, payload, checksum]);
+  };
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width); header.writeUInt32BE(height, 4); header[8] = 8; header[9] = 6;
+  return Buffer.concat([Buffer.from('89504e470d0a1a0a', 'hex'), chunk('IHDR', header),
+    chunk('IDAT', deflateSync(Buffer.alloc(height * (width * 4 + 1)))), chunk('IEND', Buffer.alloc(0))]);
+};
+
+test('failure PNG evidence requires the fixed name, regular small complete PNG and exact dimensions', t => {
+  const work = temp(t), file = path.join(work, 'failure.png'), bytes = syntheticPng();
+  writeFileSync(file, bytes);
+  assert.deepEqual(inspectFailurePng(file), { file: 'failure.png', bytes: bytes.length,
+    sha256: hash('sha256', bytes), width: 640, height: 1280 });
+  for (const invalid of [Buffer.from('not an image'), bytes.subarray(0, -12), syntheticPng(640, 1279), Buffer.alloc(1_048_577)]) {
+    writeFileSync(file, invalid);
+    assert.throws(() => inspectFailurePng(file), { code: 'INVALID_FAILURE_PNG' });
+  }
+  rmSync(file);
+  const other = path.join(work, 'other.png'); writeFileSync(other, bytes); symlinkSync(other, file);
+  assert.throws(() => inspectFailurePng(file), { code: 'INVALID_FAILURE_PNG' });
+  assert.throws(() => inspectFailurePng(other), { code: 'INVALID_FAILURE_PNG' });
+});
+
+test('failure capture writes only the small PNG and fixed nonprivate state, with partial cases separate', async t => {
+  const workDir = temp(t), calls = [], bytes = syntheticPng();
+  const result = await captureFailureEvidence({ workDir, emulatorAlive: true,
+    receipt: { sourceCommit: 'a'.repeat(40), failureCode: 'INSTRUMENTATION_DID_NOT_PASS',
+      observedPassedCaseIds: ['launch', 'unrecognized-case'], privateValue: 'never-publish', allFourCasesPassed: true,
+      failureScreenshotBeforeExit: true },
+    adb: async args => { calls.push(args); if (args[2] === 'pull') writeFileSync(args[4], bytes); return { status: 0 }; },
+  });
+  assert.equal(result.saved, true); assert.equal(result.captureError, null);
+  assert.deepEqual(calls.map(args => args.slice(2, 4)), [['pull', '/data/local/tmp/genie-device-failure.png'], ['shell', 'rm']]);
+  const raw = readFileSync(path.join(workDir, 'diagnostics/state.json'), 'utf8'), state = JSON.parse(raw);
+  assert.equal(state.allFourCasesPassed, false);
+  assert.deepEqual(state.observedPassedCaseIds, ['launch']);
+  assert.equal(state.screenshot.sha256, hash('sha256', bytes));
+  assert.equal(state.screenshotTiming, 'before-test-exit');
+  assert.equal(raw.includes('never-publish'), false);
+  assert.deepEqual(readFileSync(path.join(workDir, 'diagnostics/failure.png')), bytes);
+});
+
+test('failure capture rejects bad image and preserves original failure when capture or cleanup fails', async t => {
+  const workDir = temp(t), calls = [];
+  const result = await captureFailureEvidence({ workDir, emulatorAlive: true,
+    receipt: { failureCode: 'ORIGINAL_TOUCH_FAILURE', observedPassedCaseIds: ['launch'] },
+    adb: async args => {
+      calls.push(args);
+      if (args[2] === 'pull') writeFileSync(args[4], 'not a screenshot');
+      if (args[3] === 'rm') throw new Error('private diagnostic must not escape');
+      return { status: 0 };
+    },
+  });
+  assert.equal(result.saved, true); assert.equal(result.captureError, 'INVALID_FAILURE_PNG');
+  assert.equal(existsSync(path.join(workDir, 'diagnostics/failure.png')), false);
+  const state = JSON.parse(readFileSync(path.join(workDir, 'diagnostics/state.json'), 'utf8'));
+  assert.equal(state.failureCode, 'ORIGINAL_TOUCH_FAILURE'); assert.equal(state.screenshot, null);
+  assert.equal(state.allFourCasesPassed, false); assert.equal(calls.length, 3);
 });

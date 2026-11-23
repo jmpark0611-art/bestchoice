@@ -447,6 +447,56 @@ export function parseInstrumentation(result, phase) {
   return reports;
 }
 
+/** Only this fixed, small emulator screenshot may enter failure artifacts. */
+export function inspectFailurePng(file) {
+  if (path.basename(file) !== 'failure.png' || !regular(file) || lstatSync(file).size > 1_048_576) reject('INVALID_FAILURE_PNG');
+  const bytes = readFileSync(file);
+  if (bytes.length < 45 || bytes.length > 1_048_576 ||
+      !bytes.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')) ||
+      bytes.readUInt32BE(8) !== 13 || bytes.toString('ascii', 12, 16) !== 'IHDR' ||
+      bytes.readUInt32BE(16) !== 640 || bytes.readUInt32BE(20) !== 1280 ||
+      !bytes.subarray(-12).equals(Buffer.from('0000000049454e44ae426082', 'hex'))) reject('INVALID_FAILURE_PNG');
+  return { file: 'failure.png', bytes: bytes.length, sha256: digest(bytes), width: 640, height: 1280 };
+}
+
+/** Best-effort capture. Its error must never replace the original test failure. */
+export async function captureFailureEvidence({ workDir, adb, receipt, emulatorAlive }) {
+  const knownCases = [...PHASES.first.cases, ...PHASES.restore.cases];
+  const state = {
+    schemaVersion: 1, kind: 'android-emulator-fixture-failure', fixtureOnly: true,
+    signedReleaseNotTested: true, applicationId: FIXTURE_APP_ID, expectedApiLevel: 36,
+    sourceCommit: /^[0-9a-f]{40}$/.test(receipt.sourceCommit ?? '') ? receipt.sourceCommit : null,
+    failureCode: /^[A-Z][A-Z0-9_]+$/.test(receipt.failureCode ?? '') ? receipt.failureCode : 'DEVICE_CHECK_FAILED',
+    allFourCasesPassed: false,
+    observedPassedCaseIds: knownCases.filter(id => receipt.observedPassedCaseIds?.includes(id)),
+    screenshot: null, screenshotTiming: null, captureError: null,
+  };
+  const directory = path.join(workDir, 'diagnostics'), file = path.join(directory, 'failure.png');
+  const deviceFile = '/data/local/tmp/genie-device-failure.png';
+  let created = false;
+  try {
+    if (!path.isAbsolute(workDir) || !lstatSync(workDir).isDirectory() || lstatSync(workDir).isSymbolicLink()) reject('UNSAFE_FAILURE_DIRECTORY');
+    mkdirSync(directory, { mode: 0o700 }); created = true;
+    if (!emulatorAlive) reject('FAILURE_EMULATOR_UNAVAILABLE');
+    if (!receipt.failureScreenshotBeforeExit &&
+        (await adb(['-s', serial, 'shell', 'screencap', '-p', deviceFile], 15_000)).status !== 0) reject('FAILURE_SCREENSHOT_CAPTURE_FAILED');
+    if ((await adb(['-s', serial, 'pull', deviceFile, file], 15_000)).status !== 0) reject('FAILURE_SCREENSHOT_PULL_FAILED');
+    state.screenshot = inspectFailurePng(file);
+    state.screenshotTiming = receipt.failureScreenshotBeforeExit ? 'before-test-exit' : 'after-test-exit-fallback';
+  } catch (error) {
+    state.captureError = /^[A-Z][A-Z0-9_]+$/.test(error.code ?? '') ? error.code : 'FAILURE_EVIDENCE_CAPTURE_FAILED';
+    if (created) { try { rmSync(file, { force: true }); } catch {} }
+  } finally {
+    if (created && emulatorAlive) {
+      try { await adb(['-s', serial, 'shell', 'rm', '-f', deviceFile], 5_000); } catch {}
+    }
+  }
+  if (created) {
+    try { save(path.join(directory, 'state.json'), state); } catch { return { saved: false, captureError: 'FAILURE_STATE_WRITE_FAILED' }; }
+  }
+  return { saved: created, screenshot: state.screenshot, captureError: state.captureError };
+}
+
 function preparedAt(workDir) {
   if (!path.isAbsolute(workDir ?? '') || lstatSync(workDir).isSymbolicLink() || !regular(path.join(workDir, 'prepared.json'))) reject('PREPARED_FIXTURE_REQUIRED');
   const prepared = json(path.join(workDir, 'prepared.json'));
@@ -591,6 +641,30 @@ export async function runDeviceCheck(workDir, env = process.env, run = execute) 
   } catch (error) {
     failure = error;
     receipt.failureCode = /^[A-Z][A-Z0-9_]+$/.test(error.code ?? '') ? error.code : 'DEVICE_CHECK_FAILED';
+    // Preserve separately observed subcase evidence without relaxing the full
+    // instrumentation/force-stop success gate or treating a failed phase as passed.
+    const observed = new Set(cases.map(value => value.caseId));
+    receipt.failureScreenshotBeforeExit = false;
+    for (const file of ['phase-first.log', 'phase-restore.log']) {
+      const logFile = path.join(workDir, file);
+      if (!regular(logFile)) continue;
+      let output;
+      try { output = readFileSync(logFile, 'utf8'); } catch { continue; }
+      if (/(?:^|\n)GENIE_FAILURE_SCREENSHOT_BEFORE_TEST_EXIT\r?(?:\n|$)/.test(output)) receipt.failureScreenshotBeforeExit = true;
+      for (const line of output.split(/\r?\n/)) {
+        const marker = line.indexOf('GENIE_DEVICE_CASE ');
+        if (marker < 0) continue;
+        try {
+          const value = JSON.parse(line.slice(marker + 'GENIE_DEVICE_CASE '.length));
+          if (value.passed === true) observed.add(value.caseId);
+        } catch {}
+      }
+    }
+    receipt.observedPassedCaseIds = [...PHASES.first.cases, ...PHASES.restore.cases].filter(id => observed.has(id));
+    try {
+      receipt.failureEvidence = await captureFailureEvidence({ workDir, adb, receipt,
+        emulatorAlive: Boolean(emulator && emulator.exitCode === null && emulator.pid) });
+    } catch { receipt.failureEvidence = { saved: false, captureError: 'FAILURE_EVIDENCE_CAPTURE_FAILED' }; }
     for (const file of ['phase-first.log', 'phase-restore.log', 'emulator.log']) {
       const logFile = path.join(workDir, file);
       if (regular(logFile)) console.error(file + '\n' + readFileSync(logFile, 'utf8').slice(-10_000));

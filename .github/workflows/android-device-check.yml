@@ -1,7 +1,8 @@
 name: Genie Android device check (isolated fixture)
 
 # One disposable public standard runner. No production secrets, deployment,
-# paid runner, cache, artifact upload, or SDK license acceptance.
+# paid runner, cache, or SDK license acceptance. Only synthetic failure evidence
+# may be retained for one day; no AVD, credentials, app storage or raw logcat.
 on:
   push:
     branches:
@@ -81,6 +82,19 @@ jobs:
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,
             '## Android emulator fixture check\n\nOnly the four named cases below are evaluated. A physical phone, signed release, shared voting, clipboard denial, and a real backend are not validated by this job.\n\n```json\n' + receipt + '\n```\n');
           JS
+      - name: Retain only a synthetic failure screen and fixed state for one day
+        if: failure() && env.GENIE_DEVICE_WORK != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: genie-device-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.GENIE_DEVICE_WORK }}/diagnostics/failure.png
+            ${{ env.GENIE_DEVICE_WORK }}/diagnostics/state.json
+          if-no-files-found: ignore
+          include-hidden-files: false
+          retention-days: 1
+          compression-level: 0
+          overwrite: false
       - name: Remove this job's disposable files
         if: always()
         run: |
