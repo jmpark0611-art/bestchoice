@@ -8,6 +8,7 @@ import { runAndroidRelease, publicBuildEnvironment } from './android-release.mjs
 import { resolveAndroidReleaseConfig } from './android-release-config.mjs';
 import { findExecutable } from './android-release-environment.mjs';
 import { readVerifiedBundleIdentity } from './android-bundle-identity.mjs';
+import { packagedAssetsCheckJob } from './android-packaged-assets.mjs';
 import { digest, verifyAndroidRelease } from './android-release-manifest.mjs';
 
 const webRootDefault = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -109,24 +110,8 @@ export async function runNativeSmoke({ webRoot = webRootDefault, env = process.e
     if (!identity.ok) return fail('AAB_FINAL_MANIFEST_IDENTITY_UNCONFIRMED');
     // Read only the new AAB. Compare the exact combined set of prepared app assets
     // and the pinned dependency's bridge, including every byte/fingerprint.
-    const archive = await run({ stage: 'verify-package', command: tools.python3, args: ['-c',
-      'import hashlib,json,pathlib,sys,zipfile\n' +
-      'aab,root,library_json=sys.argv[1:]\nroot=pathlib.Path(root)\nlibrary=json.loads(library_json)\n' +
-      'with zipfile.ZipFile(aab) as z:\n' +
-      ' names=z.namelist()\n' +
-      ' files=[p for p in root.rglob("*") if p.is_file()]\n' +
-      ' app_expected={"base/assets/"+str(p.relative_to(root)) for p in files}\n' +
-      ' expected=app_expected|set(library)\n' +
-      ' actual={n for n in names if n.startswith("base/assets/") and not n.endswith("/")}\n' +
-      ' changed=["base/assets/"+str(p.relative_to(root)) for p in files if "base/assets/"+str(p.relative_to(root)) in actual and z.read("base/assets/"+str(p.relative_to(root)))!=p.read_bytes()]\n' +
-      ' changed += [n for n,h in library.items() if n in actual and hashlib.sha256(z.read(n)).hexdigest()!=h]\n' +
-      ' report={"duplicateEntries":len(names)!=len(set(names)),"manifestPresent":"base/manifest/AndroidManifest.xml" in names,"dexPresent":any(n.startswith("base/dex/") and n.endswith(".dex") for n in names),"missing":sorted(expected-actual),"unexpected":sorted(actual-expected),"changed":sorted(changed)}\n' +
-      ' report["sourceAssetCollision"]=sorted(app_expected&set(library))\n' +
-      ' report["unexpectedSha256"]={n:hashlib.sha256(z.read(n)).hexdigest() for n in report["unexpected"]}\n' +
-      ' if report["duplicateEntries"] or not report["manifestPresent"] or not report["dexPresent"] or report["sourceAssetCollision"] or actual!=expected or changed:\n' +
-      '  print("AAB_PACKAGE_DIAGNOSTICS "+json.dumps(report,ensure_ascii=True))\n' +
-      '  sys.exit(1)\n' +
-      'print("AAB_ASSETS_MATCH")\n', artifact, path.join(androidDir, 'app/src/main/assets'), JSON.stringify(libraryAssets)], cwd: androidDir, env: buildEnv, capture: true });
+    const archive = await run(packagedAssetsCheckJob({ pythonExecutable: tools.python3, artifactPath: artifact,
+      assetRoot: path.join(androidDir, 'app/src/main/assets'), libraryAssets, cwd: androidDir, env: buildEnv }));
     if (archive.status !== 0 || !archive.stdout.includes('AAB_ASSETS_MATCH')) {
       // File names and structural checks only; never log file bytes or signing inputs.
       const diagnostic = archive.stdout.split('\n').find(line => line.startsWith('AAB_PACKAGE_DIAGNOSTICS '));

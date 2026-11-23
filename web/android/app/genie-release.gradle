@@ -45,14 +45,27 @@ def genieSigningVariableNames = [
 def genieSigningValues = genieSigningVariableNames.collectEntries { name ->
     [(name): providers.environmentVariable(name).orNull]
 }
+def genieUnsignedExportProperty = providers.gradleProperty('genieUnsignedExport').orNull
+if (genieUnsignedExportProperty != null && genieUnsignedExportProperty != 'true') {
+    throw new GradleException('The unsigned export option accepts only an explicit true value; omit it for the normal signed release.')
+}
+boolean genieUnsignedExport = genieUnsignedExportProperty == 'true'
+if (genieUnsignedExport && genieSigningValues.values().any { it != null }) {
+    throw new GradleException('Unsigned Android export must not receive any signing environment variables.')
+}
 def genieKeystorePath = genieSigningValues.GENIE_ANDROID_KEYSTORE_PATH
-def genieKeystore = genieKeystorePath ? new File(genieKeystorePath) : null
-def genieSigningConfig = android.signingConfigs.create('genieRelease')
-genieSigningConfig.storeFile = genieKeystore
-genieSigningConfig.storePassword = genieSigningValues.GENIE_ANDROID_KEYSTORE_PASSWORD
-genieSigningConfig.keyAlias = genieSigningValues.GENIE_ANDROID_KEY_ALIAS
-genieSigningConfig.keyPassword = genieSigningValues.GENIE_ANDROID_KEY_PASSWORD
-android.buildTypes.getByName('release').signingConfig = genieSigningConfig
+def genieKeystore = !genieUnsignedExport && genieKeystorePath ? new File(genieKeystorePath) : null
+if (genieUnsignedExport) {
+    // Explicit export only: never fall back to a debug or disposable signer.
+    android.buildTypes.getByName('release').signingConfig = null
+} else {
+    def genieSigningConfig = android.signingConfigs.create('genieRelease')
+    genieSigningConfig.storeFile = genieKeystore
+    genieSigningConfig.storePassword = genieSigningValues.GENIE_ANDROID_KEYSTORE_PASSWORD
+    genieSigningConfig.keyAlias = genieSigningValues.GENIE_ANDROID_KEY_ALIAS
+    genieSigningConfig.keyPassword = genieSigningValues.GENIE_ANDROID_KEY_PASSWORD
+    android.buildTypes.getByName('release').signingConfig = genieSigningConfig
+}
 
 // AGP 8.13 exposes the full applicationId only on the variant API; buildTypes
 // provide a suffix. Keep Java/R namespace stable and change only release outputs.
@@ -90,10 +103,10 @@ def verifyGenieRelease = tasks.register('verifyGenieRelease', Exec) {
         } catch (Exception ignored) {
             throw new GradleException('Android release preparation changed or became unreadable. Prepare a new isolated release workspace.')
         }
-        if (!genieSigningValues.values().every { it != null && !it.trim().isEmpty() } ||
+        if (!genieUnsignedExport && (!genieSigningValues.values().every { it != null && !it.trim().isEmpty() } ||
                 genieKeystore == null || !genieKeystore.isAbsolute() || !genieKeystore.isFile() || !genieKeystore.canRead() ||
                 genieKeystore.name.equalsIgnoreCase('debug.keystore') ||
-                genieSigningValues.GENIE_ANDROID_KEY_ALIAS.trim().equalsIgnoreCase('androiddebugkey')) {
+                genieSigningValues.GENIE_ANDROID_KEY_ALIAS.trim().equalsIgnoreCase('androiddebugkey'))) {
             throw new GradleException('Android release requires all four nonblank GENIE_ANDROID signing environment variables and a readable absolute, non-debug keystore path and alias.')
         }
         if (!genieVerifier.isFile()) {

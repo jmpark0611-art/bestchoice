@@ -7,7 +7,21 @@ on:
     branches:
       - codex/genie-android-native-check-20261123
     paths:
-      - 'web/**'
+      - 'web/src/**'
+      - 'web/public/**'
+      - 'web/index.html'
+      - 'web/package*.json'
+      - 'web/*config.*'
+      - 'web/android/app/src/main/**'
+      - 'web/android/app/*.gradle'
+      - 'web/android/*.gradle'
+      - 'web/android/*.properties'
+      - 'web/android/gradle/**'
+      - 'web/android/gradlew*'
+      - 'web/scripts/android-native-smoke.mjs'
+      - 'web/scripts/android-packaged-assets.mjs'
+      - 'web/scripts/android-release*.mjs'
+      - 'web/scripts/android-bundle-identity.mjs'
       - '.github/workflows/android-native-check.yml'
   workflow_dispatch:
 
@@ -36,7 +50,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '24'
+          node-version: '24.22.3'
       - name: Select the runner's existing Java 21 and Android SDK
         run: |
           test -x "${JAVA_HOME_21_X64}/bin/javac"
