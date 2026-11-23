@@ -530,7 +530,7 @@ export async function runDeviceCheck(workDir, env = process.env, run = execute) 
   try {
     const acceleration = await checked(run, { stage: 'kvm-check', command: emulatorBinary, args: ['-accel-check'], env: child });
     if (!/\bKVM\b/i.test(acceleration) || !/usable|installed/i.test(acceleration)) reject('KVM_ACCELERATION_NOT_CONFIRMED');
-    receipt.emulatorVersionOutput = (await checked(run, { stage: 'emulator-version', command: emulatorBinary, args: ['-version'], env: child })).split('\n')[0];
+    receipt.emulatorVersionOutput = (await checked(run, { stage: 'emulator-version', command: emulatorBinary, args: ['-no-window', '-version'], env: child })).split('\n')[0];
     const avd = path.join(workDir, 'avd', avdName + '.avd');
     mkdirSync(avd);
     writeFileSync(path.join(workDir, 'avd', avdName + '.ini'),
