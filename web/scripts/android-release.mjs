@@ -4,6 +4,7 @@ import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, wr
 import path from 'node:path';
 import { resolveAndroidReleaseConfig } from './android-release-config.mjs';
 import { inspectAndroidNativeEnvironment } from './android-release-environment.mjs';
+import { readVerifiedBundleIdentity } from './android-bundle-identity.mjs';
 import { digest, includeNativePath, inventory, sourceSnapshot, writeReleaseManifest, verifyAndroidRelease } from './android-release-manifest.mjs';
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -157,7 +158,7 @@ export async function runAndroidRelease({ command, webRoot = defaultRoot, env = 
     // cached distribution executable directly, so a missing wrapper cache cannot fetch one.
     const gradle = nativeTools.gradleExecutable;
     const nativeEnv = { ...env, GENIE_NODE_BINARY: process.execPath };
-    if ((await run({ stage, command: gradle, args: ['--offline', '--no-daemon', '--no-configuration-cache', '-Pandroid.builder.sdkDownload=false', '--console=plain', 'bundleRelease'], cwd: androidDir, env: nativeEnv })).status !== 0) {
+    if ((await run({ stage, command: gradle, args: ['--offline', '--no-daemon', '--no-configuration-cache', '-Pandroid.builder.sdkDownload=false', '--console=plain', 'bundleRelease', 'verifyGenieBundleIdentity'], cwd: androidDir, env: nativeEnv })).status !== 0) {
       return failed(stage, 'ANDROID_BUNDLE_FAILED', 'Android 빌드에 실패했습니다. 이전 AAB를 완료 결과로 사용하지 않습니다.');
     }
     const artifactPath = path.join(androidDir, 'app/build/outputs/bundle/release/app-release.aab');
@@ -170,9 +171,15 @@ export async function runAndroidRelease({ command, webRoot = defaultRoot, env = 
     if (signature.status !== 0 || !/jar verified\./i.test(signature.stdout ?? '') || /jar is unsigned|unsigned entries|invalid signature/i.test(signature.stdout ?? '')) {
       return failed(stage, 'ANDROID_SIGNATURE_UNCONFIRMED', 'AAB 서명을 확인하지 못했습니다. 제출 가능한 파일로 표시하지 않습니다.');
     }
+    stage = 'verify-bundle-identity';
+    const identity = readVerifiedBundleIdentity({ androidDir, config });
+    if (!identity.ok) {
+      return failed(stage, identity.code, '최종 AAB 안의 앱 ID와 버전을 확인하지 못했습니다. 출시 파일로 표시하지 않습니다.');
+    }
     writeFileSync(path.join(workspace, 'ANDROID-BUNDLE.json'), json({ status: 'created-awaiting-device-and-store-review',
-      applicationId: config.applicationId, versionCode: config.versionCode, versionName: config.versionName,
-      file: 'android/app/build/outputs/bundle/release/app-release.aab', sha256: digest(readFileSync(artifactPath)) }));
+      applicationId: identity.receipt.applicationId, versionCode: identity.receipt.versionCode, versionName: identity.receipt.versionName,
+      file: 'android/app/build/outputs/bundle/release/app-release.aab', sha256: identity.receipt.sha256,
+      finalBinaryManifestIdentityVerified: true, manifestSha256: identity.receipt.manifestSha256 }));
     return { ok: true, workspace, artifactPath, manifestPath };
   } catch {
     return failed(stage, 'LOCAL_PREPARATION_FAILED', '로컬 출시 준비를 완료하지 못했습니다. 준비 기록이나 이전 산출물을 출시 완료로 사용하지 마세요.');

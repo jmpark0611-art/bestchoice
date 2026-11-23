@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runNativeSmoke } from './android-native-smoke.mjs';
 import { findExecutable } from './android-release-environment.mjs';
+import { digest } from './android-release-manifest.mjs';
 
 // Native command results are injected: no compilation, signing, or backend calls.
 // The final regression runs only Python's ZIP guard against synthetic archives.
@@ -53,6 +54,10 @@ function fixture(t, options = {}) {
     state.workspace = mkdtempSync(path.join(releaseRoot, 'run-synthetic-'));
     put(state.workspace, 'android/gradlew', 'INERT_MUST_NOT_EXECUTE\n');
     put(state.workspace, 'android/app/src/main/assets/public/index.html', '<p>Synthetic orchestration fixture only</p>\n');
+    put(state.workspace, 'android/genie-release-manifest.json', JSON.stringify({
+      schemaVersion: 1, profile: 'android-release', status: 'prepared-not-native-validated',
+      applicationId: 'kr.synthfixture.genie', versionCode: 12, versionName: '1.2.0', appName: '결정해지니',
+    }));
     state.artifact = path.join(state.workspace, 'android/app/build/outputs/bundle/release/app-release.aab');
     return { ok: true, workspace: state.workspace };
   };
@@ -72,6 +77,15 @@ function fixture(t, options = {}) {
     if (job.stage === 'native-build') {
       // Partial and successful fake outputs are deliberately invalid as AABs.
       put(job.cwd, 'app/build/outputs/bundle/release/app-release.aab', 'INERT_NOT_AN_AAB_OR_SIGNATURE\n');
+      assert.ok(job.args.includes('verifyGenieBundleIdentity'));
+      // Injected identity proof only. No fixture is a real parsed Android AAB.
+      if (!options.missingIdentity) put(job.cwd, 'app/build/outputs/bundle/release/genie-bundle-identity.json', JSON.stringify({
+        schemaVersion: 1, status: 'verified-final-aab-manifest-identity',
+        file: 'app/build/outputs/bundle/release/app-release.aab', manifestEntry: 'base/manifest/AndroidManifest.xml',
+        applicationId: options.wrongIdentity ? 'kr.synthfixture.wrong' : 'kr.synthfixture.genie', versionCode: 12, versionName: '1.2.0',
+        sha256: digest(readFileSync(state.artifact)), manifestSha256: digest('INERT_NOT_A_BINARY_MANIFEST'),
+        releaseManifestSha256: digest(readFileSync(path.join(job.cwd, 'genie-release-manifest.json'))),
+      }));
       if (options.throwStage === job.stage) throw new Error('INJECTED_PRIVATE_FAILURE_SENTINEL_9281');
       return { status: options.failStage === job.stage ? 7 : 0, stdout: '' };
     }
@@ -164,7 +178,11 @@ nativeTest('injected success emits only an explicitly non-release receipt after 
   assert.equal(receipt.status, 'native-check-passed-not-a-release');
   assert.equal(receipt.syntheticConfigurationOnly, true);
   assert.equal(receipt.generatedKeyAndAabDeleted, true);
-  for (const field of ['backendContacted', 'appOrDeviceLaunched', 'storeSubmission', 'productionSigningKeyUsed', 'finalBinaryManifestIdentityVerified']) assert.equal(receipt[field], false);
+  for (const field of ['backendContacted', 'appOrDeviceLaunched', 'storeSubmission', 'productionSigningKeyUsed']) assert.equal(receipt[field], false);
+  assert.equal(receipt.finalBinaryManifestIdentityVerified, true);
+  assert.equal(receipt.finalApplicationId, 'kr.synthfixture.genie');
+  assert.equal(receipt.finalVersionCode, 12);
+  assert.equal(receipt.finalVersionName, '1.2.0');
   assert.equal(receipt.configuredApplicationId, 'kr.synthfixture.genie');
   assert.equal(receipt.sourceCommit, f.env.GITHUB_SHA);
   assert.match(receipt.aabSha256, /^[a-f0-9]{64}$/);
@@ -194,6 +212,15 @@ nativeTest('a zero exit code with unsigned or partially unsigned content cannot 
   for (const signatureText of ['jar is unsigned.\n', 'jar verified.\nThis jar contains unsigned entries.\n']) {
     const f = fixture(t, { signatureText });
     assertCleanFailure(f, await invoke(f), 'AAB_SIGNATURE_UNCONFIRMED');
+    assert.equal(f.state.calls.some(job => job.stage === 'verify-package'), false);
+    assert.equal(f.state.verifications.length, 0);
+  }
+});
+
+nativeTest('missing or mismatched final manifest evidence rejects signed fake artifacts and cleans every temporary file', async t => {
+  for (const options of [{ missingIdentity: true }, { wrongIdentity: true }]) {
+    const f = fixture(t, options);
+    assertCleanFailure(f, await invoke(f), 'AAB_FINAL_MANIFEST_IDENTITY_UNCONFIRMED');
     assert.equal(f.state.calls.some(job => job.stage === 'verify-package'), false);
     assert.equal(f.state.verifications.length, 0);
   }

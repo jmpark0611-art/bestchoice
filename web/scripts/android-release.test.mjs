@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runAndroidRelease } from './android-release.mjs';
+import { digest } from './android-release-manifest.mjs';
 
 const sourceWebRoot = fileURLToPath(new URL('..', import.meta.url));
 // Syntax-only fixtures. Tests inject every command and never contact these hosts.
@@ -59,7 +60,8 @@ async function fixture(t) {
 }
 
 function fakeCommands({ failStage, omitBuildOutput = false, failBundle = false, createSyntheticBundle = false,
-  signatureText = 'jar verified.', tamperSync = false, nonemptyShim = false, unexpectedExtra = false, missingShim = false, throwStage } = {}) {
+  signatureText = 'jar verified.', missingIdentity = false, wrongIdentity = false,
+  tamperSync = false, nonemptyShim = false, unexpectedExtra = false, missingShim = false, throwStage } = {}) {
   const calls = [];
   const run = async job => {
     calls.push({ ...job, args: [...job.args], env: { ...job.env } });
@@ -100,6 +102,17 @@ function fakeCommands({ failStage, omitBuildOutput = false, failBundle = false, 
       const artifact = path.join(job.cwd, 'app', 'build', 'outputs', 'bundle', 'release', 'app-release.aab');
       await mkdir(path.dirname(artifact), { recursive: true });
       await writeFile(artifact, 'SYNTHETIC_NOT_AN_ANDROID_BUNDLE_OR_SIGNATURE');
+      assert.ok(job.args.includes('verifyGenieBundleIdentity'));
+      // This injected receipt tests orchestration only; it is not evidence of a
+      // real Android manifest parse, bundle, or signature.
+      if (!missingIdentity) await writeFile(path.join(path.dirname(artifact), 'genie-bundle-identity.json'), JSON.stringify({
+        schemaVersion: 1, status: 'verified-final-aab-manifest-identity',
+        file: 'app/build/outputs/bundle/release/app-release.aab', manifestEntry: 'base/manifest/AndroidManifest.xml',
+        applicationId: wrongIdentity ? 'kr.synthfixture.wrong' : validEnv.GENIE_ANDROID_APPLICATION_ID,
+        versionCode: Number(validEnv.GENIE_ANDROID_VERSION_CODE), versionName: validEnv.GENIE_ANDROID_VERSION_NAME,
+        sha256: digest(await readFile(artifact)), manifestSha256: digest('INERT_NOT_A_BINARY_MANIFEST'),
+        releaseManifestSha256: digest(await readFile(path.join(job.cwd, 'genie-release-manifest.json'))),
+      }));
       return { status: 0 };
     }
     if (job.stage === 'verify-bundle') {
@@ -287,7 +300,23 @@ test('injected successful bundle flow uses cached tools and returns only the fre
   assert.equal(await readFile(result.artifactPath, 'utf8'), 'SYNTHETIC_NOT_AN_ANDROID_BUNDLE_OR_SIGNATURE');
   const proof = JSON.parse(await readFile(path.join(result.workspace, 'ANDROID-BUNDLE.json'), 'utf8'));
   assert.equal(proof.status, 'created-awaiting-device-and-store-review');
+  assert.equal(proof.finalBinaryManifestIdentityVerified, true);
+  assert.equal(proof.applicationId, validEnv.GENIE_ANDROID_APPLICATION_ID);
 });
+
+for (const [label, option] of [['missing', { missingIdentity: true }], ['mismatched', { wrongIdentity: true }]]) {
+  test(`a signed injected bundle with ${label} final identity evidence cannot be reported complete`, async t => {
+    const webRoot = await fixture(t);
+    const commands = fakeCommands({ createSyntheticBundle: true, ...option });
+    const result = await runAndroidRelease({ command: 'bundle', webRoot, env: validEnv,
+      run: commands.run, inspectNative: nativeReady, log() {} });
+    assert.equal(result.ok, false);
+    assert.equal(result.stage, 'verify-bundle-identity');
+    assert.equal('artifactPath' in result, false);
+    const bundle = commands.calls.find(call => call.stage === 'bundle');
+    assert.equal(existsSync(path.join(bundle.cwd, '..', 'ANDROID-BUNDLE.json')), false);
+  });
+}
 
 test('zero exit with an unsigned verification result cannot be reported as a completed bundle', async t => {
   const webRoot = await fixture(t);

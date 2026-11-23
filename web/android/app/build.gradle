@@ -44,6 +44,7 @@ dependencies {
 
 apply from: 'capacitor.build.gradle'
 apply from: 'genie-release.gradle'
+apply from: 'genie-bundle-identity.gradle'
 
 try {
     def servicesJSON = file('google-services.json')

@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { runAndroidRelease, publicBuildEnvironment } from './android-release.mjs';
 import { resolveAndroidReleaseConfig } from './android-release-config.mjs';
 import { findExecutable } from './android-release-environment.mjs';
+import { readVerifiedBundleIdentity } from './android-bundle-identity.mjs';
 import { digest, verifyAndroidRelease } from './android-release-manifest.mjs';
 
 const webRootDefault = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -95,7 +96,7 @@ export async function runNativeSmoke({ webRoot = webRootDefault, env = process.e
     // The production android:bundle command remains offline.
     const build = await run({ stage: 'native-build', command: '/bin/sh',
       args: [path.join(androidDir, 'gradlew'), '--no-daemon', '--no-configuration-cache',
-        '-Pandroid.builder.sdkDownload=false', '--console=plain', 'bundleRelease'], cwd: androidDir, env: nativeEnv });
+        '-Pandroid.builder.sdkDownload=false', '--console=plain', 'bundleRelease', 'verifyGenieBundleIdentity'], cwd: androidDir, env: nativeEnv });
     if (build.status !== 0) return fail('ANDROID_NATIVE_COMPILATION_FAILED');
     const artifact = path.join(androidDir, 'app/build/outputs/bundle/release/app-release.aab');
     if (!regular(artifact) || lstatSync(artifact).size === 0) return fail('NEW_AAB_MISSING');
@@ -104,6 +105,8 @@ export async function runNativeSmoke({ webRoot = webRootDefault, env = process.e
     if (signature.status !== 0 || !/jar verified\./i.test(signature.stdout) || /jar is unsigned|unsigned entries|invalid signature/i.test(signature.stdout)) {
       return fail('AAB_SIGNATURE_UNCONFIRMED');
     }
+    const identity = readVerifiedBundleIdentity({ androidDir, config });
+    if (!identity.ok) return fail('AAB_FINAL_MANIFEST_IDENTITY_UNCONFIRMED');
     // Read only the new AAB. Compare the exact combined set of prepared app assets
     // and the pinned dependency's bridge, including every byte/fingerprint.
     const archive = await run({ stage: 'verify-package', command: tools.python3, args: ['-c',
@@ -135,12 +138,16 @@ export async function runNativeSmoke({ webRoot = webRootDefault, env = process.e
     }
     const checked = verify({ androidDir, env: buildEnv });
     if (!checked.ok) return fail('SOURCE_OR_ASSETS_CHANGED_DURING_NATIVE_BUILD');
+    const finalBundleSha256 = digest(readFileSync(artifact));
+    if (finalBundleSha256 !== identity.receipt.sha256) return fail('AAB_CHANGED_AFTER_FINAL_MANIFEST_VERIFICATION');
     const receipt = { status: 'native-check-passed-not-a-release',
       sourceCommit: /^[0-9a-f]{40}$/.test(env.GITHUB_SHA ?? '') ? env.GITHUB_SHA : null,
       node: process.version, javac: java.stdout.trim(), configuredApplicationId: config.applicationId,
       versionCode: config.versionCode, versionName: config.versionName,
-      aabSha256: digest(readFileSync(artifact)), nativeCompilation: true, signatureVerified: true,
-      packagedAssetsMatch: true, libraryAssetsVerified: libraryAssets, finalBinaryManifestIdentityVerified: false,
+      aabSha256: finalBundleSha256, nativeCompilation: true, signatureVerified: true,
+      packagedAssetsMatch: true, libraryAssetsVerified: libraryAssets, finalBinaryManifestIdentityVerified: true,
+      finalApplicationId: identity.receipt.applicationId, finalVersionCode: identity.receipt.versionCode,
+      finalVersionName: identity.receipt.versionName, finalManifestSha256: identity.receipt.manifestSha256,
       syntheticConfigurationOnly: true, backendContacted: false, appOrDeviceLaunched: false,
       storeSubmission: false, productionSigningKeyUsed: false,
       generatedKeyAndAabDeleted: true };

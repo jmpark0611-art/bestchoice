@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "status": "local-release-candidate-inputs-selected-not-registered",
+  "appName": "결정해지니",
+  "applicationId": "com.jmpark0611.genie",
+  "versionCode": 1,
+  "versionName": "1.0.0",
+  "supabaseProjectId": "njrtcxohbkfgrgwhlvua",
+  "supabaseUrl": "https://njrtcxohbkfgrgwhlvua.supabase.co",
+  "publicAppUrl": "https://genie-web-rosy.vercel.app",
+  "publishableKeySha256": "04918d6318b6028779b25e77fc1289cb9dda9e982842d7783ee9ef6f6fb6de21",
+  "currentProductionWebCommit": "470dba663677f0df7fbc3c07843b0371758b7f32",
+  "currentProductionDeploymentId": "dpl_47WBMiAdKoXvhDzRVEbs88pXJ8BX",
+  "productionDeploymentMetadataState": "READY",
+  "shareFlowWithCurrentCandidateVerified": false,
+  "uploadCertificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+  "uploadKeyRegisteredInPlay": false,
+  "releaseAabCreated": false,
+  "actualBackendValidated": false,
+  "androidDeviceValidated": false,
+  "recordedAtUtc": "2026-11-23T07:09:05.175351+00:00"
+}

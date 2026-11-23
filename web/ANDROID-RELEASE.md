@@ -5,6 +5,12 @@
 2026-11-23에 통과했습니다. 정식 출시용 AAB, 실제 서버 및 실기기 확인,
 Google Play 제출은 남아 있습니다. 상세 결과는 `ANDROID-NATIVE-CHECK.md`에 있습니다.
 
+후속 준비에서 실제 연결 대상과 앱 등록 전 후보 입력을
+`ANDROID-RELEASE-PROFILE.json`에 기록했습니다. 앱 ID는 `com.jmpark0611.genie`,
+첫 버전은 `1.0.0`(versionCode 1)입니다. 이 ID의 Play 등록·사용 가능 여부를
+확인했다는 의미는 아니며, 최초 스토어 업로드 전에는 변경할 수 있는 준비값입니다.
+해당 서버의 활성 공개 키와 새로 생성·검증한 업로드 서명키는 소스 밖에서 보관합니다.
+
 ## 실행 명령
 
 `web` 폴더에서 실행합니다. 설치된 의존성을 사용하며 자동 설치는 하지 않습니다.
@@ -13,7 +19,7 @@ Google Play 제출은 남아 있습니다. 상세 결과는 `ANDROID-NATIVE-CHEC
 | --- | --- | --- |
 | `npm run android:check` | 명시한 공개 설정의 형식, 로컬 JDK 도구·SDK 파일·Gradle 배포 캐시·서명 입력의 존재를 읽기 전용으로 확인 | 도구 버전 호환성, 전체 Gradle/Maven 캐시, 키 비밀번호·소유권, 서버 동작 |
 | `npm run android:prepare` | 타입 검사, 새 웹 빌드, 별도 사본에서 Android만 동기화, 소스·설정·복사 파일 대조 | 네이티브 컴파일, AAB 서명, 실제 서버 및 실기기 |
-| `npm run android:bundle` | 네이티브 준비 조건을 먼저 확인한 뒤 새로 `prepare`하고, 캐시된 Gradle로 AAB 생성 및 `jarsigner` 검증 시도 | 실제 기기, Play Console 검토, 제출·출시 |
+| `npm run android:bundle` | 네이티브 준비 조건을 먼저 확인한 뒤 새로 `prepare`하고, 캐시된 Gradle로 AAB 생성, 서명 및 최종 Manifest 앱 ID·버전 검증 시도 | 실제 기기, Play Console 검토, 제출·출시 |
 | `npm run test:android-release` | 새 출시 경로의 설정 검증·파일 일치·중단 동작을 로컬에서 확인 | 모의 실행 테스트는 실제 Gradle 컴파일·서명 검증을 대신하지 않음 |
 
 `prepare`는 JDK, Android SDK 또는 서명키가 없어도 공개 설정과 기존 웹 의존성이
@@ -57,6 +63,12 @@ Capacitor 자식 프로세스에는 서명 정보나 무관한 서비스 비밀�
 별칭은 거부하며, 서명 정보가 없으면 디버그 키로 대체하지 않습니다. Gradle의
 설정 캐시를 끄고, 새로 생성된 AAB에 대한 `jarsigner` 결과가 확인되어야 생성 완료로
 표시합니다. 서명 성공은 Play 계정의 승인이나 업로드 키 등록 상태를 보장하지 않습니다.
+
+2026-11-23에는 결정해지니 전용 RSA 3072비트 업로드 키를 생성하고, 별도의 작은
+JAR에 실제 서명한 뒤 `jarsigner` 검증을 마쳤습니다. 키 저장소·접근 정보·공개 인증서·
+생성 기록을 비공개로 보관했습니다. 기존 앱의 키를 사용하거나 변경하지 않았고,
+새 키의 Play 등록과 이 키로 서명한 출시용 AAB 생성은 아직 하지 않았습니다.
+공개 인증서 SHA-256은 `ANDROID-RELEASE-PROFILE.json`에서 확인할 수 있습니다.
 
 ## 기존에 준비되어 있어야 하는 도구
 
@@ -111,6 +123,15 @@ SHA-256을 저장합니다. 이 파일은 앱 웹 자산에 포함하지 않습�
 `ANDROID-BUNDLE.json`을 완료 결과로 안내합니다. 이후에도 상태는
 `created-awaiting-device-and-store-review`입니다.
 
+`bundleRelease`와 같은 Gradle 호출에서 `verifyGenieBundleIdentity`도 실행합니다.
+이 task는 기존 AGP의 AAPT2 protobuf 클래스로 새 AAB 안의
+`base/manifest/AndroidManifest.xml`을 읽어 실제 package·versionCode·versionName을
+준비 기록과 대조합니다. 새 의존성이나 별도 도구를 다운로드하지 않습니다.
+중복·잘못된 타입·속성·namespace·resource ID, versionCodeMajor 불일치,
+빌드 입력 또는 AAB 변경을 거부하며 이전 성공 기록은 task 실행 전에 제거합니다.
+CLI는 결과 JSON의 상태·실제 ID/버전과 AAB/준비 기록의 현재 해시까지 대조한 뒤에만
+`finalBinaryManifestIdentityVerified: true`를 기록합니다.
+
 기존 Preview용 `native:preview`·`native:sync` 명령과 원본 앱 ID는 유지합니다.
 Java 코드의 namespace는 그대로 두고 release 출력의 application ID와 버전만
 별도로 적용합니다. 원본 프로젝트에서 준비 기록 없이 직접 release를 실행하면
@@ -136,8 +157,8 @@ variant를 컴파일합니다. 네이티브 의존성 다운로드는 이 별도
 
 검증이 성공하면 새 AAB의 서명과 포함된 자산을 확인한 뒤 임시 키와 AAB를 삭제하고
 `native-check-passed-not-a-release` 기록만 남깁니다. 실제 서버나 앱을 실행하지
-않습니다. 최종 binary Manifest의 package ID·버전 확인 및 실기기 검증은 별도로
-남습니다. 이 경로는 `.github/workflows/android-native-check.yml`에 연결되어 있습니다.
+않습니다. 이 경로에도 최종 binary Manifest의 package ID·버전 검증을 연결했습니다.
+실기기 검증은 별도로 남습니다. 이 경로는 `.github/workflows/android-native-check.yml`에 연결되어 있습니다.
 사용자가 새 빌드 전용 브랜치의 소스 반영과 검증을 승인한 뒤 실제 실행했습니다.
 최종 통과 커밋은 `9c88d192f26fd370e02186abad71d5794fabc961`이며,
 [실행 기록](https://github.com/jmpark0611-art/bestchoice/actions/runs/45114713986)과
@@ -150,23 +171,35 @@ variant를 컴파일합니다. 네이티브 의존성 다운로드는 이 별도
 
 빌드 전용 브랜치 `codex/genie-android-native-check-20261123`의 Vercel 자동 배포는
 `web/vercel.json`의 `git.deploymentEnabled`에서 끄도록 준비했습니다. 다른 브랜치의
-설정은 지정하지 않습니다. 반영 직전에 현재 연결된 계정과 팀을 이 저장소 ID로
-조회했고 연결 프로젝트가 반환되지 않았습니다. 계정 설정 변경이나 웹 배포는 하지 않았습니다.
+설정은 지정하지 않습니다. 최초 저장소 ID 필터 조회에서는 연결 프로젝트가
+반환되지 않았으나, 후속 작업에서 기존 이름으로 `genie-web` 프로젝트를 찾았습니다.
+공유 주소 `genie-web-rosy.vercel.app`는 production 배포
+`dpl_47WBMiAdKoXvhDzRVEbs88pXJ8BX`(기존 기본 브랜치 `470dba6`)에 연결되어 있습니다.
+이는 새 Android 후보의 공유 흐름을 검증한 결과가 아닙니다. 계정 설정 변경이나
+웹 배포는 하지 않았습니다.
 
 현재 준비 폴더 `.genie-release/run-*`를 다른 컴퓨터에 복사해서 재사용하지 않습니다.
 기록의 sourceRoot와 의존성 링크가 원본 절대 경로를 가리키므로, 대상 컴퓨터에서는
 정확한 전체 소스와 lockfile로 새 `android:prepare` 또는 `android:bundle`을 실행합니다.
 
-기본 실행 경로에는 여전히 정식 설정 여섯 가지, 출시 서명 입력,
-Android SDK와 Gradle 배포 캐시가 제공되지 않았습니다. 따라서 출시용 AAB는 아직
-생성하지 않았습니다. 합성 설정으로 웹 빌드·파일 복사를 확인해도 실제 서버 접속을
-검증한 것으로 계산하지 않습니다.
+후속 작업에서는 실제 설정 여섯 가지와 출시 서명 입력을 연결하여 사전 점검했습니다.
+현재 정확한 차단 항목은 `ANDROID_SDK_MISSING`과 `GRADLE_CACHE_MISSING`입니다.
+따라서 출시용 AAB는 아직 생성하지 않았습니다. 실제 연결 정보를 넣어 로컬 웹 빌드와
+파일 복사를 하더라도 앱을 실행하지 않으므로 실제 서버 접속 검증으로 계산하지 않습니다.
 
-다음 실행에는 확정한 앱 ID·버전과 승인된 서버/공유 URL, 준비된 네이티브 빌드
-환경이 필요합니다. 서버 통합 확인은 이미 접근이 허용된 별도 격리 환경에서 합성
+다음 실행에는 위 후보 입력을 사용하는 준비된 비공개 네이티브 빌드 환경이 필요합니다.
+서버 통합 확인은 이미 접근이 허용된 별도 격리 환경에서 합성
 데이터와 분리된 두 세션으로 결정→공유→투표→작성자 집계/삭제를 확인해야 합니다.
 운영에 연결된 Preview를 테스트 서버로 간주하지 않습니다. 기존 운영 마이그레이션과
 `vs-decide`를 이 작업에서 변경하지 않습니다.
+
+기존 승인된 로컬 통합 대상은 정확히 `http://127.0.0.1:55321`이며 현재 listener가
+없습니다. `scripts/verify-local-integration.mjs`는 이전 보관 도구를 복원하여 현재 API
+계약에 맞게 보강한 실행 준비물입니다. `--run`과
+`GENIE_CONFIRM=isolated-genie-synthetic-only`, 로컬 스택에서 발급한 공개 키가 필요합니다.
+키의 로컬 출처·listener 소유권·외부 통신 차단은 별도 환경 근거가 필요합니다.
+리디렉션은 거부하며 정해진 경로에만 요청하고, 출력에 토큰을 기록하지 않습니다.
+합성 응답으로 도구를 확인한 결과를 실제 Supabase 검증으로 취급하지 않습니다.
 
 서명된 AAB가 생기면 Android 실기기의 시작·뒤로가기·공유 링크·초안 복원·투표·신고
 흐름을 확인하고, 개인정보/스토어 안내와 실제 동작의 일치를 확인합니다.

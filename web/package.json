@@ -17,7 +17,7 @@
     "android:bundle": "node scripts/android-release.mjs bundle",
     "android:jdk": "node scripts/prepare-local-jdk.mjs",
     "android:native-check": "node scripts/android-native-smoke.mjs",
-    "test:android-release": "node --test scripts/android-release*.test.mjs"
+    "test:android-release": "node --test scripts/android-release*.test.mjs scripts/android-bundle-identity.test.mjs scripts/android-native-smoke.test.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.2",
