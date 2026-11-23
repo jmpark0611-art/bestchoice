@@ -4,6 +4,8 @@
 합성 설정과 일회용 키를 사용한 실제 Android 컴파일·서명·자산 대조는
 2026-11-23에 통과했습니다. 정식 출시용 AAB, 실제 서버 및 실기기 확인,
 Google Play 제출은 남아 있습니다. 상세 결과는 `ANDROID-NATIVE-CHECK.md`에 있습니다.
+현재 준비 완료 항목과 환경 차단점은
+`ANDROID-RELEASE-PROGRESS-2026-11-23.md`에 정리했습니다.
 
 후속 준비에서 실제 연결 대상과 앱 등록 전 후보 입력을
 `ANDROID-RELEASE-PROFILE.json`에 기록했습니다. 앱 ID는 `com.jmpark0611.genie`,
@@ -160,9 +162,14 @@ variant를 컴파일합니다. 네이티브 의존성 다운로드는 이 별도
 않습니다. 이 경로에도 최종 binary Manifest의 package ID·버전 검증을 연결했습니다.
 실기기 검증은 별도로 남습니다. 이 경로는 `.github/workflows/android-native-check.yml`에 연결되어 있습니다.
 사용자가 새 빌드 전용 브랜치의 소스 반영과 검증을 승인한 뒤 실제 실행했습니다.
-최종 통과 커밋은 `9c88d192f26fd370e02186abad71d5794fabc961`이며,
+첫 통과 커밋은 `9c88d192f26fd370e02186abad71d5794fabc961`이며,
 [실행 기록](https://github.com/jmpark0611-art/bestchoice/actions/runs/45114713986)과
 `ANDROID-NATIVE-VERIFICATION-2026-11-23.json`에 범위·결과를 기록했습니다.
+최종 binary Manifest 검증을 추가한 후속 실행은
+`022bbd56881066c4bb12a2916dda77ad1e3a2028`에서 통과했습니다.
+[실행 45129704040](https://github.com/jmpark0611-art/bestchoice/actions/runs/45129704040)의
+121개 Gradle task가 성공했고, 실제 AAB의 앱 ID·버전 대조를 확인했습니다.
+해당 결과는 `ANDROID-RELEASE-PROGRESS-2026-11-23.json`에 이전 결과와 구분하여 기록했습니다.
 
 실제 빌드에서 Capacitor가 라이브러리 자산 `base/assets/native-bridge.js`를 병합하는
 것을 확인했습니다. 검증기는 빌드 전 해당 원본의 SHA-256을 기록하고 AAB의 같은

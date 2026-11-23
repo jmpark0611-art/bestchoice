@@ -1,5 +1,14 @@
 # 결정해지니 Android 실제 빌드 검증 결과
 
+**후속 결과 — 2026-11-23 16:16 한국 시간:**
+[실행 45129704040](https://github.com/jmpark0611-art/bestchoice/actions/runs/45129704040)에서
+최종 AAB의 binary Manifest를 직접 읽는 앱 ID·버전 검증까지 통과했습니다.
+검증 커밋은 `022bbd56881066c4bb12a2916dda77ad1e3a2028`이며,
+새 receipt의 `finalBinaryManifestIdentityVerified`는 `true`입니다.
+합성 설정·일회용 키를 사용한 범위이고 정식 출시 AAB나 서버·기기 검증은 아닙니다.
+아래 13:57 결과는 최초 통과 이력을 보존한 것입니다. 현재 세 가지 출시 준비 상태는
+[ANDROID-RELEASE-PROGRESS-2026-11-23.md](./ANDROID-RELEASE-PROGRESS-2026-11-23.md)에 있습니다.
+
 확인일: 2026-11-23 13:57 한국 시간
 
 ## 결과: 네이티브 검증 통과

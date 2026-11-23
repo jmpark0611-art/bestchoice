@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "status": "prepared-awaiting-private-native-build-isolated-server-and-device",
+  "recordedAtUtc": "2026-11-23T07:20:02.544952+00:00",
+  "localSourceCommit": "5ffd7d46fb22c5da1a5a61405d563f5cd5c4f023",
+  "reviewedRemoteCommit": "022bbd56881066c4bb12a2916dda77ad1e3a2028",
+  "buildOnlyBranch": "codex/genie-android-native-check-20261123",
+  "candidateInputs": {
+    "applicationId": "com.jmpark0611.genie",
+    "versionCode": 1,
+    "versionName": "1.0.0",
+    "publicConfiguration": {
+      "supabaseUrl": "https://njrtcxohbkfgrgwhlvua.supabase.co",
+      "publicAppUrl": "https://genie-web-rosy.vercel.app",
+      "publishableKeySha256": "04918d6318b6028779b25e77fc1289cb9dda9e982842d7783ee9ef6f6fb6de21"
+    },
+    "playRegistrationConfirmed": false
+  },
+  "actualInputPreparation": {
+    "status": "prepared-not-native-validated",
+    "preparedAt": "2026-11-23T07:12:49.712Z",
+    "preparationManifestSha256": "702b95d634683b929be793103d83cd775ba37084556959795c75d7a7b8c67bd3",
+    "sourceFileCount": 135,
+    "assetFileCount": 183,
+    "typecheckPassed": true,
+    "freshWebBuildPassed": true,
+    "androidSyncPassed": true,
+    "preparedFilesVerified": true,
+    "backendContacted": false,
+    "nativeBuildRun": false
+  },
+  "uploadKey": {
+    "status": "generated-and-signature-verified-not-registered",
+    "algorithm": "RSA",
+    "keySize": 3072,
+    "validityDays": 10000,
+    "certificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+    "privateBackupVerified": true,
+    "freshJarSignAndVerifyPassed": true,
+    "registeredInPlayConsole": false,
+    "usedToSignReleaseAab": false
+  },
+  "localFocusedChecks": {
+    "bundleIdentityReceiptTestsPassed": 10,
+    "releaseAndSmokeOrchestrationTestsPassed": 5,
+    "localIntegrationHarnessTestsPassed": 24,
+    "injectedOrSyntheticOnly": true,
+    "existingFullAppSuiteRepeated": false
+  },
+  "newNativeIdentityRun": {
+    "runId": 45129704040,
+    "jobId": 137542148987,
+    "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45129704040",
+    "status": "completed",
+    "syntheticInputsOnly": true,
+    "conclusion": "success",
+    "completedAtUtc": "2026-11-23T07:16:58Z",
+    "artifactCount": 0,
+    "gradle": "8.14.3",
+    "gradleBuildDuration": "1m36s",
+    "executedTaskCount": 121,
+    "receipt": {
+      "status": "native-check-passed-not-a-release",
+      "sourceCommit": "022bbd56881066c4bb12a2916dda77ad1e3a2028",
+      "node": "v24.22.3",
+      "javac": "javac 21.0.13",
+      "configuredApplicationId": "kr.synthfixture.genie",
+      "versionCode": 12,
+      "versionName": "1.2.0",
+      "aabSha256": "9fc479c2c5ba4316f15395bad0a5cc013faced75b5e0ab6a9595c425248a3206",
+      "nativeCompilation": true,
+      "signatureVerified": true,
+      "packagedAssetsMatch": true,
+      "libraryAssetsVerified": {
+        "base/assets/native-bridge.js": "02dfc17bd41d1e5d0748f7f6c48aa9f2a3e624bb3677df488db466fbc93f2246"
+      },
+      "finalBinaryManifestIdentityVerified": true,
+      "finalApplicationId": "kr.synthfixture.genie",
+      "finalVersionCode": 12,
+      "finalVersionName": "1.2.0",
+      "finalManifestSha256": "1d51b2d36531c6bd0e411e37832e94caca524de23d16729d40b78f6e3a2dc4f2",
+      "syntheticConfigurationOnly": true,
+      "backendContacted": false,
+      "appOrDeviceLaunched": false,
+      "storeSubmission": false,
+      "productionSigningKeyUsed": false,
+      "generatedKeyAndAabDeleted": true
+    }
+  },
+  "remainingBlockers": [
+    {
+      "code": "ANDROID_SDK_MISSING",
+      "scope": "private-release-build",
+      "observed": true
+    },
+    {
+      "code": "GRADLE_CACHE_MISSING",
+      "scope": "private-release-build",
+      "observed": true
+    },
+    {
+      "code": "APPROVED_LOCAL_SUPABASE_NOT_RUNNING",
+      "endpoint": "http://127.0.0.1:55321",
+      "listenerObserved": false
+    },
+    {
+      "code": "ANDROID_DEVICE_OR_EMULATOR_NOT_AVAILABLE",
+      "adbAvailable": false,
+      "deviceRunPerformed": false
+    },
+    {
+      "code": "SHARED_WEB_CANDIDATE_INTEGRATION_UNVERIFIED",
+      "currentProductionWebCommit": "470dba663677f0df7fbc3c07843b0371758b7f32"
+    }
+  ],
+  "scope": {
+    "releaseAabCreated": false,
+    "realBackendValidationPerformed": false,
+    "deviceValidationPerformed": false,
+    "storeSubmission": false,
+    "productionDataWrites": false,
+    "productionSettingsChanged": false,
+    "productionDeployment": false,
+    "existingSupabaseFilesChanged": false,
+    "newPaidResourcesCreated": false,
+    "otherRemoteFilesPreserved": 223,
+    "defaultAndWebCandidateBranchesUnchanged": true
+  }
+}
