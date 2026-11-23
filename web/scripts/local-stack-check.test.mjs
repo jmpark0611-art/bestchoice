@@ -92,6 +92,30 @@ test('structured pinned-CLI health failure exposes only redacted code/message, n
     error: { code: 'HealthCheckTimeoutError', message: 'untagged-private-message' } }), stderr: '' }).lines, []);
 });
 
+test('pinned image download diagnostics distinguish registry failures without exposing credentials or inspection stdout', () => {
+  const result = { status: 1, stdout: '{"Config":{"Env":["SECRET=private"]}}', stderr: [
+    'Error response from daemon: denied: access forbidden',
+    'toomanyrequests: retry later',
+    'Get "https://registry.invalid/v2/?token=private-value": net/http: TLS handshake timeout',
+    'unauthorized: authentication required',
+  ].join('\n') };
+  const diagnostic = sanitizedFailureDiagnostic('PINNED_IMAGE_PULL_FAILED', result);
+  assert.equal(diagnostic.lines.length, 4);
+  assert.match(diagnostic.lines[0], /denied/);
+  assert.match(diagnostic.lines[1], /toomanyrequests/);
+  assert.equal(JSON.stringify(diagnostic).includes('private'), false);
+  assert.equal(JSON.stringify(diagnostic).includes('Config'), false);
+  assert.equal(diagnostic.category, 'RATE_LIMIT');
+  assert.equal(diagnostic.httpStatus, null);
+  const rateLimit = sanitizedFailureDiagnostic('PINNED_IMAGE_PULL_FAILED', { status: 1,
+    stderr: 'Error response from daemon: unexpected HTTP status 429' });
+  assert.equal(rateLimit.category, 'RATE_LIMIT');
+  assert.equal(rateLimit.httpStatus, 429);
+  assert.deepEqual(sanitizedFailureDiagnostic('PINNED_IMAGE_INSPECTION_FAILED', { status: 1,
+    stdout: result.stdout, stderr: 'Error: No such image: pinned-example' }).lines, ['Error: No such image: pinned-example']);
+  assert.equal(sanitizedFailureDiagnostic('DOCKER_OPERATION_FAILED', result), null);
+});
+
 test('startup state projection keeps owned service health and fixed error names without inspect secrets or output', () => {
   const values = makeContainers();
   values[0].State = { Running: true, Status: 'running', ExitCode: 0, OOMKilled: false,

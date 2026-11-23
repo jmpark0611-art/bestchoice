@@ -50,7 +50,8 @@ const fixedCode = error => error instanceof Error && /^[A-Z][A-Z0-9_]+$/.test(er
   ? error.message : 'LOCAL_STACK_CHECK_INCOMPLETE';
 const DIAGNOSTIC_STAGES = new Set(['CLI_DOWNLOAD_FAILED', 'CLI_EXTRACTION_FAILED', 'CLI_VERSION_FAILED',
   'CLI_HELP_FAILED', 'LOCAL_INIT_FAILED', 'LOCAL_CONFIG_INVALID', 'EDGE_CONFIG_INVALID',
-  'LOCAL_CORE_START_FAILED', 'LOCAL_EDGE_START_FAILED', 'SCOPED_FIREWALL_SUPPORT_REQUIRED', 'SCOPED_FIREWALL_INSTALL_FAILED']);
+  'LOCAL_CORE_START_FAILED', 'LOCAL_EDGE_START_FAILED', 'SCOPED_FIREWALL_SUPPORT_REQUIRED', 'SCOPED_FIREWALL_INSTALL_FAILED',
+  'PINNED_IMAGE_PULL_FAILED', 'PINNED_IMAGE_INSPECTION_FAILED']);
 
 /** Bounded known startup errors; never status/inspect bodies or arbitrary stdout. */
 export function sanitizedFailureDiagnostic(stage, result, privateValues = []) {
@@ -77,9 +78,22 @@ export function sanitizedFailureDiagnostic(stage, result, privateValues = []) {
     .replace(/\b(?:https?|postgresql|postgres):\/\/[^\s"'<>]+/gi, '[redacted-url]')
     .replace(/\b[A-Za-z0-9_]*(?:key|token|secret|password|jwt)[A-Za-z0-9_]*\s*[:=]\s*(?:"[^"]*"|'[^']*'|[^\s,;]+)/gi, '[redacted-setting]');
   const lines = value.split(/\r?\n/).map(line => line.trim()).filter(line =>
-    /^(?:error\b|fatal\b|failed\b|invalid\b|unknown (?:flag|command)\b|unsupported\b|unrecognized\b|curl:|tar:|iptables:)/i.test(line))
+    /^(?:error\b|fatal\b|failed\b|invalid\b|unknown (?:flag|command)\b|unsupported\b|unrecognized\b|curl:|tar:|iptables:)/i.test(line) ||
+    (stage === 'PINNED_IMAGE_PULL_FAILED' && /^(?:unauthorized\b|denied\b|manifest\b|no matching manifest\b|get\s|head\s|net\/http:|x509:|toomanyrequests:)/i.test(line)))
     .slice(0, 4).map(line => line.slice(0, 220));
-  return { stage, exitCode: Number.isInteger(result.status) ? result.status : 1, lines };
+  const download = {};
+  if (stage === 'PINNED_IMAGE_PULL_FAILED') {
+    const error = String(result.stderr ?? '').slice(0, 64_000);
+    download.category = [[/toomanyrequests|too many requests|\b429\b/i, 'RATE_LIMIT'],
+      [/unauthorized|authentication required|\b401\b/i, 'AUTHENTICATION'], [/denied|forbidden|\b403\b/i, 'ACCESS_DENIED'],
+      [/manifest unknown|manifest.*not found|no matching manifest/i, 'MANIFEST_UNAVAILABLE'],
+      [/x509|certificate|TLS/i, 'TLS'], [/timeout|timed out/i, 'TIMEOUT'],
+      [/connection refused|no route|network is unreachable|lookup.*no such host/i, 'NETWORK']]
+      .find(([pattern]) => pattern.test(error))?.[1] ?? 'UNCLASSIFIED';
+    const status = error.match(/(?:status(?: code)?[ :=]+|HTTP(?:\/\d(?:\.\d)?)?\s+)([45]\d\d)\b/i);
+    download.httpStatus = status ? Number(status[1]) : null;
+  }
+  return { stage, exitCode: Number.isInteger(result.status) ? result.status : 1, lines, ...download };
 }
 
 export function validateInvocation(env, allowDownloads, platform = process.platform, arch = process.arch) {
@@ -407,8 +421,20 @@ class DockerStackRuntime {
     ensure(startHelp.includes('--exclude'), 'CLI_REQUIRED_FLAGS_MISSING');
     await this.command('CLI_HELP_FAILED', this.cli, ['functions', 'serve', '--help']);
     for (const image of [...Object.values(IMAGES), PINS.probeImage]) {
-      await this.docker(['pull', image], { timeout: 240_000 });
-      const [proof] = await this.inspect('image', [image]);
+      let result;
+      try {
+        await this.command('PINNED_IMAGE_PULL_FAILED', this.tools.docker, ['pull', image], { timeout: 240_000 });
+        result = await this.command('PINNED_IMAGE_INSPECTION_FAILED', this.tools.docker, ['image', 'inspect', image]);
+      } catch (error) {
+        const diagnostic = this.diagnostics.at(-1);
+        if (['PINNED_IMAGE_PULL_FAILED', 'PINNED_IMAGE_INSPECTION_FAILED'].includes(diagnostic?.stage)) {
+          diagnostic.image = image;
+          diagnostic.completedImages = Object.keys(this.imageProof);
+        }
+        throw error;
+      }
+      let proof;
+      try { [proof] = JSON.parse(result.stdout); } catch { fail('IMAGE_INSPECTION_INVALID'); }
       ensure(/^sha256:[0-9a-f]{64}$/.test(proof.Id ?? '') && proof.RepoDigests?.some(value => /@sha256:[0-9a-f]{64}$/.test(value)), 'IMAGE_DIGEST_UNCONFIRMED');
       this.imageProof[image] = { id: proof.Id, digests: proof.RepoDigests };
     }

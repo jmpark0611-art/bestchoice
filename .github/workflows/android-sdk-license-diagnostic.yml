@@ -1,0 +1,130 @@
+name: Genie Android SDK license diagnostic (read only)
+
+# Evidence only. No package installation, acceptance input, npm/Gradle build,
+# emulator launch, cache, or artifact upload. The four-case guard is unchanged.
+on:
+  push:
+    branches:
+      - codex/genie-android-native-check-20261123
+    paths:
+      - '.github/workflows/android-sdk-license-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  license-diagnostic:
+    if: >-
+      github.repository == 'jmpark0611-art/bestchoice' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/codex/genie-android-native-check-20261123'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Compare official license literals and inspect SDK manager with EOF
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, re, signal, subprocess, tempfile
+          import urllib.request, xml.etree.ElementTree as ET
+
+          sdk = pathlib.Path(os.environ["ANDROID_HOME"])
+          java = pathlib.Path(os.environ["JAVA_HOME_21_X64"])
+          manager = sdk / "cmdline-tools/latest/bin/sdkmanager"
+          source_file = sdk / "licenses/android-sdk-license"
+          package_file = sdk / "platforms/android-36/package.xml"
+          for file in [manager, java / "bin/java", source_file, package_file]:
+              if not file.is_file():
+                  raise RuntimeError("EXISTING_SDK_DIAGNOSTIC_INPUT_MISSING")
+          source_before = source_file.read_bytes()
+          metadata_url = "https://dl.google.com/android/repository/repository2-1.xml"
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  raise RuntimeError("METADATA_REDIRECT_REFUSED")
+          opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+          with opener.open(metadata_url, timeout=30) as response:
+              metadata = response.read(20_000_001)
+          if len(metadata) > 20_000_000:
+              raise RuntimeError("METADATA_LIMIT")
+
+          def license_text(data):
+              if re.search(br"<!\s*(DOCTYPE|ENTITY)", data, re.I):
+                  raise RuntimeError("XML_DECLARATION_REFUSED")
+              root = ET.fromstring(data)
+              found = [e for e in root if e.tag.split("}")[-1] == "license"
+                       and e.get("id") == "android-sdk-license"]
+              if len(found) != 1 or len(found[0]) or not found[0].text:
+                  raise RuntimeError("EXACT_LICENSE_LITERAL_REQUIRED")
+              return found[0].text
+
+          remote_text = license_text(metadata)
+          installed_text = license_text(package_file.read_bytes())
+          sha1 = lambda value: hashlib.sha1(value.encode("utf-8")).hexdigest()
+          canonical = lambda value: re.sub(r"\s+", " ", value).strip()
+          report = {
+              "status": "license-diagnostic-only-no-acceptance",
+              "sourceCommit": os.environ.get("GITHUB_SHA"),
+              "metadataSource": metadata_url,
+              "metadataSha256": hashlib.sha256(metadata).hexdigest(),
+              "licenseId": "android-sdk-license",
+              "acceptedHashes": [line for line in source_before.decode().splitlines()
+                                 if re.fullmatch(r"[0-9a-f]{40}", line)],
+              "remoteLiteralSha1": sha1(remote_text),
+              "installedAndroid36LiteralSha1": sha1(installed_text),
+              "remoteLiteralCharacters": len(remote_text),
+              "installedLiteralCharacters": len(installed_text),
+              "remoteLicenseLastLine": remote_text.strip().splitlines()[-1],
+              "installedLicenseLastLine": installed_text.strip().splitlines()[-1],
+              "exactLiteralEqual": remote_text == installed_text,
+              "whitespaceCollapsedTextEqual": canonical(remote_text) == canonical(installed_text),
+              "canonicalTextSha256": hashlib.sha256(canonical(remote_text).encode()).hexdigest(),
+              "officialManagerCommand": "sdkmanager --sdk_root=<temporary SDK> --licenses",
+              "stdin": "EOF; no acceptance or review input",
+              "binariesDownloaded": False, "appOrEmulatorLaunched": False,
+              "licensesAcceptedByThisJob": False,
+          }
+          # Clone only this existing acceptance. No SDK license file is edited.
+          # Any manager metadata cache writes are confined to this disposable root.
+          with tempfile.TemporaryDirectory(prefix="genie-sdk-license-", dir=os.environ["RUNNER_TEMP"]) as work:
+              root = pathlib.Path(work)
+              private_sdk = root / "sdk"
+              (private_sdk / "licenses").mkdir(parents=True)
+              copied = private_sdk / "licenses/android-sdk-license"
+              copied.write_bytes(source_before)
+              copied.chmod(0o444)
+              for name in ["android-user", "tmp"]:
+                  (root / name).mkdir()
+              child_env = {
+                  "PATH": str(java / "bin") + ":/usr/bin:/bin",
+                  "JAVA_HOME": str(java), "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8",
+                  "ANDROID_HOME": str(private_sdk), "ANDROID_SDK_ROOT": str(private_sdk),
+                  "ANDROID_USER_HOME": str(root / "android-user"), "TMPDIR": str(root / "tmp"),
+              }
+              process = subprocess.Popen([str(manager), "--sdk_root=" + str(private_sdk), "--licenses"],
+                  stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                  text=True, env=child_env, start_new_session=True)
+              try:
+                  stdout, stderr = process.communicate(input="", timeout=180)
+                  report["sdkmanagerExitCode"] = process.returncode
+              except subprocess.TimeoutExpired:
+                  os.killpg(process.pid, signal.SIGKILL)
+                  stdout, stderr = process.communicate()
+                  report["sdkmanagerTimedOut"] = True
+                  report["sdkmanagerExitCode"] = process.returncode
+              report["sdkmanagerSummary"] = [line.strip() for line in stdout.replace("\r", "\n").splitlines()
+                  if re.search(r"(SDK package licenses|Review licenses that have not been accepted|All.*licenses accepted)", line, re.I)]
+              report["sdkmanagerWarnings"] = [line.strip()[:400] for line in stderr.splitlines()
+                  if re.search(r"warning|error|failed|exception", line, re.I)][:12]
+              report["temporaryAcceptanceUnchanged"] = copied.read_bytes() == source_before
+              report["temporaryLicenseFiles"] = sorted(p.name for p in (private_sdk / "licenses").iterdir())
+          report["originalAcceptanceUnchanged"] = source_file.read_bytes() == source_before
+          if not report["originalAcceptanceUnchanged"] or not report["temporaryAcceptanceUnchanged"] \
+                  or report["temporaryLicenseFiles"] != ["android-sdk-license"]:
+              raise RuntimeError("LICENSE_DIAGNOSTIC_CHANGED_ACCEPTANCE")
+          print("GENIE_SDK_LICENSE_DIAGNOSTIC " + json.dumps(report))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+              summary.write("## SDK license evidence only\n\nNo SDK package was installed or accepted; no app or emulator ran.\n\n```json\n"
+                            + json.dumps(report, indent=2) + "\n```\n")
+          PY
