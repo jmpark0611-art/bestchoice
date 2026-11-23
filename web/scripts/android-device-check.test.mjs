@@ -5,8 +5,8 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { deflateSync } from 'node:zlib';
-import { captureFailureEvidence, checkFixtureEnvironment, copyFixture, downloadArchive, EMULATOR_PIN, fixtureEnvironment, inspectFailurePng,
-  instrumentationArgs, parseInstrumentation, parseSdkMetadata, PHASES, prepareDeviceCheck,
+import { captureFailureEvidence, checkFixtureEnvironment, copyFixture, downloadArchive, EMULATOR_PIN, FIXTURE_APP_ID, fixtureEnvironment, inspectFailurePng,
+  instrumentationArgs, parseInstrumentation, parseSdkMetadata, PHASES, prepareDeviceCheck, prepareDraftAndForceStop,
   requireAcceptedLicense, validateNamespace } from './android-device-check.mjs';
 
 const hash = (algorithm, value) => createHash(algorithm).update(value).digest('hex');
@@ -175,15 +175,21 @@ test('requires a different namespace with exactly loopback and no external IPv4 
   assert.throws(() => validateNamespace({ ...safe, routes: [...safe.routes, { dev: 'eth0', dst: 'default' }] }), { code: 'LOOPBACK_ONLY_NETWORK_REQUIRED' });
 });
 
-const phaseOutput = phase => PHASES[phase].cases.map(caseId => 'GENIE_DEVICE_CASE ' + JSON.stringify({ caseId, passed: true })).join('\n')
-  + (phase === 'first' ? '\nGENIE_DRAFT_PREPARED' : '') + '\nOK (1 test)\nINSTRUMENTATION_CODE: -1\n';
+const preparedReceipt = pid => 'GENIE_DRAFT_PREPARED ' + JSON.stringify({ schemaVersion: 1, pid });
+const phaseOutput = (phase, pid = 4242) => PHASES[phase].cases.map(caseId => 'GENIE_DEVICE_CASE ' + JSON.stringify({ caseId, passed: true })).join('\n')
+  + (phase === 'first' ? '\n' + preparedReceipt(pid) : '') + '\nOK (1 test)\nINSTRUMENTATION_CODE: -1\n';
 
 test('selects only the two intended instrumentation methods and verifies all named case receipts', () => {
   assert.match(instrumentationArgs('first').at(-2), /GenieDeviceCheck#launchBackNarrowAndPrepareDraft$/);
   assert.match(instrumentationArgs('restore').at(-2), /GenieDeviceCheck#restoreDraftAfterHostForceStop$/);
+  assert.equal(instrumentationArgs('first').filter(arg => arg === '--no-restart').length, 1);
+  assert.equal(instrumentationArgs('restore').includes('--no-restart'), false);
+  assert.equal(instrumentationArgs('first').includes('waitForActivitiesToComplete'), false);
   assert.equal(instrumentationArgs('first').includes('clearPackageData'), false);
-  assert.equal(parseInstrumentation({ status: 0, stdout: phaseOutput('first') }, 'first').length, 3);
-  assert.equal(parseInstrumentation({ status: 0, stdout: phaseOutput('restore') }, 'restore').length, 1);
+  const first = parseInstrumentation({ status: 0, stdout: phaseOutput('first') }, 'first');
+  assert.equal(first.cases.length, 3); assert.equal(first.preparedPid, 4242);
+  const restored = parseInstrumentation({ status: 0, stdout: phaseOutput('restore') }, 'restore');
+  assert.equal(restored.cases.length, 1); assert.equal(restored.preparedPid, null);
 });
 
 test('adb exit zero cannot turn failed, missing, duplicate or crashed tests into success', () => {
@@ -192,6 +198,9 @@ test('adb exit zero cannot turn failed, missing, duplicate or crashed tests into
     good.replace('OK (1 test)', 'FAILURES!!!'),
     good + 'INSTRUMENTATION_STATUS_CODE: -2\n',
     good + 'INSTRUMENTATION_FAILED\n',
+    good + 'INSTRUMENTATION_ABORTED\n',
+    good + 'Process crashed\n',
+    good + 'shortMsg=Process crashed\n',
     good.replace('INSTRUMENTATION_CODE: -1', 'INSTRUMENTATION_CODE: 0'),
     good.replace('GENIE_DRAFT_PREPARED', ''),
     good.replace('\"caseId\":\"launch\"', '\"caseId\":\"native-back\"'),
@@ -199,6 +208,121 @@ test('adb exit zero cannot turn failed, missing, duplicate or crashed tests into
     good.split('\n').slice(1).join('\n'),
   ]) assert.throws(() => parseInstrumentation({ status: 0, stdout }, 'first'));
   assert.throws(() => parseInstrumentation({ status: 1, stdout: good }, 'first'), { code: 'INSTRUMENTATION_DID_NOT_PASS' });
+});
+
+test('requires exactly one well-formed prepared PID receipt, never a bare marker or duplicate', () => {
+  const good = phaseOutput('first'), marker = preparedReceipt(4242);
+  const parse = stdout => parseInstrumentation({ status: 0, stdout }, 'first');
+  for (const raw of ['null', '[]', '{}', '{', '{"schemaVersion":1}',
+    '{"schemaVersion":1,"pid":0}', '{"schemaVersion":1,"pid":-1}', '{"schemaVersion":1,"pid":1.5}',
+    '{"schemaVersion":1,"pid":"4242"}', '{"schemaVersion":1,"pid":2147483648}',
+    '{"schemaVersion":2,"pid":4242}', '{"schemaVersion":1,"pid":4242,"pid":4243}',
+    '{"schemaVersion":1,"pid":4242,"\\u0070id":4243}',
+    '{"schemaVersion":1,"pid":4242,"\\u0073chemaVersion":1}',
+    '{"schemaVersion":1,"schemaVersion":1,"pid":4242}', '{"schemaVersion":1,"pid":4242,"extra":true}',
+    ' '.repeat(128) + '{"schemaVersion":1,"pid":4242}',
+  ]) assert.throws(() => parse(good.replace(marker, 'GENIE_DRAFT_PREPARED ' + raw)), { code: 'MALFORMED_DRAFT_PREPARATION' });
+  assert.throws(() => parse(good.replace(marker, 'GENIE_DRAFT_PREPARED')), { code: 'MALFORMED_DRAFT_PREPARATION' });
+  for (const stdout of [good.replace(marker, ''), good + marker + '\n', good + preparedReceipt(4243) + '\n']) {
+    assert.throws(() => parse(stdout), { code: 'MISSING_OR_DUPLICATE_DRAFT_PREPARATION' });
+  }
+  assert.throws(() => parseInstrumentation({ status: 0, stdout: phaseOutput('restore') + marker + '\n' }, 'restore'),
+    { code: 'MISSING_OR_DUPLICATE_DRAFT_PREPARATION' });
+  assert.equal(parse(good.replace(marker, 'GENIE_DRAFT_PREPARED {"pid":4242,"schemaVersion":1}')).preparedPid, 4242);
+});
+
+const boundaryFixture = (t, replacements = {}) => {
+  const workDir = temp(t), calls = [];
+  const receipt = { cases: [], preparedProcessPreserved: false, forceStopConfirmed: false };
+  const results = [
+    { status: 0, stdout: 'Status: ok\n' }, { status: 0, stdout: '4242\n' },
+    { status: 0, stdout: phaseOutput('first') }, { status: 0, stdout: '4242\n' },
+    { status: 0, stdout: '' }, { status: 1, stdout: '', stderr: '' },
+  ].map((result, index) => replacements[index] ?? result);
+  return { workDir, calls, receipt, run: () => prepareDraftAndForceStop({ workDir, receipt,
+    adb: async (args, timeout) => {
+      calls.push({ args, timeout });
+      assert.ok(calls.length <= results.length, 'unexpected command or fallback');
+      return results[calls.length - 1];
+    },
+  }) };
+};
+
+test('stops the same prepared process after normal JUnit success, without an intermediate relaunch', async t => {
+  const fixture = boundaryFixture(t);
+  await fixture.run();
+  const pidArgs = ['-s', 'emulator-5554', 'shell', 'pidof', FIXTURE_APP_ID];
+  assert.deepEqual(fixture.calls.map(call => call.args), [
+    ['-s', 'emulator-5554', 'shell', 'am', 'start', '-W', '-n', FIXTURE_APP_ID + '/' + FIXTURE_APP_ID + '.MainActivity'],
+    pidArgs, instrumentationArgs('first'), pidArgs,
+    ['-s', 'emulator-5554', 'shell', 'am', 'force-stop', FIXTURE_APP_ID], pidArgs,
+  ]);
+  assert.equal(fixture.calls[2].timeout, 120_000);
+  assert.deepEqual([fixture.receipt.prelaunchPid, fixture.receipt.preparedPid, fixture.receipt.pidBeforeForceStop], [4242, 4242, 4242]);
+  assert.equal(fixture.receipt.preparedProcessPreserved, true);
+  assert.equal(fixture.receipt.forceStopConfirmed, true);
+  assert.equal(fixture.receipt.cases.length, 3);
+  assert.equal(readFileSync(path.join(fixture.workDir, 'phase-first.log'), 'utf8'), phaseOutput('first'));
+});
+
+test('fails before instrumentation when prelaunch fails or its PID is absent, ambiguous or invalid', async t => {
+  const launchFailure = boundaryFixture(t, { 0: { status: 1, stdout: '' } });
+  await assert.rejects(launchFailure.run(), { code: 'APP_PRELAUNCH_FAILED' });
+  assert.equal(launchFailure.calls.length, 1);
+  for (const result of [{ status: 1, stdout: '' }, { status: 0, stdout: '' },
+    { status: 0, stdout: '4242 4243\n' }, { status: 0, stdout: '0\n' }, { status: 0, stdout: '2147483648\n' },
+    { status: 0, stdout: '4242\n', stderr: 'unexpected error' }]) {
+    const fixture = boundaryFixture(t, { 1: result });
+    await assert.rejects(fixture.run(), { code: 'APP_NOT_RUNNING_BEFORE_INSTRUMENTATION' });
+    assert.equal(fixture.calls.length, 2);
+    assert.equal(existsSync(path.join(fixture.workDir, 'phase-first.log')), false);
+    assert.equal(fixture.receipt.forceStopConfirmed, false);
+  }
+});
+
+test('does not fall back or stop another process when attachment fails or the prepared PID changes', async t => {
+  for (const [result, code] of [
+    [{ status: 0, stdout: 'INSTRUMENTATION_FAILED: unsupported --no-restart\n' }, 'INSTRUMENTATION_DID_NOT_PASS'],
+    [{ status: 0, stdout: phaseOutput('first') + 'INSTRUMENTATION_ABORTED\n' }, 'INSTRUMENTATION_DID_NOT_PASS'],
+    [{ status: 0, stdout: phaseOutput('first', 4243) }, 'PREPARED_PROCESS_CHANGED'],
+    [{ status: 0, stdout: phaseOutput('first').replace(preparedReceipt(4242), '') }, 'MISSING_OR_DUPLICATE_DRAFT_PREPARATION'],
+  ]) {
+    const fixture = boundaryFixture(t, { 2: result });
+    await assert.rejects(fixture.run(), { code });
+    assert.equal(fixture.calls.length, 3);
+    assert.equal(fixture.receipt.preparedProcessPreserved, false);
+    assert.equal(fixture.receipt.forceStopConfirmed, false);
+  }
+});
+
+test('rejects a prepared process that vanishes, changes or becomes ambiguous after JUnit completion', async t => {
+  for (const [result, code] of [
+    [{ status: 1, stdout: '' }, 'PREPARED_PROCESS_NOT_RUNNING'],
+    [{ status: 0, stdout: '4243\n' }, 'PREPARED_PROCESS_CHANGED'],
+    [{ status: 0, stdout: '4242 4243\n' }, 'PREPARED_PROCESS_NOT_RUNNING'],
+    [{ status: 0, stdout: '4242\n', stderr: 'unexpected error' }, 'PREPARED_PROCESS_NOT_RUNNING'],
+  ]) {
+    const fixture = boundaryFixture(t, { 3: result });
+    await assert.rejects(fixture.run(), { code });
+    assert.equal(fixture.calls.length, 4);
+    assert.equal(fixture.receipt.preparedProcessPreserved, false);
+    assert.equal(fixture.receipt.forceStopConfirmed, false);
+  }
+});
+
+test('requires the host stop to succeed and the target PID to be absent before restore is allowed', async t => {
+  const stopFailure = boundaryFixture(t, { 4: { status: 1, stdout: '' } });
+  await assert.rejects(stopFailure.run(), { code: 'HOST_FORCE_STOP_FAILED' });
+  assert.equal(stopFailure.calls.length, 5);
+  assert.equal(stopFailure.receipt.forceStopConfirmed, false);
+  for (const result of [{ status: 0, stdout: '4242\n' }, { status: 0, stdout: '' },
+    { status: 1, stdout: '4242\n' }, { status: 1, stdout: '', stderr: 'unexpected error' }]) {
+    const fixture = boundaryFixture(t, { 5: result });
+    await assert.rejects(fixture.run(), { code: 'APP_FORCE_STOP_NOT_CONFIRMED' });
+    assert.equal(fixture.calls.length, 6);
+    assert.equal(fixture.receipt.preparedProcessPreserved, true);
+    assert.equal(fixture.receipt.forceStopConfirmed, false);
+  }
 });
 
 const syntheticPng = (width = 640, height = 1280) => {

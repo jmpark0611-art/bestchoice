@@ -424,9 +424,12 @@ export function validateNamespace({ parent, current, links, routes }) {
 
 export function instrumentationArgs(phase) {
   if (!Object.hasOwn(PHASES, phase)) reject('UNKNOWN_INSTRUMENTATION_PHASE');
-  return ['-s', serial, 'shell', 'am', 'instrument', '-w', '-r', '-e', 'class',
+  return ['-s', serial, 'shell', 'am', 'instrument', '-w', '-r',
+    ...(phase === 'first' ? ['--no-restart'] : []), '-e', 'class',
     TEST_CLASS + '#' + PHASES[phase].method, FIXTURE_APP_ID + '.test/androidx.test.runner.AndroidJUnitRunner'];
 }
+
+const validPid = pid => Number.isSafeInteger(pid) && pid > 0 && pid <= 2_147_483_647;
 
 export function parseInstrumentation(result, phase) {
   const expected = PHASES[phase]?.cases;
@@ -435,16 +438,60 @@ export function parseInstrumentation(result, phase) {
   if (result.status !== 0 || !/^OK \(1 test\)\s*$/m.test(output) || !/^INSTRUMENTATION_CODE: -1\s*$/m.test(output) ||
       /^INSTRUMENTATION_STATUS_CODE: -[0-9]+/m.test(output) ||
       /FAILURES!!!|INSTRUMENTATION_FAILED|INSTRUMENTATION_ABORTED|Process crashed|shortMsg=/.test(output)) reject('INSTRUMENTATION_DID_NOT_PASS');
-  const reports = [];
+  const reports = [], preparations = [];
   for (const line of output.split(/\r?\n/)) {
+    if (line.includes('GENIE_DRAFT_PREPARED')) {
+      const prefix = 'GENIE_DRAFT_PREPARED ';
+      if (!line.startsWith(prefix)) reject('MALFORMED_DRAFT_PREPARATION');
+      const raw = line.slice(prefix.length);
+      let value;
+      try { value = JSON.parse(raw); } catch { reject('MALFORMED_DRAFT_PREPARATION'); }
+      if (raw.length > 128 || raw.includes('\\') || value === null || typeof value !== 'object' || Array.isArray(value) ||
+          Object.keys(value).length !== 2 || value.schemaVersion !== 1 || !validPid(value.pid) ||
+          (raw.match(/"schemaVersion"\s*:/g) ?? []).length !== 1 ||
+          (raw.match(/"pid"\s*:/g) ?? []).length !== 1) reject('MALFORMED_DRAFT_PREPARATION');
+      preparations.push(value.pid);
+    }
     const start = line.indexOf('GENIE_DEVICE_CASE ');
     if (start < 0) continue;
     try { reports.push(JSON.parse(line.slice(start + 'GENIE_DEVICE_CASE '.length))); } catch { reject('MALFORMED_DEVICE_CASE_REPORT'); }
   }
   if (reports.length !== expected.length || reports.some(report => report.passed !== true || !expected.includes(report.caseId)) ||
       new Set(reports.map(report => report.caseId)).size !== expected.length) reject('MISSING_OR_DUPLICATE_DEVICE_CASE');
-  if (phase === 'first' && !output.includes('GENIE_DRAFT_PREPARED')) reject('DRAFT_PREPARATION_NOT_CONFIRMED');
-  return reports;
+  if (preparations.length !== (phase === 'first' ? 1 : 0)) reject('MISSING_OR_DUPLICATE_DRAFT_PREPARATION');
+  return { cases: reports, preparedPid: preparations[0] ?? null };
+}
+
+function fixturePid(result, failureCode) {
+  const raw = (result.stdout ?? '').trim();
+  if (result.status !== 0 || result.stderr?.trim() || !/^[1-9][0-9]{0,9}$/.test(raw) || !validPid(Number(raw))) {
+    reject(failureCode);
+  }
+  return Number(raw);
+}
+
+/** Verify process attribution, not a WebView storage flush. Runner Activity cleanup stays enabled. */
+export async function prepareDraftAndForceStop({ workDir, adb, receipt }) {
+  const started = await adb(['-s', serial, 'shell', 'am', 'start', '-W', '-n', FIXTURE_APP_ID + '/' + FIXTURE_APP_ID + '.MainActivity']);
+  if (started.status !== 0) reject('APP_PRELAUNCH_FAILED');
+  const pidArgs = ['-s', serial, 'shell', 'pidof', FIXTURE_APP_ID];
+  receipt.prelaunchPid = fixturePid(await adb(pidArgs), 'APP_NOT_RUNNING_BEFORE_INSTRUMENTATION');
+  const first = await adb(instrumentationArgs('first'), 120_000);
+  writeFileSync(path.join(workDir, 'phase-first.log'), first.stdout, { flag: 'wx', mode: 0o600 });
+  const parsed = parseInstrumentation(first, 'first');
+  receipt.cases.push(...parsed.cases);
+  receipt.preparedPid = parsed.preparedPid;
+  if (receipt.preparedPid !== receipt.prelaunchPid) reject('PREPARED_PROCESS_CHANGED');
+  receipt.pidBeforeForceStop = fixturePid(await adb(pidArgs), 'PREPARED_PROCESS_NOT_RUNNING');
+  if (receipt.pidBeforeForceStop !== receipt.preparedPid) reject('PREPARED_PROCESS_CHANGED');
+  receipt.preparedProcessPreserved = true;
+  // No relaunch here: stop the process that actually prepared the draft. This
+  // removes an implicit runner process death; it does not establish durability.
+  const stopped = await adb(['-s', serial, 'shell', 'am', 'force-stop', FIXTURE_APP_ID]);
+  if (stopped.status !== 0) reject('HOST_FORCE_STOP_FAILED');
+  const remaining = await adb(pidArgs);
+  if (remaining.status !== 1 || remaining.stdout?.trim() || remaining.stderr?.trim()) reject('APP_FORCE_STOP_NOT_CONFIRMED');
+  receipt.forceStopConfirmed = true;
 }
 
 /** Only this fixed, small emulator screenshot may enter failure artifacts. */
@@ -574,6 +621,8 @@ export async function runDeviceCheck(workDir, env = process.env, run = execute) 
     instrumentationApkSha256: prepared.testApkSha256, signedReleaseNotTested: true,
     physicalDeviceTested: false, backendContacted: false, externalNetwork: 'blocked-by-loopback-only-network-namespace',
     emulator: prepared.pins.emulator, image: prepared.pins.image, node: prepared.node, javac: prepared.javac,
+    firstInstrumentationNoRestart: true, firstLaunchMode: 'activity-recreated-in-prelaunched-process',
+    preparedProcessPreserved: false, prelaunchPid: null, preparedPid: null, pidBeforeForceStop: null,
     forceStopConfirmed: false, cases, allFourCasesPassed: false,
   };
   let failure;
@@ -621,22 +670,11 @@ export async function runDeviceCheck(workDir, env = process.env, run = execute) 
     }
     await mustAdb(['-s', serial, 'install', prepared.apk]);
     await mustAdb(['-s', serial, 'install', prepared.testApk]);
-    const first = await adb(instrumentationArgs('first'), 120_000);
-    writeFileSync(path.join(workDir, 'phase-first.log'), first.stdout, { flag: 'wx', mode: 0o600 });
-    cases.push(...parseInstrumentation(first, 'first'));
-    // The first runner may finish its app process. Launch it once before the
-    // explicit host force-stop so we prove a running app is actually stopped.
-    await mustAdb(['-s', serial, 'shell', 'am', 'start', '-W', '-n', FIXTURE_APP_ID + '/' + FIXTURE_APP_ID + '.MainActivity']);
-    const pidBefore = (await mustAdb(['-s', serial, 'shell', 'pidof', FIXTURE_APP_ID])).trim();
-    if (!/^\d+(?: \d+)*$/.test(pidBefore)) reject('APP_NOT_RUNNING_BEFORE_FORCE_STOP');
-    await mustAdb(['-s', serial, 'shell', 'am', 'force-stop', FIXTURE_APP_ID]);
-    const remaining = await adb(['-s', serial, 'shell', 'pidof', FIXTURE_APP_ID]);
-    if (remaining.status !== 1 || remaining.stdout.trim() || remaining.stderr?.trim()) reject('APP_FORCE_STOP_NOT_CONFIRMED');
-    receipt.forceStopConfirmed = true;
+    await prepareDraftAndForceStop({ workDir, adb, receipt });
     const restored = await adb(instrumentationArgs('restore'), 120_000);
     writeFileSync(path.join(workDir, 'phase-restore.log'), restored.stdout, { flag: 'wx', mode: 0o600 });
-    cases.push(...parseInstrumentation(restored, 'restore'));
-    receipt.allFourCasesPassed = cases.length === 4 && receipt.forceStopConfirmed;
+    cases.push(...parseInstrumentation(restored, 'restore').cases);
+    receipt.allFourCasesPassed = cases.length === 4 && receipt.preparedProcessPreserved && receipt.forceStopConfirmed;
     receipt.status = 'four-android-emulator-fixture-cases-passed-not-a-release';
   } catch (error) {
     failure = error;

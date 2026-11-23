@@ -36,8 +36,9 @@ import org.junit.runner.RunWith;
 
 /**
  * Run ONLY through scripts/android-device-check.mjs in its network namespace.
- * These methods intentionally run in separate instrumentation processes. The
- * host force-stops the fixture app between them, without clearing its data.
+ * The first method recreates an Activity in the host's prelaunched process.
+ * The host verifies that process survives instrumentation, then force-stops it
+ * before the separate restore invocation, without clearing the app's data.
  * No API is mocked in the app; no decision button or remote URL is activated.
  */
 @RunWith(AndroidJUnit4.class)
@@ -372,10 +373,11 @@ public class GenieDeviceCheck {
         } catch (RuntimeException ignored) {
             // Diagnostic delivery must not change the original success criteria.
         }
-        // The following is preparation evidence, not a fourth passed case. Only
-        // the separately launched method can prove persistence after force-stop.
+        // Identify the process that prepared the draft. This does not prove a
+        // disk flush or a fourth passed case; restoration is checked separately.
         Bundle status = new Bundle();
-        status.putString("stream", "\nGENIE_DRAFT_PREPARED\n");
+        JSONObject prepared = new JSONObject().put("schemaVersion", 1).put("pid", android.os.Process.myPid());
+        status.putString("stream", "\nGENIE_DRAFT_PREPARED " + prepared + "\n");
         instrumentation.sendStatus(2, status);
     }
 
