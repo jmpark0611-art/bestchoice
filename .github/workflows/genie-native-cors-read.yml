@@ -1,0 +1,75 @@
+name: Genie native CORS read-only preflight
+
+# Inspect the deployed OPTIONS response only. No POST, authentication token,
+# request body, model invocation, user creation, or database mutation.
+on:
+  push:
+    branches: [codex/genie-android-native-check-20261123]
+    paths: [.github/workflows/genie-native-cors-read.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight-headers:
+    if: >-
+      github.repository == 'jmpark0611-art/bestchoice' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/codex/genie-android-native-check-20261123'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24.22.3'
+      - name: Read only the deployed preflight headers for the native and existing web origins
+        run: |
+          node --input-type=module <<'JS'
+          const endpoint = 'https://njrtcxohbkfgrgwhlvua.supabase.co/functions/v1/vs-decide';
+          const cases = [
+            { client: 'android', origin: 'https://localhost' },
+            { client: 'existing-web', origin: 'https://genie-web-rosy.vercel.app' },
+          ];
+          const results = [];
+          for (const item of cases) {
+            try {
+              const response = await fetch(endpoint, {
+                method: 'OPTIONS', redirect: 'error', signal: AbortSignal.timeout(15000),
+                headers: { Origin: item.origin, 'Access-Control-Request-Method': 'POST',
+                  'Access-Control-Request-Headers': 'authorization,apikey,content-type' },
+              });
+              const split = header => (response.headers.get(header) ?? '').toLowerCase().split(',').map(value => value.trim());
+              const allowedOrigin = response.headers.get('access-control-allow-origin');
+              const allowedHeaders = split('access-control-allow-headers');
+              const allowedMethods = split('access-control-allow-methods');
+              let knownError = null;
+              if (response.status === 403) {
+                const reader = response.body?.getReader();
+                if (reader) {
+                  const part = await reader.read();await reader.cancel();
+                  if (part.value && part.value.byteLength <= 1024) {
+                    try { const value = JSON.parse(new TextDecoder().decode(part.value));
+                      if (value.error === 'ORIGIN_DENIED') knownError = 'ORIGIN_DENIED';
+                    } catch {}
+                  }
+                }
+              } else await response.body?.cancel();
+              const allowed = response.status >= 200 && response.status < 300 && allowedOrigin === item.origin &&
+                allowedMethods.includes('post') && ['authorization', 'apikey', 'content-type'].every(value => allowedHeaders.includes(value));
+              results.push({ ...item, httpStatus: response.status,
+                allowedOrigin: [item.origin, '*'].includes(allowedOrigin) ? allowedOrigin : allowedOrigin === null ? null : 'different-origin',
+                postAllowed: allowedMethods.includes('post'),
+                requiredHeadersAllowed: ['authorization', 'apikey', 'content-type'].every(value => allowedHeaders.includes(value)),
+                knownError, preflightAllowed: allowed });
+            } catch {
+              results.push({ ...item, transportFailed: true, preflightAllowed: null });
+            }
+          }
+          console.log('GENIE_NATIVE_CORS_READ ' + JSON.stringify({
+            sourceCommit: process.env.GITHUB_SHA, checkedAtUtc: new Date().toISOString(),
+            method: 'OPTIONS', bodySent: false, authenticationSent: false,
+            applicationDataWritten: false, modelCalled: false,
+            invocationScope: 'deployed-preflight-only-not-an-integration-test', results,
+          }));
+          JS

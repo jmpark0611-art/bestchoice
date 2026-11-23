@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 2,
+  "status": "derived-additive-release-bodies-awaiting-cli-generated-migrations-and-root-application",
+  "recordedAtUtc": "2026-11-23T16:14:06.338539+00:00",
+  "authorizationScope": "Parent reports explicit operational approval for additive report/block APIs and Android origin; no store submission or production user-data test writes.",
+  "canonicalDependencySourceSha256": "a11c228c811cf8f04030a6507755863a4a3c6a771f86caa5268db59c77a136f1",
+  "changes": [
+    "Replace LOCAL-only comments with exact source provenance and runner-managed transaction instructions.",
+    "Replace only the leading LOCAL session opt-in DO block with catalog-only prerequisite and collision checks.",
+    "Remove the outer top-level BEGIN and terminal COMMIT from derived files only so the migration runner owns DDL and history atomicity.",
+    "Preserve the entire post-guard DDL, function bodies, indexes, RLS, grants and comments before terminal COMMIT byte-for-byte."
+  ],
+  "originalProposalsChanged": false,
+  "runtimeBusinessLogicChanged": false,
+  "existingCanonicalObjectsChanged": false,
+  "topLevelApplicationDataDmlAdded": false,
+  "productionApplied": false,
+  "cliMigrationFilenameGenerated": false,
+  "functionDependencyPins": [
+    {
+      "signature": "public.vs_poll_json(public.vs_polls,uuid)",
+      "bodyMd5": "2c2e689d88599f3103b52955ffdef59e",
+      "bodyCharacters": 858
+    },
+    {
+      "signature": "public.vs_shared_poll(text)",
+      "bodyMd5": "5a9cbf86abff3e172d5bad3664fccd1e",
+      "bodyCharacters": 380
+    },
+    {
+      "signature": "public.vs_vote(text,text)",
+      "bodyMd5": "af4c5e177c35ad17289a30101ff09d9f",
+      "bodyCharacters": 909
+    }
+  ],
+  "files": [
+    {
+      "source": "supabase/proposals/vs-report-result.sql",
+      "sourceSha256": "c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c",
+      "derived": "supabase/release-prep/vs-report-result.release.sql",
+      "newGuardSha256": "b58c7f230170f5d2c638d4ca7254fb973fa0c62ab0fafde2aade848f8391e79c",
+      "publicFunctionNames": [
+        "vs_report_result"
+      ],
+      "newPrivateSchema": "genie_reporting_private",
+      "supersededPreparedSha256": "958866f8e594c71cb76cd64dc3a31bc544645d75674f1ab88aa749ea72784687",
+      "supersededPreparedApplied": false,
+      "derivedSha256": "0472a96417bfe838e82f904fcfe5fe8e72f88b9df07fe20eeecd359cfe3a6019",
+      "preservedDefinitionsSha256": "411056a16dcb989233fed2ae7f8a1032e9a6c66b5f410876930f8f8aac1d4b1d",
+      "preservedDefinitionsByteCount": 7192,
+      "entirePostGuardDefinitionsBeforeCommitByteIdentical": true
+    },
+    {
+      "source": "supabase/proposals/vs-question-safety.sql",
+      "sourceSha256": "b1394b91284d6882238570afa28f2b8c8290652679cd63564ac81f651c855dba",
+      "derived": "supabase/release-prep/vs-question-safety.release.sql",
+      "newGuardSha256": "3b2f2cebd6eaedcfa62663fe1f216c1ed5af3e7691401d3aa17360519ad95f09",
+      "publicFunctionNames": [
+        "vs_report_question",
+        "vs_set_question_author_block",
+        "vs_clear_question_author_blocks",
+        "vs_shared_poll_guarded",
+        "vs_vote_guarded"
+      ],
+      "newPrivateSchema": "genie_question_safety_private",
+      "supersededPreparedSha256": "33f3d8db41a20592e6024aaa507aeb150d36b0ef97ce19a6fb314a88ba836196",
+      "supersededPreparedApplied": false,
+      "derivedSha256": "75edfca4b958df0560e90f50ac983cf7c81620b9aef565d5109d9bb2c853fc8f",
+      "preservedDefinitionsSha256": "7a40be5e52c67d1a97673cf7e837f1d6a0c4065991800903b8e556a23a9ea462",
+      "preservedDefinitionsByteCount": 12824,
+      "entirePostGuardDefinitionsBeforeCommitByteIdentical": true
+    }
+  ],
+  "transactionControl": {
+    "mode": "migration-runner-managed",
+    "topLevelBeginRemoved": true,
+    "terminalCommitRemoved": true,
+    "sourceProposalTransactionControlUnchanged": true,
+    "reason": "Supabase official knowledge base states embedded BEGIN/COMMIT can break runner atomicity and leave schema without migration history.",
+    "reference": "https://supabase.com/kb/troubleshooting/partial-migrations-and-schema-inconsistencies-from-embedded-transactions-13ae82"
+  },
+  "expectedReferencedTableMetadataEffect": "New foreign keys automatically add internal constraint triggers on referenced auth.users/vs_polls; existing user definitions, grants, policies and rows are not explicitly changed."
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">결정해지니 Preview</string>
+    <string name="title_activity_main">결정해지니 Preview</string>
+    <string name="package_name">dev.local.genie.preview</string>
+    <string name="custom_url_scheme">dev.local.genie.preview</string>
+</resources>

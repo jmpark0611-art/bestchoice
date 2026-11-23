@@ -1,0 +1,1171 @@
+{
+  "schemaVersion": 1,
+  "kind": "production-read-only-operational-evidence",
+  "preparedAtUtc": "2026-11-23 13:11:05 UTC",
+  "localRepositoryHeadAtInspection": "8ced932e5454b61b1ff1e17989218e31e4936fbf",
+  "project": {
+    "ref": "njrtcxohbkfgrgwhlvua",
+    "name": "bestchoice",
+    "status": "ACTIVE_HEALTHY",
+    "region": "ap-northeast-2",
+    "databaseVersion": "17.6.1.166",
+    "environment": "production; explicitly not a test target"
+  },
+  "scope": {
+    "actionsPerformed": [
+      "project metadata read",
+      "specified PostgreSQL catalog SELECTs",
+      "specified purge cron status metadata SELECTs",
+      "deployed vs-decide source read with safe factual extraction",
+      "local canonical SQL comparison"
+    ],
+    "productionWrites": false,
+    "productionFunctionInvocation": false,
+    "productionOptionsRequest": false,
+    "productionUserCreation": false,
+    "paidModelCall": false,
+    "applicationRowsRead": false,
+    "applicationRowCountsRead": false,
+    "authUserRowsRead": false,
+    "reportContentsRead": false,
+    "platformRequestLogsRead": false,
+    "secretOrEnvironmentValueRead": false,
+    "rawDeployedSourcePersisted": false,
+    "rawProviderResponsePersisted": false,
+    "excluded": [
+      "user identifiers and account data",
+      "questions, choices, notes, votes, report contents",
+      "credential values",
+      "other cron jobs",
+      "broad runtime logs",
+      "production API behavior tests",
+      "DDL, settings changes, migrations and deployment"
+    ]
+  },
+  "summary": {
+    "canonicalDatabaseContract": "No differences identified in the inspected canonical vs_* catalog contract. All 9 function body MD5s and character counts match the canonical source; signatures, flags, client permissions and the 4-table structure match inspected canonical declarations.",
+    "productionReportRpc": "Absent: public.vs_report_result and genie_reporting_private do not exist.",
+    "purge": "Present, active and last five observed scheduled runs succeeded. The function matches canonical two-calendar-month poll retention and seven-day quota cleanup.",
+    "edge": "ACTIVE version 2. Source uses the OpenAI Responses API with store:false; exact model and actual environment CORS allowlist remain unknown.",
+    "runtimeCompatibility": "Not proven. No production application request or OPTIONS request was sent; actual Auth, Data API and Android CORS settings were not obtained."
+  },
+  "canonical": {
+    "repository": "jmpark0611-art/bestchoice",
+    "migrationPath": "supabase/migrations/20261115000000_vs_polls_and_votes.sql",
+    "gitBlob": "c2a91f8f3dfc69598907faf1109fae41be0c638a",
+    "sha256": "a11c228c811cf8f04030a6507755863a4a3c6a771f86caa5268db59c77a136f1",
+    "comparisonMethod": "Read local canonical function bodies between $function$ delimiters. Compare UTF-8 source-body MD5 and character count with pg_proc.prosrc metadata; manually compare returned catalog declarations and permissions to canonical SQL. No live application rows queried.",
+    "caveat": "Matching MD5 plus character count is a comparison result, not an independent cryptographic byte-equality proof of all deployment files or runtime configuration.",
+    "functionComparisons": [
+      {
+        "name": "vs_claim",
+        "sourceMd5Matches": true,
+        "characterCountMatches": true,
+        "source_md5": "3e527d77cdd07e6e762c6b629f712dec",
+        "characters": 875
+      },
+      {
+        "name": "vs_poll_json",
+        "sourceMd5Matches": true,
+        "characterCountMatches": true,
+        "source_md5": "2c2e689d88599f3103b52955ffdef59e",
+        "characters": 858
+      },
+      {
+        "name": "vs_my_poll",
+        "sourceMd5Matches": true,
+        "characterCountMatches": true,
+        "source_md5": "d87800080660ccba2ea8aec692b25820",
+        "characters": 373
+      },
+      {
+        "name": "vs_share",
+        "sourceMd5Matches": true,
+        "characterCountMatches": true,
+        "source_md5": "632772f742d01131f718d23d742c705f",
+        "characters": 683
+      },
+      {
+        "name": "vs_shared_poll",
+        "sourceMd5Matches": true,
+        "characterCountMatches": true,
+        "source_md5": "5a9cbf86abff3e172d5bad3664fccd1e",
+        "characters": 380
+      },
+      {
+        "name": "vs_vote",
+        "sourceMd5Matches": true,
+        "characterCountMatches": true,
+        "source_md5": "af4c5e177c35ad17289a30101ff09d9f",
+        "characters": 909
+      },
+      {
+        "name": "vs_set_did",
+        "sourceMd5Matches": true,
+        "characterCountMatches": true,
+        "source_md5": "858627d6a0c120ed2fe7a4d1d8d428b1",
+        "characters": 414
+      },
+      {
+        "name": "vs_delete_poll",
+        "sourceMd5Matches": true,
+        "characterCountMatches": true,
+        "source_md5": "62896e04aced60587a083faf82936aa7",
+        "characters": 202
+      },
+      {
+        "name": "vs_purge_expired",
+        "sourceMd5Matches": true,
+        "characterCountMatches": true,
+        "source_md5": "ffabf01d1ef16f17ed9b1b19e343a4df",
+        "characters": 258
+      }
+    ],
+    "inspectedCounts": {
+      "tables": 4,
+      "columns": 19,
+      "constraints": 16,
+      "indexes": 7,
+      "policies": 1,
+      "functions": 9
+    },
+    "identifiedDifferences": [],
+    "nonInternalTriggersFound": [],
+    "customRulesFound": []
+  },
+  "inventory": {
+    "observed_at_utc": "2026-11-23 12:58:44.208607+00",
+    "server_version": "17.6",
+    "reporting_schema_exists": false,
+    "reporting_rpc_exists": false,
+    "pg_cron_version": "1.6.4",
+    "cron_job_catalog_exists": true,
+    "cron_run_catalog_exists": true,
+    "vs_tables": "{vs_daily_total,vs_polls,vs_user_limits,vs_votes}"
+  },
+  "databaseCatalog": {
+    "tables": [
+      {
+        "name": "vs_daily_total",
+        "rls": true,
+        "force_rls": false,
+        "owner": "postgres",
+        "anon_select": false,
+        "anon_insert": false,
+        "authenticated_select": false,
+        "authenticated_insert": false,
+        "authenticated_update": false,
+        "authenticated_delete": false,
+        "service_role_insert": true
+      },
+      {
+        "name": "vs_polls",
+        "rls": true,
+        "force_rls": false,
+        "owner": "postgres",
+        "anon_select": false,
+        "anon_insert": false,
+        "authenticated_select": true,
+        "authenticated_insert": false,
+        "authenticated_update": false,
+        "authenticated_delete": false,
+        "service_role_insert": true
+      },
+      {
+        "name": "vs_user_limits",
+        "rls": true,
+        "force_rls": false,
+        "owner": "postgres",
+        "anon_select": false,
+        "anon_insert": false,
+        "authenticated_select": false,
+        "authenticated_insert": false,
+        "authenticated_update": false,
+        "authenticated_delete": false,
+        "service_role_insert": true
+      },
+      {
+        "name": "vs_votes",
+        "rls": true,
+        "force_rls": false,
+        "owner": "postgres",
+        "anon_select": false,
+        "anon_insert": false,
+        "authenticated_select": false,
+        "authenticated_insert": false,
+        "authenticated_update": false,
+        "authenticated_delete": false,
+        "service_role_insert": true
+      }
+    ],
+    "columns": [
+      {
+        "table": "vs_daily_total",
+        "position": 1,
+        "name": "day",
+        "type": "date",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_daily_total",
+        "position": 2,
+        "name": "used",
+        "type": "integer",
+        "not_null": true,
+        "default": "0"
+      },
+      {
+        "table": "vs_polls",
+        "position": 1,
+        "name": "id",
+        "type": "uuid",
+        "not_null": true,
+        "default": "gen_random_uuid()"
+      },
+      {
+        "table": "vs_polls",
+        "position": 2,
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 3,
+        "name": "option_a",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 4,
+        "name": "option_b",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 5,
+        "name": "note",
+        "type": "text",
+        "not_null": false,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 6,
+        "name": "pick",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 7,
+        "name": "reason",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 8,
+        "name": "share_code",
+        "type": "text",
+        "not_null": false,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 9,
+        "name": "did",
+        "type": "text",
+        "not_null": false,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 10,
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true,
+        "default": "now()"
+      },
+      {
+        "table": "vs_user_limits",
+        "position": 1,
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_user_limits",
+        "position": 2,
+        "name": "day",
+        "type": "date",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_user_limits",
+        "position": 3,
+        "name": "used",
+        "type": "integer",
+        "not_null": true,
+        "default": "0"
+      },
+      {
+        "table": "vs_votes",
+        "position": 1,
+        "name": "poll_id",
+        "type": "uuid",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_votes",
+        "position": 2,
+        "name": "voter_id",
+        "type": "uuid",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_votes",
+        "position": 3,
+        "name": "choice",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_votes",
+        "position": 4,
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true,
+        "default": "now()"
+      }
+    ],
+    "constraints": [
+      {
+        "table": "vs_daily_total",
+        "name": "vs_daily_total_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (day)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_did_check",
+        "type": "c",
+        "definition": "CHECK (did = ANY (ARRAY['a'::text, 'b'::text, 'none'::text]))"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_note_check",
+        "type": "c",
+        "definition": "CHECK (note IS NULL OR char_length(note) >= 1 AND char_length(note) <= 60)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_option_a_check",
+        "type": "c",
+        "definition": "CHECK (char_length(option_a) >= 1 AND char_length(option_a) <= 20)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_option_b_check",
+        "type": "c",
+        "definition": "CHECK (char_length(option_b) >= 1 AND char_length(option_b) <= 20)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_pick_check",
+        "type": "c",
+        "definition": "CHECK (pick = ANY (ARRAY['a'::text, 'b'::text]))"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_reason_check",
+        "type": "c",
+        "definition": "CHECK (char_length(reason) >= 1 AND char_length(reason) <= 300)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_share_code_key",
+        "type": "u",
+        "definition": "UNIQUE (share_code)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "vs_user_limits",
+        "name": "vs_user_limits_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (user_id, day)"
+      },
+      {
+        "table": "vs_user_limits",
+        "name": "vs_user_limits_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_choice_check",
+        "type": "c",
+        "definition": "CHECK (choice = ANY (ARRAY['a'::text, 'b'::text]))"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (poll_id, voter_id)"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_poll_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (poll_id) REFERENCES vs_polls(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_voter_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (voter_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      }
+    ],
+    "indexes": [
+      {
+        "table": "vs_daily_total",
+        "name": "vs_daily_total_pkey",
+        "definition": "CREATE UNIQUE INDEX vs_daily_total_pkey ON public.vs_daily_total USING btree (day)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_pkey",
+        "definition": "CREATE UNIQUE INDEX vs_polls_pkey ON public.vs_polls USING btree (id)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_share_code_key",
+        "definition": "CREATE UNIQUE INDEX vs_polls_share_code_key ON public.vs_polls USING btree (share_code)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_user_created_idx",
+        "definition": "CREATE INDEX vs_polls_user_created_idx ON public.vs_polls USING btree (user_id, created_at DESC)"
+      },
+      {
+        "table": "vs_user_limits",
+        "name": "vs_user_limits_pkey",
+        "definition": "CREATE UNIQUE INDEX vs_user_limits_pkey ON public.vs_user_limits USING btree (user_id, day)"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_pkey",
+        "definition": "CREATE UNIQUE INDEX vs_votes_pkey ON public.vs_votes USING btree (poll_id, voter_id)"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_voter_idx",
+        "definition": "CREATE INDEX vs_votes_voter_idx ON public.vs_votes USING btree (voter_id)"
+      }
+    ],
+    "policies": [
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_read_own",
+        "roles": [
+          "authenticated"
+        ],
+        "command": "SELECT",
+        "using": "(user_id = ( SELECT auth.uid() AS uid))",
+        "check": null
+      }
+    ]
+  },
+  "functionCatalog": [
+    {
+      "name": "vs_claim",
+      "identity_arguments": "p_user uuid",
+      "result_type": "void",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "3e527d77cdd07e6e762c6b629f712dec",
+      "source_characters": 875,
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_delete_poll",
+      "identity_arguments": "p_id uuid",
+      "result_type": "void",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "62896e04aced60587a083faf82936aa7",
+      "source_characters": 202,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_my_poll",
+      "identity_arguments": "p_id uuid",
+      "result_type": "jsonb",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "s",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "d87800080660ccba2ea8aec692b25820",
+      "source_characters": 373,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_poll_json",
+      "identity_arguments": "p_poll vs_polls, p_user uuid",
+      "result_type": "jsonb",
+      "language": "sql",
+      "security_definer": true,
+      "volatility": "s",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "2c2e689d88599f3103b52955ffdef59e",
+      "source_characters": 858,
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_purge_expired",
+      "identity_arguments": "",
+      "result_type": "void",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "ffabf01d1ef16f17ed9b1b19e343a4df",
+      "source_characters": 258,
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_set_did",
+      "identity_arguments": "p_id uuid, p_did text",
+      "result_type": "void",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "858627d6a0c120ed2fe7a4d1d8d428b1",
+      "source_characters": 414,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_share",
+      "identity_arguments": "p_id uuid",
+      "result_type": "text",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "632772f742d01131f718d23d742c705f",
+      "source_characters": 683,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_shared_poll",
+      "identity_arguments": "p_code text",
+      "result_type": "jsonb",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "s",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "5a9cbf86abff3e172d5bad3664fccd1e",
+      "source_characters": 380,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_vote",
+      "identity_arguments": "p_code text, p_choice text",
+      "result_type": "jsonb",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "af4c5e177c35ad17289a30101ff09d9f",
+      "source_characters": 909,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    }
+  ],
+  "behaviorCatalog": {
+    "function_flags": [
+      {
+        "name": "vs_claim",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_delete_poll",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_my_poll",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_poll_json",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_purge_expired",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_set_did",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_share",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_shared_poll",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_vote",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      }
+    ],
+    "non_internal_triggers": null,
+    "custom_rules": null,
+    "client_privileges": [
+      {
+        "table": "vs_daily_total",
+        "role": "anon",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_daily_total",
+        "role": "authenticated",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_polls",
+        "role": "anon",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_polls",
+        "role": "authenticated",
+        "select": true,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_user_limits",
+        "role": "anon",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_user_limits",
+        "role": "authenticated",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_votes",
+        "role": "anon",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_votes",
+        "role": "authenticated",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      }
+    ]
+  },
+  "retention": {
+    "sourceRule": {
+      "polls": "created_at < now() - interval '2 months'",
+      "votes": "ON DELETE CASCADE from the associated poll",
+      "userQuota": "day < UTC current date - 7",
+      "globalQuota": "day < UTC current date - 7",
+      "authUsers": "Not deleted by vs_purge_expired"
+    },
+    "interpretation": "Two calendar months, checked by one daily purge; not an exact 60-day or immediate expiry promise. Poll deletion cascades associated votes. No application rows or deletion counts were inspected.",
+    "cronStatus": {
+      "observed_at_utc": "2026-11-23T13:01:03.350696+00:00",
+      "timezone": "GMT",
+      "launch_active_jobs": "on",
+      "log_run": "on",
+      "jobs": [
+        {
+          "jobid": 2,
+          "name": "vs-purge-expired",
+          "schedule": "10 18 * * *",
+          "active": true,
+          "command_matches_canonical": false,
+          "command_md5": "f8259fd5e1bfa2ccbee0b23b63ea2bc0",
+          "last_success_in_7_days": "2026-11-22T18:10:00.113912+00:00",
+          "recent_runs": [
+            {
+              "status": "succeeded",
+              "start_time": "2026-11-22T18:10:00.092514+00:00",
+              "end_time": "2026-11-22T18:10:00.113912+00:00"
+            },
+            {
+              "status": "succeeded",
+              "start_time": "2026-11-21T18:10:00.100681+00:00",
+              "end_time": "2026-11-21T18:10:00.126377+00:00"
+            },
+            {
+              "status": "succeeded",
+              "start_time": "2026-11-20T18:10:00.080343+00:00",
+              "end_time": "2026-11-20T18:10:00.102482+00:00"
+            },
+            {
+              "status": "succeeded",
+              "start_time": "2026-11-19T18:10:00.101127+00:00",
+              "end_time": "2026-11-19T18:10:00.128431+00:00"
+            },
+            {
+              "status": "succeeded",
+              "start_time": "2026-11-18T18:10:00.093491+00:00",
+              "end_time": "2026-11-18T18:10:00.115072+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    "commandNormalization": {
+      "qualified_simple_purge": true,
+      "unqualified_simple_purge": false,
+      "command_length": 32
+    },
+    "commandExplanation": "The first raw-string comparison against a trailing-semicolon form was false. A follow-up allowlisted normalization confirmed exactly one schema-qualified SELECT public.vs_purge_expired() with only case/whitespace/optional trailing-semicolon normalization, not extra SQL.",
+    "scheduleLocal": "Daily 03:10 Asia/Seoul (18:10 UTC on the previous UTC date)",
+    "limits": [
+      "Success metadata proves the scheduled function completed, not a row-by-row deletion audit.",
+      "No claim about Auth-account, backup, automatic platform log, or AI-provider retention."
+    ]
+  },
+  "edge": {
+    "metadata": {
+      "slug": "vs-decide",
+      "name": "vs-decide",
+      "status": "ACTIVE",
+      "version": 2,
+      "verify_jwt": false,
+      "updated_at": 1794880753708,
+      "ezbr_sha256": "bc1be82fc8eba681fc4818f5511e115e259f525b95dbef1b80f794a2c842f5f4"
+    },
+    "updatedAtUtc": "2026-11-17T01:59:13.708Z",
+    "sourceFiles": [
+      {
+        "name": "index.ts",
+        "characters": 6745
+      }
+    ],
+    "sourceEvidenceOnly": true,
+    "imports": [
+      "npm:@supabase/supabase-js@2.117.2",
+      "npm:zod@3.25.76"
+    ],
+    "environmentVariableNames": [
+      "VS_ALLOWED_ORIGINS",
+      "OPENAI_API_KEY",
+      "OPENAI_MODEL",
+      "SUPABASE_URL",
+      "SUPABASE_SERVICE_ROLE_KEY"
+    ],
+    "environmentValuesNotRead": true,
+    "provider": {
+      "url": "https://api.openai.com/v1/responses",
+      "modelSelection": "Deno.env.get('OPENAI_MODEL'); no source fallback",
+      "actualModel": "unverified",
+      "store": false,
+      "maxOutputTokens": 400,
+      "userInputFields": [
+        "a",
+        "b",
+        "note"
+      ],
+      "userInputForm": "JSON.stringify({a: input.a, b: input.b, note: input.note || null})",
+      "staticInstructions": true,
+      "strictStructuredOutput": true,
+      "automaticUserUuidSent": false,
+      "automaticBearerTokenSent": false,
+      "automaticHistorySent": false,
+      "limit": "User-provided fields can themselves contain personal information. store:false is the observed request flag; it does not establish all provider retention policies."
+    },
+    "inputContract": {
+      "strictObject": true,
+      "optionA": "trimmed text, 1–20 characters",
+      "optionB": "trimmed text, 1–20 characters",
+      "note": "trimmed text, maximum 60 characters; empty allowed",
+      "maxRequestTextCharacters": 2000,
+      "sameChoicesRejected": true
+    },
+    "authentication": {
+      "gatewayVerifyJwt": false,
+      "handlerChecksBearerTokenVia": "db.auth.getUser(token)",
+      "missingOrInvalidUser": "401",
+      "interpretation": "The gateway flag is not equivalent to no authentication: the function validates the bearer token before quota/model work."
+    },
+    "quota": {
+      "function": "public.vs_claim",
+      "runsBeforeProviderCall": true,
+      "perUserPerUtcDay": 30,
+      "globalPerUtcDay": 300
+    },
+    "persistence": {
+      "table": "public.vs_polls",
+      "insertedFields": [
+        "user_id",
+        "option_a",
+        "option_b",
+        "note",
+        "pick",
+        "reason"
+      ],
+      "requestNoteEmptyBecomesNull": true
+    },
+    "explicitLogging": {
+      "successOnly": true,
+      "fields": [
+        "fixed success event",
+        "model combined with promptVersion"
+      ],
+      "promptVersion": "vs-v1",
+      "requestTextInExplicitLog": false,
+      "userUuidInExplicitLog": false,
+      "bearerTokenInExplicitLog": false,
+      "limit": "Only explicit source log calls were inspected. Automatic gateway, Auth, platform, provider logs and retention were not read."
+    },
+    "recognizableRawCredentialLiteralFound": false,
+    "credentialScanLimit": "No recognizable raw credential literal was found in the inspected source; this is not a comprehensive secret audit. No secret values were requested or persisted.",
+    "cors": {
+      "sourceFallbackOrigins": [
+        "http://localhost:5173",
+        "http://localhost:4173",
+        "https://genie-web-rosy.vercel.app",
+        "https://genie-web-jmpark0611-1816s-projects.vercel.app"
+      ],
+      "overrideEnvironmentName": "VS_ALLOWED_ORIGINS",
+      "actualOverrideValue": "unverified",
+      "androidHttpsLocalhostInFallback": false,
+      "allowedOptionsStatus": 204,
+      "disallowedOriginStatus": 403,
+      "optionsBeforeAuthDatabaseQuotaAndProvider": true,
+      "productionOptionsSent": false,
+      "handlerLineOrder": {
+        "functionStart": 92,
+        "originRejection": 104,
+        "optionsEarlyReturn": 105,
+        "postMethodGuard": 106,
+        "providerEnvironmentRead": 108,
+        "databaseClientCreation": 110,
+        "authUserVerification": 115,
+        "quotaRpc": 129,
+        "providerCallFromHandler": 136,
+        "successLog": 147,
+        "requestStoreFalse": 57,
+        "providerRequestFields": 60
+      },
+      "implication": "Actual Android https://localhost compatibility remains unverified because a deployed environment override may add this origin; fallback source alone does not show it."
+    }
+  },
+  "runtimeSettings": {
+    "dataApiSchemaObservation": null,
+    "connectionDataApiSchemaSetting": null,
+    "interpretation": "Null values from these database-setting views do not prove that the Data API is disabled or which schemas its management/runtime configuration exposes.",
+    "authAnonymousSignInEnabled": "unverified; no Auth configuration getter was exposed in the available tools",
+    "anonymousRecoveryAndAccountDeletionConfiguration": "unverified; auth.users and Auth configuration were not read",
+    "actualEdgeModelAndCorsOverrides": "unverified; environment values were not requested"
+  },
+  "reporting": {
+    "productionRpcExists": false,
+    "productionPrivateSchemaExists": false,
+    "productionReceiptAvailability": "unavailable until a reviewed backend change is separately approved and deployed",
+    "productionAiResultReporting": "not deployed",
+    "userGeneratedQuestionReporting": "not established by the inspected canonical contract; no reporting function in its vs_* surface",
+    "isolatedEvidence": {
+      "proposalSha256": "c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c",
+      "qaSource": "fff40a925c09183cecee01ff2855f5213a04c91a",
+      "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45166205966",
+      "receiptAtUtc": "2026-11-23T11:33:57.989Z",
+      "result": "Previously passed in a disposable local Supabase stack; production was not changed. This audit did not rerun it.",
+      "scope": "Actual Auth/PostgREST HTTP owner/voted access, unauthorized denial, two parallel identical request receipts, one-row and one-quota accounting, changed-payload/consent denial, source deletion cascade, role SELECT/INSERT denials and owned resource cleanup."
+    }
+  },
+  "remainingDecisions": [
+    {
+      "id": "REPORTING_NOT_DEPLOYED",
+      "fact": "Report API/private schema absent in production",
+      "next": "Review any required reporting scope and approve a concrete production change separately; do not claim live report receipt."
+    },
+    {
+      "id": "ANDROID_CORS_UNVERIFIED",
+      "fact": "Fallback allowlist lacks https://localhost and deployed override is unknown",
+      "next": "Obtain a safe read of the effective allowed origins or separately approve a data-free preflight. No production request was made in this audit."
+    },
+    {
+      "id": "AUTH_AND_DATA_API_SETTINGS_UNVERIFIED",
+      "fact": "Anonymous Auth enablement and effective Data API configuration not exposed by the reads used",
+      "next": "Confirm settings through an authorized read-only configuration view, then assess actual client access without creating production users."
+    },
+    {
+      "id": "ACTUAL_MODEL_UNVERIFIED",
+      "fact": "Source uses OPENAI_MODEL with no fallback; value not read",
+      "next": "Confirm the selected non-secret model identifier and provider processing/retention facts for disclosures without exposing credentials."
+    },
+    {
+      "id": "PRODUCTION_END_TO_END_NOT_EXERCISED",
+      "fact": "Catalog/source agreement is not a production request result",
+      "next": "Retain separate isolated integration/device evidence and avoid representing this read-only audit as a live production flow test."
+    }
+  ],
+  "queries": [
+    {
+      "id": "project-metadata",
+      "tool": "supabase_get_project",
+      "arguments": {
+        "id": "njrtcxohbkfgrgwhlvua"
+      },
+      "persistedResult": "safe project projection only"
+    },
+    {
+      "id": "inventory",
+      "tool": "supabase_execute_sql",
+      "arguments": {
+        "project_id": "njrtcxohbkfgrgwhlvua",
+        "query": "select\n  current_timestamp as observed_at_utc,\n  current_setting('server_version') as server_version,\n  exists(select 1 from pg_catalog.pg_namespace where nspname = 'genie_reporting_private') as reporting_schema_exists,\n  exists(select 1 from pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid=p.pronamespace\n    where n.nspname='public' and p.proname='vs_report_result') as reporting_rpc_exists,\n  (select extversion from pg_catalog.pg_extension where extname='pg_cron') as pg_cron_version,\n  to_regclass('cron.job') is not null as cron_job_catalog_exists,\n  to_regclass('cron.job_run_details') is not null as cron_run_catalog_exists,\n  (select array_agg(c.relname order by c.relname) from pg_catalog.pg_class c\n    join pg_catalog.pg_namespace n on n.oid=c.relnamespace\n    where n.nspname='public' and c.relname like 'vs\\_%' escape '\\' and c.relkind in ('r','p')) as vs_tables;"
+      }
+    },
+    {
+      "id": "schema",
+      "tool": "supabase_execute_sql",
+      "arguments": {
+        "project_id": "njrtcxohbkfgrgwhlvua",
+        "query": "select json_build_object(\n 'tables', (select json_agg(json_build_object('name',c.relname,'rls',c.relrowsecurity,'force_rls',c.relforcerowsecurity,\n  'owner',pg_get_userbyid(c.relowner),'anon_select',has_table_privilege('anon',c.oid,'SELECT'),\n  'anon_insert',has_table_privilege('anon',c.oid,'INSERT'),'authenticated_select',has_table_privilege('authenticated',c.oid,'SELECT'),\n  'authenticated_insert',has_table_privilege('authenticated',c.oid,'INSERT'),'authenticated_update',has_table_privilege('authenticated',c.oid,'UPDATE'),\n  'authenticated_delete',has_table_privilege('authenticated',c.oid,'DELETE'),'service_role_insert',has_table_privilege('service_role',c.oid,'INSERT')) order by c.relname)\n  from pg_catalog.pg_class c join pg_catalog.pg_namespace n on n.oid=c.relnamespace\n  where n.nspname='public' and c.relname in ('vs_polls','vs_votes','vs_user_limits','vs_daily_total') and c.relkind='r'),\n 'columns', (select json_agg(json_build_object('table',c.relname,'position',a.attnum,'name',a.attname,\n  'type',format_type(a.atttypid,a.atttypmod),'not_null',a.attnotnull,'default',pg_get_expr(d.adbin,d.adrelid)) order by c.relname,a.attnum)\n  from pg_catalog.pg_class c join pg_catalog.pg_namespace n on n.oid=c.relnamespace\n  join pg_catalog.pg_attribute a on a.attrelid=c.oid and a.attnum>0 and not a.attisdropped\n  left join pg_catalog.pg_attrdef d on d.adrelid=c.oid and d.adnum=a.attnum\n  where n.nspname='public' and c.relname in ('vs_polls','vs_votes','vs_user_limits','vs_daily_total')),\n 'constraints', (select json_agg(json_build_object('table',c.relname,'name',co.conname,'type',co.contype,\n  'definition',pg_get_constraintdef(co.oid,true)) order by c.relname,co.conname)\n  from pg_catalog.pg_constraint co join pg_catalog.pg_class c on c.oid=co.conrelid join pg_catalog.pg_namespace n on n.oid=c.relnamespace\n  where n.nspname='public' and c.relname in ('vs_polls','vs_votes','vs_user_limits','vs_daily_total')),\n 'indexes', (select json_agg(json_build_object('table',tablename,'name',indexname,'definition',indexdef) order by tablename,indexname)\n  from pg_catalog.pg_indexes where schemaname='public' and tablename in ('vs_polls','vs_votes','vs_user_limits','vs_daily_total')),\n 'policies', (select json_agg(json_build_object('table',tablename,'name',policyname,'roles',roles,'command',cmd,'using',qual,'check',with_check) order by tablename,policyname)\n  from pg_catalog.pg_policies where schemaname='public' and tablename in ('vs_polls','vs_votes','vs_user_limits','vs_daily_total'))\n) as catalog;"
+      }
+    },
+    {
+      "id": "functions",
+      "tool": "supabase_execute_sql",
+      "arguments": {
+        "project_id": "njrtcxohbkfgrgwhlvua",
+        "query": "select p.proname as name,pg_get_function_identity_arguments(p.oid) as identity_arguments,\n pg_get_function_result(p.oid) as result_type,l.lanname as language,p.prosecdef as security_definer,\n p.provolatile as volatility,\n (select array_agg(v) from unnest(coalesce(p.proconfig,array[]::text[])) v where v like 'search_path=%') as search_path_settings,\n (select count(*) from unnest(coalesce(p.proconfig,array[]::text[])) v where v not like 'search_path=%') as other_setting_count,\n md5(p.prosrc) as source_md5,length(p.prosrc) as source_characters,\n has_function_privilege('anon',p.oid,'EXECUTE') as anon_execute,\n has_function_privilege('authenticated',p.oid,'EXECUTE') as authenticated_execute,\n has_function_privilege('service_role',p.oid,'EXECUTE') as service_role_execute,\n exists(select 1 from aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a where a.grantee=0 and a.privilege_type='EXECUTE') as public_execute\nfrom pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid=p.pronamespace join pg_catalog.pg_language l on l.oid=p.prolang\nwhere n.nspname='public' and p.proname like 'vs\\_%' escape '\\' order by p.proname,identity_arguments;"
+      }
+    },
+    {
+      "id": "purge-cron-status",
+      "tool": "supabase_execute_sql",
+      "arguments": {
+        "project_id": "njrtcxohbkfgrgwhlvua",
+        "query": "select json_build_object(\n 'observed_at_utc',current_timestamp,\n 'timezone',current_setting('cron.timezone',true),\n 'launch_active_jobs',current_setting('cron.launch_active_jobs',true),\n 'log_run',current_setting('cron.log_run',true),\n 'jobs',(select json_agg(json_build_object('jobid',j.jobid,'name',j.jobname,'schedule',j.schedule,'active',j.active,\n  'command_matches_canonical',btrim(j.command)='select public.vs_purge_expired();','command_md5',md5(j.command),\n  'last_success_in_7_days',(select max(r.end_time) from cron.job_run_details r where r.jobid=j.jobid and r.status='succeeded'\n    and r.start_time>=current_timestamp-interval '7 days'),\n  'recent_runs',(select json_agg(q order by q.start_time desc) from (\n    select r.status,r.start_time,r.end_time from cron.job_run_details r where r.jobid=j.jobid\n    and r.start_time>=current_timestamp-interval '7 days' order by r.start_time desc limit 5)q)\n ) order by j.jobid) from cron.job j where j.jobname='vs-purge-expired')\n) as cron_status;"
+      }
+    },
+    {
+      "id": "purge-command-and-selected-api-settings",
+      "tool": "supabase_execute_sql",
+      "arguments": {
+        "project_id": "njrtcxohbkfgrgwhlvua",
+        "query": "select json_build_object(\n 'cron_command',(select json_build_object(\n  'qualified_simple_purge',regexp_replace(lower(command),'[[:space:]]','','g') in ('selectpublic.vs_purge_expired();','selectpublic.vs_purge_expired()'),\n  'unqualified_simple_purge',regexp_replace(lower(command),'[[:space:]]','','g') in ('selectvs_purge_expired();','selectvs_purge_expired()'),\n  'command_length',length(command)\n ) from cron.job where jobname='vs-purge-expired' and jobid=2),\n 'data_api_db_schema_settings',(select json_agg(json_build_object('role',r.rolname,'setting',v))\n  from pg_catalog.pg_db_role_setting s join pg_catalog.pg_roles r on r.oid=s.setrole,\n  lateral unnest(s.setconfig) v where r.rolname in ('authenticator','postgres') and v like 'pgrst.db_schemas=%'),\n 'connection_data_api_schema_setting',current_setting('pgrst.db_schemas',true)\n) as settings;"
+      }
+    },
+    {
+      "id": "function-flags-triggers-rules-client-privileges",
+      "tool": "supabase_execute_sql",
+      "arguments": {
+        "project_id": "njrtcxohbkfgrgwhlvua",
+        "query": "select json_build_object(\n 'function_flags',(select json_agg(json_build_object('name',p.proname,'owner',pg_get_userbyid(p.proowner),\n  'strict',p.proisstrict,'returns_set',p.proretset,'default_argument_count',p.pronargdefaults,\n  'leakproof',p.proleakproof,'parallel',p.proparallel,'kind',p.prokind) order by p.proname)\n  from pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid=p.pronamespace\n  where n.nspname='public' and p.proname like 'vs\\_%' escape '\\'),\n 'non_internal_triggers',(select json_agg(json_build_object('table',c.relname,'name',t.tgname,'enabled',t.tgenabled) order by c.relname,t.tgname)\n  from pg_catalog.pg_trigger t join pg_catalog.pg_class c on c.oid=t.tgrelid join pg_catalog.pg_namespace n on n.oid=c.relnamespace\n  where n.nspname='public' and c.relname in ('vs_polls','vs_votes','vs_user_limits','vs_daily_total') and not t.tgisinternal),\n 'custom_rules',(select json_agg(json_build_object('table',c.relname,'name',r.rulename) order by c.relname,r.rulename)\n  from pg_catalog.pg_rewrite r join pg_catalog.pg_class c on c.oid=r.ev_class join pg_catalog.pg_namespace n on n.oid=c.relnamespace\n  where n.nspname='public' and c.relname in ('vs_polls','vs_votes','vs_user_limits','vs_daily_total')),\n 'client_privileges',(select json_agg(json_build_object('table',c.relname,'role',roles.name,\n  'select',has_table_privilege(roles.name,c.oid,'SELECT'),'insert',has_table_privilege(roles.name,c.oid,'INSERT'),\n  'update',has_table_privilege(roles.name,c.oid,'UPDATE'),'delete',has_table_privilege(roles.name,c.oid,'DELETE'),\n  'truncate',has_table_privilege(roles.name,c.oid,'TRUNCATE'),'references',has_table_privilege(roles.name,c.oid,'REFERENCES'),\n  'trigger',has_table_privilege(roles.name,c.oid,'TRIGGER')) order by c.relname,roles.name)\n  from pg_catalog.pg_class c join pg_catalog.pg_namespace n on n.oid=c.relnamespace\n  cross join (values('anon'),('authenticated'))roles(name)\n  where n.nspname='public' and c.relname in ('vs_polls','vs_votes','vs_user_limits','vs_daily_total') and c.relkind='r')\n) as behavior_catalog;"
+      }
+    },
+    {
+      "id": "deployed-edge-source",
+      "tool": "supabase_get_edge_function",
+      "arguments": {
+        "project_id": "njrtcxohbkfgrgwhlvua",
+        "function_slug": "vs-decide"
+      },
+      "persistedResult": "safe metadata and factual projections only; no raw source"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://supabase.com/changelog.md",
+      "use": "Required current changelog review before Supabase work; no upgrade or mutation performed."
+    },
+    {
+      "url": "https://supabase.com/docs/guides/cron",
+      "use": "Primary documentation for cron.job and cron.job_run_details status metadata."
+    }
+  ]
+}

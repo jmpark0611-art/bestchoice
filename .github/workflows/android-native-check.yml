@@ -1,0 +1,75 @@
+name: Genie Android native check (synthetic configuration)
+
+# Restricted to the user's approved, isolated native-verification branch.
+# No pull_request trigger, production secrets, deployment, or artifact upload.
+on:
+  push:
+    branches:
+      - codex/genie-android-native-check-20261123
+    paths:
+      - 'web/src/**'
+      - 'web/public/**'
+      - 'web/index.html'
+      - 'web/package*.json'
+      - 'web/*config.*'
+      - 'web/android/app/src/main/**'
+      - 'web/android/app/*.gradle'
+      - 'web/android/*.gradle'
+      - 'web/android/*.properties'
+      - 'web/android/gradle/**'
+      - 'web/android/gradlew*'
+      - 'web/scripts/android-native-smoke.mjs'
+      - 'web/scripts/android-packaged-assets.mjs'
+      - 'web/scripts/android-release*.mjs'
+      - 'web/scripts/android-bundle-identity.mjs'
+      - '.github/workflows/android-native-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: genie-android-native-check
+  cancel-in-progress: false
+
+jobs:
+  native-check:
+    if: >-
+      github.repository == 'jmpark0611-art/bestchoice' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/codex/genie-android-native-check-20261123'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: web
+        shell: bash
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24.22.3'
+      - name: Select the runner's existing Java 21 and Android SDK
+        run: |
+          test -x "${JAVA_HOME_21_X64}/bin/javac"
+          test -x "${JAVA_HOME_21_X64}/bin/jarsigner"
+          test -f "${ANDROID_HOME}/platforms/android-36/android.jar"
+          test -x "${ANDROID_HOME}/build-tools/35.0.0/aapt2"
+          printf 'JAVA_HOME=%s\n' "$JAVA_HOME_21_X64" >> "$GITHUB_ENV"
+          printf '%s/bin\n' "$JAVA_HOME_21_X64" >> "$GITHUB_PATH"
+          printf 'GRADLE_USER_HOME=%s/genie-native-gradle\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Install only the locked web dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Compile and verify a disposable Android bundle
+        run: node scripts/android-native-smoke.mjs --allow-dependency-downloads
+      - name: Publish the verification receipt in the job summary
+        if: success()
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const receipt = readFileSync('.genie-release/native-smoke-result.json', 'utf8');
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            '## Android native check\n\nSynthetic configuration and a deleted temporary signing key. This is not a store release.\n\n```json\n' + receipt + '\n```\n');
+          JS

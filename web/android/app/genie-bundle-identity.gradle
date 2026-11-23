@@ -1,0 +1,269 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.nio.file.StandardOpenOption
+import java.security.MessageDigest
+import java.util.zip.ZipFile
+
+// Read the final AAB with the protobuf classes already supplied by AGP. Never
+// add a dependency or fall back to source XML / expected configuration values.
+// Schema: https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/tools/aapt2/Resources.proto
+def genieIdentityProofFile = rootProject.file('genie-release-manifest.json')
+def genieIdentityBundleFile = rootProject.file('app/build/outputs/bundle/release/app-release.aab')
+def genieIdentityReceiptFile = rootProject.file('app/build/outputs/bundle/release/genie-bundle-identity.json')
+def genieIdentityManifestEntry = 'base/manifest/AndroidManifest.xml'
+def genieIdentityAndroidNamespace = 'http://schemas.android.com/apk/res/android'
+def genieIdentityResourceIds = [versionCode: 0x0101021b, versionName: 0x0101021c, versionCodeMajor: 0x01010576]
+
+def genieIdentityReject = { String code ->
+    // Codes are constants below; never print manifest contents, environment
+    // values, signing details, or an underlying exception's message/cause.
+    throw new GradleException("Android bundle identity verification failed (${code}). No verified identity receipt was written.")
+}
+def genieIdentityRegularFile = { File file ->
+    Files.isRegularFile(file.toPath(), LinkOption.NOFOLLOW_LINKS)
+}
+def genieIdentityReadSmallFile = { File file, int limit ->
+    if (!genieIdentityRegularFile(file) || Files.size(file.toPath()) > limit) {
+        genieIdentityReject('IDENTITY_INPUT_UNREADABLE')
+    }
+    byte[] bytes = file.withInputStream { stream -> stream.readNBytes(limit + 1) }
+    if (bytes.length == 0 || bytes.length > limit) genieIdentityReject('IDENTITY_INPUT_UNREADABLE')
+    bytes
+}
+def genieIdentityHashBytes = { byte[] bytes ->
+    MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString()
+}
+def genieIdentityHashFile = { File file ->
+    def digest = MessageDigest.getInstance('SHA-256')
+    file.withInputStream { stream ->
+        byte[] buffer = new byte[65536]
+        int count
+        while ((count = stream.read(buffer)) != -1) digest.update(buffer, 0, count)
+    }
+    digest.digest().encodeHex().toString()
+}
+def genieIdentityClearReceipt = {
+    try {
+        Files.deleteIfExists(genieIdentityReceiptFile.toPath())
+    } catch (Exception ignored) {
+        genieIdentityReject('IDENTITY_RECEIPT_CANNOT_CLEAR')
+    }
+}
+
+// Bind the post-build comparison to the prepared input present at configuration
+// time, as genie-release.gradle does for the release variant's identity.
+byte[] genieIdentityExpectedProof = null
+try {
+    genieIdentityExpectedProof = genieIdentityReadSmallFile(genieIdentityProofFile, 16 * 1024 * 1024)
+} catch (Exception ignored) {
+    // Preview/debug configuration remains usable without a release workspace.
+    // The verification task itself fails closed if this snapshot is missing.
+}
+
+def verifyGenieBundleIdentity = tasks.register('verifyGenieBundleIdentity') {
+    group = 'verification'
+    description = 'Verifies the final AAB package and versions against the prepared release identity.'
+    dependsOn 'bundleRelease'
+    outputs.upToDateWhen { false }
+
+    doLast {
+        try {
+            if (genieIdentityExpectedProof == null ||
+                    !Arrays.equals(genieIdentityExpectedProof, genieIdentityReadSmallFile(genieIdentityProofFile, 16 * 1024 * 1024))) {
+                genieIdentityReject('IDENTITY_RELEASE_INPUT_CHANGED_OR_MISSING')
+            }
+            def expected = new JsonSlurper().parseText(new String(genieIdentityExpectedProof, StandardCharsets.UTF_8))
+            def forbiddenSegments = ['preview', 'debug', 'test', 'demo', 'staging', 'localhost', 'example']
+            if (!(expected instanceof Map) || expected.schemaVersion != 1 || expected.profile != 'android-release' ||
+                    expected.status != 'prepared-not-native-validated' || expected.appName != '결정해지니' ||
+                    !(expected.applicationId instanceof String) || expected.applicationId.length() > 255 ||
+                    !(expected.applicationId ==~ /[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+/) ||
+                    expected.applicationId.tokenize('.').any { forbiddenSegments.contains(it) } ||
+                    expected.applicationId == 'dev.local' || expected.applicationId.startsWith('dev.local.') ||
+                    !(expected.versionCode instanceof Integer) || expected.versionCode < 1 || expected.versionCode > 2100000000 ||
+                    !(expected.versionName instanceof String) || !(expected.versionName ==~ /[\x21-\x7e]{1,40}/) ||
+                    expected.versionName.toLowerCase(Locale.ROOT).contains('preview') ||
+                    expected.versionName.toLowerCase(Locale.ROOT).contains('test')) {
+                genieIdentityReject('IDENTITY_RELEASE_INPUT_INVALID')
+            }
+            if (!genieIdentityRegularFile(genieIdentityBundleFile) || genieIdentityBundleFile.length() == 0) {
+                genieIdentityReject('IDENTITY_AAB_MISSING')
+            }
+
+            def parseXmlNode
+            try {
+                def androidPlugin = project.plugins.findPlugin('com.android.application')
+                if (androidPlugin == null) genieIdentityReject('IDENTITY_AGP_PROTOBUF_UNAVAILABLE')
+                def xmlNodeClass = Class.forName('com.android.aapt.Resources$XmlNode', true, androidPlugin.getClass().getClassLoader())
+                parseXmlNode = xmlNodeClass.getMethod('parseFrom', byte[].class)
+            } catch (Exception ignored) {
+                genieIdentityReject('IDENTITY_AGP_PROTOBUF_UNAVAILABLE')
+            } catch (LinkageError ignored) {
+                genieIdentityReject('IDENTITY_AGP_PROTOBUF_UNAVAILABLE')
+            }
+
+            String bundleSha256 = genieIdentityHashFile(genieIdentityBundleFile)
+            byte[] manifestBytes
+            int manifestLimit = 4 * 1024 * 1024
+            new ZipFile(genieIdentityBundleFile).withCloseable { archive ->
+                def entries = archive.entries()
+                def manifestEntry = null
+                while (entries.hasMoreElements()) {
+                    def entry = entries.nextElement()
+                    if (entry.name == genieIdentityManifestEntry) {
+                        if (manifestEntry != null) genieIdentityReject('IDENTITY_DUPLICATE_MANIFEST_ENTRY')
+                        manifestEntry = entry
+                    }
+                }
+                if (manifestEntry == null || manifestEntry.isDirectory()) genieIdentityReject('IDENTITY_MANIFEST_MISSING')
+                if (manifestEntry.size < 1 || manifestEntry.size > manifestLimit) genieIdentityReject('IDENTITY_MANIFEST_SIZE_INVALID')
+                manifestBytes = archive.getInputStream(manifestEntry).withCloseable { stream -> stream.readNBytes(manifestLimit + 1) }
+                if (manifestBytes.length != manifestEntry.size || manifestBytes.length > manifestLimit) {
+                    genieIdentityReject('IDENTITY_MANIFEST_SIZE_INVALID')
+                }
+            }
+            def node
+            try {
+                node = parseXmlNode.invoke(null, [manifestBytes] as Object[])
+            } catch (Exception ignored) {
+                genieIdentityReject('IDENTITY_MANIFEST_PROTO_INVALID')
+            }
+            if (!node.hasElement() || node.getElement().getName() != 'manifest' || node.getElement().getNamespaceUri() != '') {
+                genieIdentityReject('IDENTITY_MANIFEST_ROOT_INVALID')
+            }
+            def root = node.getElement()
+            def namespacePrefixes = new HashSet<String>()
+            root.getNamespaceDeclarationList().each { namespace ->
+                if (!namespacePrefixes.add(namespace.getPrefix()) || namespace.getUri().isEmpty() ||
+                        (namespace.getPrefix() == 'android' && namespace.getUri() != genieIdentityAndroidNamespace)) {
+                    genieIdentityReject('IDENTITY_NAMESPACE_INVALID')
+                }
+            }
+
+            def attributeKeys = new HashSet<List<String>>()
+            def resourceIds = new HashSet<Integer>()
+            def identityAttributes = [:]
+            root.getAttributeList().each { attribute ->
+                String name = attribute.getName()
+                String namespace = attribute.getNamespaceUri()
+                int resourceId = attribute.getResourceId()
+                if (!attributeKeys.add([namespace, name]) || (resourceId != 0 && !resourceIds.add(resourceId))) {
+                    genieIdentityReject('IDENTITY_DUPLICATE_ATTRIBUTE')
+                }
+                if (name == 'package') {
+                    if (namespace != '' || resourceId != 0) genieIdentityReject('IDENTITY_ATTRIBUTE_NAMESPACE_OR_ID_INVALID')
+                    identityAttributes[name] = attribute
+                } else if (genieIdentityResourceIds.containsKey(name)) {
+                    if (namespace != genieIdentityAndroidNamespace || resourceId != genieIdentityResourceIds[name]) {
+                        genieIdentityReject('IDENTITY_ATTRIBUTE_NAMESPACE_OR_ID_INVALID')
+                    }
+                    identityAttributes[name] = attribute
+                } else if (genieIdentityResourceIds.containsValue(resourceId)) {
+                    genieIdentityReject('IDENTITY_ATTRIBUTE_NAMESPACE_OR_ID_INVALID')
+                }
+            }
+            if (!['package', 'versionCode', 'versionName'].every { identityAttributes.containsKey(it) }) {
+                genieIdentityReject('IDENTITY_REQUIRED_ATTRIBUTE_MISSING')
+            }
+
+            def readLiteralString = { attribute ->
+                String raw = attribute.getValue()
+                if (!attribute.hasCompiledItem()) {
+                    if (raw.isEmpty()) genieIdentityReject('IDENTITY_STRING_VALUE_MISSING')
+                    return raw
+                }
+                def item = attribute.getCompiledItem()
+                if (item.getValueCase().name() != 'STR') genieIdentityReject('IDENTITY_STRING_TYPE_INVALID')
+                String compiled = item.getStr().getValue()
+                if (compiled.isEmpty()) genieIdentityReject('IDENTITY_STRING_VALUE_MISSING')
+                if (!raw.isEmpty() && raw != compiled) genieIdentityReject('IDENTITY_RAW_COMPILED_MISMATCH')
+                compiled
+            }
+            def readInteger = { attribute, boolean allowZero ->
+                if (!attribute.hasCompiledItem() || attribute.getCompiledItem().getValueCase().name() != 'PRIM') {
+                    genieIdentityReject('IDENTITY_INTEGER_TYPE_INVALID')
+                }
+                def primitive = attribute.getCompiledItem().getPrim()
+                String primitiveType = primitive.getOneofValueCase().name()
+                long compiled
+                if (primitiveType == 'INT_DECIMAL_VALUE') {
+                    compiled = primitive.getIntDecimalValue()
+                } else if (primitiveType == 'INT_HEXADECIMAL_VALUE') {
+                    compiled = Integer.toUnsignedLong(primitive.getIntHexadecimalValue())
+                } else {
+                    genieIdentityReject('IDENTITY_INTEGER_TYPE_INVALID')
+                }
+                if (compiled < (allowZero ? 0 : 1) || compiled > 2100000000L) genieIdentityReject('IDENTITY_INTEGER_RANGE_INVALID')
+                String raw = attribute.getValue()
+                if (!raw.isEmpty()) {
+                    long rawInteger
+                    if (raw ==~ /[0-9]{1,10}/) {
+                        rawInteger = Long.parseLong(raw, 10)
+                    } else if (raw ==~ /0[xX][0-9a-fA-F]{1,8}/) {
+                        rawInteger = Long.parseLong(raw.substring(2), 16)
+                    } else {
+                        genieIdentityReject('IDENTITY_INTEGER_RAW_INVALID')
+                    }
+                    if (rawInteger != compiled) genieIdentityReject('IDENTITY_RAW_COMPILED_MISMATCH')
+                }
+                (int) compiled
+            }
+            String applicationId = readLiteralString(identityAttributes['package'])
+            int versionCode = readInteger(identityAttributes['versionCode'], false)
+            String versionName = readLiteralString(identityAttributes['versionName'])
+            // A nonzero major part would change Android's longVersionCode even
+            // when the ordinary versionCode agrees with the prepared input.
+            if (identityAttributes.containsKey('versionCodeMajor') && readInteger(identityAttributes['versionCodeMajor'], true) != 0) {
+                genieIdentityReject('IDENTITY_VERSION_CODE_MAJOR_UNSUPPORTED')
+            }
+            if (applicationId != expected.applicationId || versionCode != expected.versionCode || versionName != expected.versionName) {
+                genieIdentityReject('IDENTITY_RELEASE_INPUT_MISMATCH')
+            }
+            if (!genieIdentityRegularFile(genieIdentityBundleFile) || genieIdentityHashFile(genieIdentityBundleFile) != bundleSha256) {
+                genieIdentityReject('IDENTITY_AAB_CHANGED_DURING_VERIFICATION')
+            }
+            if (!Arrays.equals(genieIdentityExpectedProof, genieIdentityReadSmallFile(genieIdentityProofFile, 16 * 1024 * 1024))) {
+                genieIdentityReject('IDENTITY_RELEASE_INPUT_CHANGED_OR_MISSING')
+            }
+
+            def receipt = [
+                schemaVersion: 1,
+                status: 'verified-final-aab-manifest-identity',
+                file: 'app/build/outputs/bundle/release/app-release.aab',
+                manifestEntry: genieIdentityManifestEntry,
+                applicationId: applicationId,
+                versionCode: versionCode,
+                versionName: versionName,
+                sha256: bundleSha256,
+                manifestSha256: genieIdentityHashBytes(manifestBytes),
+                releaseManifestSha256: genieIdentityHashBytes(genieIdentityExpectedProof),
+            ]
+            try {
+                byte[] report = (JsonOutput.prettyPrint(JsonOutput.toJson(receipt)) + '\n').getBytes(StandardCharsets.UTF_8)
+                Files.write(genieIdentityReceiptFile.toPath(), report, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
+            } catch (Exception ignored) {
+                genieIdentityReject('IDENTITY_RECEIPT_WRITE_FAILED')
+            }
+            logger.lifecycle('Android bundle identity matches the prepared release inputs.')
+        } catch (GradleException failure) {
+            genieIdentityClearReceipt()
+            throw failure
+        } catch (Exception ignored) {
+            genieIdentityClearReceipt()
+            genieIdentityReject('IDENTITY_INPUT_OR_MANIFEST_INVALID')
+        } catch (LinkageError ignored) {
+            genieIdentityClearReceipt()
+            genieIdentityReject('IDENTITY_AGP_PROTOBUF_UNAVAILABLE')
+        }
+    }
+}
+
+// A failed bundleRelease dependency must not leave a previous success receipt.
+// Only touch this task's exact output when this verification is in the graph.
+// Release callers explicitly disable configuration cache for fresh verification.
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(verifyGenieBundleIdentity.get())) genieIdentityClearReceipt()
+}

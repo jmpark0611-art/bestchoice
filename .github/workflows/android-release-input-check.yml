@@ -1,0 +1,79 @@
+name: Genie published Android inputs (read only)
+
+on:
+  push:
+    branches:
+      - codex/genie-android-native-check-20261123
+    paths:
+      - '.github/workflows/android-release-input-check.yml'
+      - 'web/ANDROID-RELEASE-PROFILE.json'
+
+permissions:
+  contents: read
+
+jobs:
+  public-inputs:
+    if: >-
+      github.repository == 'jmpark0611-art/bestchoice' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/codex/genie-android-native-check-20261123'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.22.3'
+      - name: Read static published inputs and compare the confirmed fingerprint
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          import { createHash } from 'node:crypto';
+          const hash = value => createHash('sha256').update(value).digest('hex');
+          const origin = 'https://genie-web-rosy.vercel.app';
+          let stage = 'profile';
+          try {
+            const p = JSON.parse(readFileSync('web/ANDROID-RELEASE-PROFILE.json', 'utf8'));
+            if (p.publicAppUrl !== origin || p.supabaseUrl !== 'https://njrtcxohbkfgrgwhlvua.supabase.co' ||
+                !/^[a-f0-9]{64}$/.test(p.publishableKeySha256)) throw new Error('PROFILE_MISMATCH');
+            const read = async (url, kind, limit) => {
+              const r = await fetch(url, { method: 'GET', redirect: 'error', signal: AbortSignal.timeout(15000) });
+              if (!r.ok || r.url !== url || !r.headers.get('content-type')?.includes(kind) || !r.body) throw new Error('STATIC_READ_FAILED');
+              const reader = r.body.getReader(), chunks = []; let total = 0;
+              try {
+                for (;;) { const { done, value } = await reader.read(); if (done) break;
+                  total += value.length; if (total > limit) throw new Error('STATIC_FILE_TOO_LARGE'); chunks.push(value); }
+              } finally { await reader.cancel().catch(() => {}); }
+              return Buffer.concat(chunks).toString('utf8');
+            };
+            stage = 'static-html';
+            const html = await read(origin + '/', 'html', 1024 * 1024);
+            const urls = new Set();
+            for (const m of html.matchAll(/<script\b[^>]*\bsrc\s*=\s*(['"])(.*?)\1[^>]*>/gi)) {
+              const url = new URL(m[2], origin + '/');
+              if (url.origin !== origin || url.search || url.hash || !/^\/assets\/[A-Za-z0-9_.-]+\.js$/.test(url.pathname)) throw new Error('STATIC_PATH_REJECTED');
+              urls.add(url.href);
+            }
+            if (!urls.size || urls.size > 8) throw new Error('STATIC_SCRIPTS_MISSING');
+            stage = 'static-javascript';
+            const bodies = [html], sources = [];
+            for (const url of urls) { const body = await read(url, 'javascript', 4 * 1024 * 1024);
+              bodies.push(body); sources.push({ path: new URL(url).pathname, sha256: hash(body) }); }
+            stage = 'client-fingerprint';
+            const matches = new Set();
+            for (const body of bodies) for (const [key] of body.matchAll(/sb_publishable_[A-Za-z0-9_-]{20,200}/g)) {
+              if (hash(key) === p.publishableKeySha256) matches.add(key);
+            }
+            if (matches.size !== 1 || !bodies.some(s => s.replaceAll('\\/', '/').includes(p.supabaseUrl))) throw new Error('CLIENT_FINGERPRINT_MISMATCH');
+            console.log('GENIE_PUBLISHED_INPUT_RECEIPT ' + JSON.stringify({ status: 'published-client-fingerprint-matched',
+              sourceCommit: process.env.GITHUB_SHA, applicationId: p.applicationId, versionCode: p.versionCode,
+              versionName: p.versionName, publishableKeySha256: p.publishableKeySha256,
+              htmlSha256: hash(html), sources, staticGetOnly: true, appExecuted: false, backendContacted: false,
+              keyWrittenToRepositoryOrLogs: false, artifactUploaded: false }));
+          } catch {
+            console.error('Published Android input check stopped at ' + stage + '. No client key or response body was logged.');
+            process.exitCode = 1;
+          }
+          JS

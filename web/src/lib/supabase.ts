@@ -13,12 +13,26 @@ export function getSupabase(): SupabaseClient {
 }
 
 /** 세션이 없으면 익명 로그인. 투표하러 온 친구도 가입 없이 이 방식으로 한 표를 가진다 */
-export async function ensureSession(): Promise<string> {
-  const sb = getSupabase();
-  const { data, error: sessionError } = await sb.auth.getSession();
-  if (sessionError) throw sessionError;
-  if (data.session) return data.session.access_token;
-  const { data: signed, error } = await sb.auth.signInAnonymously();
+export async function getExistingSessionToken(): Promise<string | null> {
+  const { data, error } = await getSupabase().auth.getSession();
+  if (error) throw error;
+  return data.session?.access_token ?? null;
+}
+
+async function loadSession(): Promise<string> {
+  const existing = await getExistingSessionToken();
+  if (existing !== null) return existing;
+  const { data: signed, error } = await getSupabase().auth.signInAnonymously();
   if (error || !signed.session) throw error ?? new Error('익명 로그인 실패');
   return signed.session.access_token;
+}
+
+
+// Concurrent operations that need authentication share one anonymous login.
+let pendingSession: Promise<string> | null = null;
+export function ensureSession(): Promise<string> {
+  if (!pendingSession) {
+    pendingSession = loadSession().finally(() => { pendingSession = null; });
+  }
+  return pendingSession;
 }

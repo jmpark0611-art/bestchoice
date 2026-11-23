@@ -1,0 +1,739 @@
+{
+  "schemaVersion": 1,
+  "status": "operational-apply-cancelled-verified-unapplied-cors-login-required",
+  "recordedAtUtc": "2026-11-23T16:55:47.827588Z",
+  "candidateSourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
+  "buildOnlyBranch": "codex/genie-android-native-check-20261123",
+  "candidateInputs": {
+    "applicationId": "com.jmpark0611.genie",
+    "versionCode": 1,
+    "versionName": "1.0.0",
+    "publicConfiguration": {
+      "supabaseUrl": "https://njrtcxohbkfgrgwhlvua.supabase.co",
+      "publicAppUrl": "https://genie-web-rosy.vercel.app",
+      "publishableKeySha256": "04918d6318b6028779b25e77fc1289cb9dda9e982842d7783ee9ef6f6fb6de21"
+    },
+    "playRegistrationConfirmed": false
+  },
+  "actualInputPreparation": {
+    "manifestRecordedStatus": "prepared-not-native-validated",
+    "preparedAt": "2026-11-23T13:29:42.225Z",
+    "sourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
+    "preparationManifestSha256": "170a46f09bf1961a9beabe9cf99360ecf4fa6144655101016c5b7a170cbf3f01",
+    "sourceFileCount": 159,
+    "assetFileCount": 184,
+    "nativeFileCount": 69,
+    "typecheckPassed": true,
+    "freshWebBuildPassed": true,
+    "androidSyncPassed": true,
+    "preparedFilesVerified": true,
+    "backendContacted": false,
+    "subsequentNativeBuildVerified": true,
+    "verificationRunId": 45184417729
+  },
+  "signedReleaseCandidate": {
+    "status": "signed-ugc-candidate-production-readiness-blocked",
+    "deliveredFile": "Genie-Android-1.0.0-1-ugc-candidate.aab",
+    "verificationFile": "Genie-Android-1.0.0-1-ugc-verification.json",
+    "sizeBytes": 4161285,
+    "sha256": "347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3",
+    "brandingIncluded": true,
+    "questionSafetyIncluded": true,
+    "nativeBuild": {
+      "runId": 45184417729,
+      "runAttempt": 1,
+      "jobId": 137726190042,
+      "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45184417729",
+      "sourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
+      "conclusion": "success",
+      "nativeCompilation": true,
+      "unsignedVerified": true,
+      "packagedAssetsMatch": true,
+      "finalBinaryManifestIdentityVerified": true,
+      "sourceSnapshotVerified": true,
+      "productionSigningKeyUsedInCi": false,
+      "backendContacted": false
+    },
+    "unsignedDelivery": {
+      "artifactId": 14822942425,
+      "artifactSha256": "28f0da202b14b0ee1e9bdd18cda0041bf8e809930c87d54461b1b45c192a55a4",
+      "sizeBytes": 4171378,
+      "retentionDays": 1,
+      "unsignedAabSha256": "277cf7d22e72e1055021a1f0b2cc5947d60e27b1060eef4415e0630df3470fa3",
+      "unsignedArtifactUploaded": true,
+      "privateSigningKeyUploaded": false,
+      "ciTemporaryFilesDeleted": true
+    },
+    "localSigningReceipt": {
+      "schemaVersion": 1,
+      "status": "signed-awaiting-device-and-store-review",
+      "repository": "jmpark0611-art/bestchoice",
+      "sourceRef": "refs/heads/codex/genie-android-native-check-20261123",
+      "sourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
+      "runId": "45184417729",
+      "runAttempt": "1",
+      "artifactSha256": "28f0da202b14b0ee1e9bdd18cda0041bf8e809930c87d54461b1b45c192a55a4",
+      "applicationId": "com.jmpark0611.genie",
+      "versionCode": 1,
+      "versionName": "1.0.0",
+      "file": "app-release-signed.aab",
+      "sha256": "347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3",
+      "unsignedAabSha256": "277cf7d22e72e1055021a1f0b2cc5947d60e27b1060eef4415e0630df3470fa3",
+      "manifestSha256": "162678b2a3ba55c256eb282b5ccb716c7dc92c7654e1a772a6289db877bf90de",
+      "originalIdentityReceiptSha256": "779b939f79a915b40b96b555a61e1bb30c8c5dac2fb905e9de9b36c5e8d46029",
+      "releaseManifestSha256": "170a46f09bf1961a9beabe9cf99360ecf4fa6144655101016c5b7a170cbf3f01",
+      "signerCertificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+      "signatureVerified": true,
+      "payloadUnchanged": true,
+      "binaryManifestIdentityPreserved": true,
+      "binaryManifestReparsed": false,
+      "artifactUploaded": false,
+      "storeSubmission": false
+    },
+    "signedReleaseDeviceValidated": false,
+    "physicalDeviceValidated": false,
+    "operationalBackendValidated": false,
+    "storeSubmitted": false
+  },
+  "uploadKey": {
+    "status": "used-for-verified-release-aab-not-registered-in-play",
+    "algorithm": "RSA",
+    "keySize": 3072,
+    "validityDays": 10000,
+    "certificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+    "privateBackupVerified": true,
+    "freshJarSignAndVerifyPassed": true,
+    "registeredInPlayConsole": false,
+    "usedToSignReleaseAab": true
+  },
+  "storeAssets": {
+    "status": "render-verified-local-assets-not-uploaded-to-play",
+    "icon": {
+      "file": "genie-play-icon.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA"
+    },
+    "featureGraphic": {
+      "file": "genie-play-feature.png",
+      "width": 1024,
+      "height": 500,
+      "mode": "RGB"
+    },
+    "phoneScreenshotsReady": false,
+    "playUploaded": false
+  },
+  "isolatedBackendBaseline": {
+    "status": "passed",
+    "runId": 45163032169,
+    "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45163032169",
+    "sourceCommit": "2448544bb6601d4ac5154cd9bfa39722a009f248",
+    "sourceScope": "qa-only-follow-up-not-the-signed-aab-source",
+    "completedAtUtc": "2026-11-23T11:13:19Z",
+    "focusedChecksPassed": 34,
+    "realAnonymousSessions": 2,
+    "realLocalAuthPostgrestAndEdge": true,
+    "decisionShareVoteAuthorTallyAndDeletionVerified": true,
+    "deterministicAiFixture": true,
+    "modelApiCalled": false,
+    "externalNetworkBlockVerified": true,
+    "disposableCleanupVerified": true,
+    "operationalBackendValidated": false
+  },
+  "reportingIntegration": {
+    "status": "passed-disposable-local-only-not-production",
+    "runId": 45166205966,
+    "jobId": 137663686487,
+    "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45166205966",
+    "sourceCommit": "fff40a925c09183cecee01ff2855f5213a04c91a",
+    "sourceScope": "seven-qa-files-only-follow-up-not-the-signed-aab-source",
+    "workflowConclusion": "success",
+    "receiptRecordedAtUtc": "2026-11-23T11:33:57.989Z",
+    "cleanupRecordedAtUtc": "2026-11-23T11:33:58.045Z",
+    "guardTests": {
+      "passed": 41,
+      "failed": 0
+    },
+    "scope": "disposable-local-http-and-concurrent-idempotency-check",
+    "proposalSha256": "c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c",
+    "actualLocalRpcValidated": true,
+    "actualHttp": true,
+    "syntheticSessions": 3,
+    "checks": {
+      "anonymousDenied": true,
+      "preVoteDenied": true,
+      "foreignOwnerDenied": true,
+      "privateHttpSchemaDenied": true,
+      "directPostgresRoleDenialsVerified": true,
+      "roleTransactionRolledBack": true,
+      "ownerReceiptVerified": true,
+      "votedGuestReceiptVerified": true,
+      "parallelHttpRequests": 2,
+      "identicalServerReceipts": true,
+      "ownerRows": 1,
+      "ownerQuota": 1,
+      "globalQuota": 1,
+      "changedPayloadAndMissingConsentDenied": true,
+      "rowsAfterSourceDeletion": 0,
+      "quotasRetained": true,
+      "baselineTwoSessionFlowPassed": true
+    },
+    "modelApiCalled": false,
+    "hostedSupabaseUsed": false,
+    "productionFilesChanged": false,
+    "disposableCleanupVerified": true,
+    "proxiesClosed": true,
+    "productionRpcApplied": false,
+    "operationalReportingReviewActivated": false,
+    "operationalBackendValidated": false,
+    "signedCandidateRebuiltOrChanged": false
+  },
+  "androidDeviceValidation": {
+    "status": "four-android-emulator-fixture-cases-passed-not-a-release",
+    "runId": 45164565371,
+    "jobId": 137658074050,
+    "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45164565371",
+    "workflowConclusion": "success",
+    "receiptLoggedAtUtc": "2026-11-23T11:25:35Z",
+    "sourceCommit": "d59e5d946f4ad45f8cc0dd72115bffd4ea4dbdde",
+    "sourceScope": "qa-driver-only-follow-up-not-the-signed-aab-source",
+    "applicationId": "dev.local.genie.preview",
+    "fixtureOnly": true,
+    "debugApkSha256": "f0f5c75b0a9af7cbaccce62d8c1baee931e16712ad5c3499b0b77d6f847cc7df",
+    "instrumentationApkSha256": "d3932d2e1fa899ae9de3b37f8edcc3a39cac11b4b2610aadcdb0f2486771d4bb",
+    "apiLevel": 36,
+    "emulatorVersion": "37.3.10.0",
+    "webViewVersion": "133.0.6943.137",
+    "driverGuardTests": {
+      "passed": 14,
+      "failed": 0
+    },
+    "cases": [
+      {
+        "caseId": "launch",
+        "passed": true,
+        "origin": "https://localhost"
+      },
+      {
+        "caseId": "native-back",
+        "passed": true,
+        "from": "/about",
+        "to": "/",
+        "actualOsTouchUsed": true,
+        "systemAction": "GLOBAL_ACTION_BACK"
+      },
+      {
+        "caseId": "narrow-screen",
+        "passed": true,
+        "width": 320,
+        "scrollWidth": 320,
+        "outside": 0,
+        "visibleControls": 18
+      },
+      {
+        "caseId": "draft-restore-after-force-stop",
+        "passed": true,
+        "explicitRestoreRequired": true,
+        "exactFieldsRestored": [
+          "a",
+          "b",
+          "note"
+        ]
+      }
+    ],
+    "allFourCasesPassed": true,
+    "forceStopConfirmed": true,
+    "externalNetwork": "blocked-by-loopback-only-network-namespace",
+    "disposableAvdAndDebugKeyRemoved": true,
+    "failureArtifactStep": "skipped",
+    "artifacts": [],
+    "signedReleaseNotTested": true,
+    "signedReleaseDeviceValidated": false,
+    "physicalDeviceTested": false,
+    "physicalDeviceValidated": false,
+    "backendContacted": false,
+    "operationalBackendValidated": false
+  },
+  "protectedRemoteState": {
+    "checkedAtUtc": "2026-11-23T11:09:49Z",
+    "method": "read-only-remote-head-and-hash-mode-comparison",
+    "protectedBranchHeadCount": 4,
+    "protectedBranchHeadsUnchanged": true,
+    "protectedFileCount": 62,
+    "protectedFileHashesAndModesUnchanged": true,
+    "protectedPaths": [
+      "app/",
+      "supabase/functions/",
+      "supabase/migrations/",
+      "AGENTS.md",
+      "web/vercel.json"
+    ],
+    "protectedBranchHeads": {
+      "claude/bestchoice-miniapp-dev-ar5jtm": "470dba663677f0df7fbc3c07843b0371758b7f32",
+      "codex/genie-v7-release-candidate-20261120": "6cb0b24748dae152e66f8f4639506dba53b618cf",
+      "codex/result-card-sharing": "302ad90767d5bc73c65b354ff1c082bfbc8aa3c2",
+      "codex/review-remote-ai": "1c3485bd646421a1a929c5a61109667d42817572"
+    }
+  },
+  "remainingBlockers": [
+    {
+      "code": "ANDROID_NATIVE_ORIGIN_REJECTED",
+      "evidenceRunId": 45183387009,
+      "httpStatus": 403,
+      "error": "ORIGIN_DENIED",
+      "next": "Operational scope authorized. Dashboard authentication and authoritative current VS_ALLOWED_ORIGINS still required; preserve current origins and add exactly https://localhost."
+    },
+    {
+      "code": "OPERATIONAL_MIGRATION_APPLY_CANCELLED",
+      "proposalSources": [
+        "supabase/proposals/vs-report-result.sql",
+        "supabase/proposals/vs-question-safety.sql"
+      ],
+      "next": "Prepared exact CLI-generated migrations passed narrow checks. Confirm resumption of the cancelled apply, re-read history/collisions, then apply once and reconcile actual remote versions.",
+      "evidence": "qa/production-server-preparation-2026-11-24.json"
+    },
+    {
+      "code": "SHARED_WEB_CANDIDATE_INTEGRATION_UNVERIFIED",
+      "currentProductionWebCommit": "470dba663677f0df7fbc3c07843b0371758b7f32",
+      "next": "Coordinate guarded client and public policy rollout after server readiness."
+    },
+    {
+      "code": "PUBLIC_PRIVACY_DATA_HANDLING_AND_TARGET_AGE_NOT_FINAL",
+      "next": "Finalize provider/log/retention/deletion facts, public HTML policy and intended target age before Console answers."
+    },
+    {
+      "code": "EXACT_CANDIDATE_DEVICE_AND_PHONE_SCREENSHOTS_PENDING",
+      "qaApkAvailable": true,
+      "next": "Use an approved isolated device; QA payload/signature verification does not prove installed app behavior."
+    },
+    {
+      "code": "PLAY_CONSOLE_ACCESS_AUTOMATIC_REVIEW_BLOCKED",
+      "next": "Use a separately permitted verified Console route; no credentials or store submission attempted."
+    }
+  ],
+  "scope": {
+    "releaseAabCreated": true,
+    "releaseAabSignedAndVerified": true,
+    "isolatedBackendValidated": true,
+    "actualBackendValidated": false,
+    "signedReleaseDeviceValidated": false,
+    "physicalDeviceValidated": false,
+    "newToolsAndIsolatedEnvironmentAlreadyAuthorized": true,
+    "existing83FullAppSuiteRepeated": false,
+    "storeSubmission": false,
+    "productionDataWrites": false,
+    "productionSettingsChanged": false,
+    "productionDeployment": false,
+    "existingSupabaseFilesChanged": false,
+    "newPaidResourcesCreated": false,
+    "protectedBranchHeadsUnchanged": true,
+    "protectedFileHashesAndModesUnchanged": true,
+    "isolatedAndroidEmulatorValidated": true,
+    "releaseDeviceValidationComplete": false,
+    "isolatedReportingValidated": true,
+    "isolatedQuestionSafetyValidated": true,
+    "qaApkCreatedAndPayloadVerified": true,
+    "productionReadOnlyPreflightPerformed": true,
+    "productionApplicationDataWrites": false
+  },
+  "history": [
+    {
+      "kind": "superseded-preparation-snapshot",
+      "snapshot": {
+        "schemaVersion": 1,
+        "status": "prepared-awaiting-private-native-build-isolated-server-and-device",
+        "recordedAtUtc": "2026-11-23T07:20:02.544952+00:00",
+        "localSourceCommit": "5ffd7d46fb22c5da1a5a61405d563f5cd5c4f023",
+        "reviewedRemoteCommit": "022bbd56881066c4bb12a2916dda77ad1e3a2028",
+        "buildOnlyBranch": "codex/genie-android-native-check-20261123",
+        "candidateInputs": {
+          "applicationId": "com.jmpark0611.genie",
+          "versionCode": 1,
+          "versionName": "1.0.0",
+          "publicConfiguration": {
+            "supabaseUrl": "https://njrtcxohbkfgrgwhlvua.supabase.co",
+            "publicAppUrl": "https://genie-web-rosy.vercel.app",
+            "publishableKeySha256": "04918d6318b6028779b25e77fc1289cb9dda9e982842d7783ee9ef6f6fb6de21"
+          },
+          "playRegistrationConfirmed": false
+        },
+        "actualInputPreparation": {
+          "status": "prepared-not-native-validated",
+          "preparedAt": "2026-11-23T07:12:49.712Z",
+          "preparationManifestSha256": "702b95d634683b929be793103d83cd775ba37084556959795c75d7a7b8c67bd3",
+          "sourceFileCount": 135,
+          "assetFileCount": 183,
+          "typecheckPassed": true,
+          "freshWebBuildPassed": true,
+          "androidSyncPassed": true,
+          "preparedFilesVerified": true,
+          "backendContacted": false,
+          "nativeBuildRun": false
+        },
+        "uploadKey": {
+          "status": "generated-and-signature-verified-not-registered",
+          "algorithm": "RSA",
+          "keySize": 3072,
+          "validityDays": 10000,
+          "certificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+          "privateBackupVerified": true,
+          "freshJarSignAndVerifyPassed": true,
+          "registeredInPlayConsole": false,
+          "usedToSignReleaseAab": false
+        },
+        "localFocusedChecks": {
+          "bundleIdentityReceiptTestsPassed": 10,
+          "releaseAndSmokeOrchestrationTestsPassed": 5,
+          "localIntegrationHarnessTestsPassed": 24,
+          "injectedOrSyntheticOnly": true,
+          "existingFullAppSuiteRepeated": false
+        },
+        "newNativeIdentityRun": {
+          "runId": 45129704040,
+          "jobId": 137542148987,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45129704040",
+          "status": "completed",
+          "syntheticInputsOnly": true,
+          "conclusion": "success",
+          "completedAtUtc": "2026-11-23T07:16:58Z",
+          "artifactCount": 0,
+          "gradle": "8.14.3",
+          "gradleBuildDuration": "1m36s",
+          "executedTaskCount": 121,
+          "receipt": {
+            "status": "native-check-passed-not-a-release",
+            "sourceCommit": "022bbd56881066c4bb12a2916dda77ad1e3a2028",
+            "node": "v24.22.3",
+            "javac": "javac 21.0.13",
+            "configuredApplicationId": "kr.synthfixture.genie",
+            "versionCode": 12,
+            "versionName": "1.2.0",
+            "aabSha256": "9fc479c2c5ba4316f15395bad0a5cc013faced75b5e0ab6a9595c425248a3206",
+            "nativeCompilation": true,
+            "signatureVerified": true,
+            "packagedAssetsMatch": true,
+            "libraryAssetsVerified": {
+              "base/assets/native-bridge.js": "02dfc17bd41d1e5d0748f7f6c48aa9f2a3e624bb3677df488db466fbc93f2246"
+            },
+            "finalBinaryManifestIdentityVerified": true,
+            "finalApplicationId": "kr.synthfixture.genie",
+            "finalVersionCode": 12,
+            "finalVersionName": "1.2.0",
+            "finalManifestSha256": "1d51b2d36531c6bd0e411e37832e94caca524de23d16729d40b78f6e3a2dc4f2",
+            "syntheticConfigurationOnly": true,
+            "backendContacted": false,
+            "appOrDeviceLaunched": false,
+            "storeSubmission": false,
+            "productionSigningKeyUsed": false,
+            "generatedKeyAndAabDeleted": true
+          }
+        },
+        "remainingBlockers": [
+          {
+            "code": "ANDROID_SDK_MISSING",
+            "scope": "private-release-build",
+            "observed": true
+          },
+          {
+            "code": "GRADLE_CACHE_MISSING",
+            "scope": "private-release-build",
+            "observed": true
+          },
+          {
+            "code": "APPROVED_LOCAL_SUPABASE_NOT_RUNNING",
+            "endpoint": "http://127.0.0.1:55321",
+            "listenerObserved": false
+          },
+          {
+            "code": "ANDROID_DEVICE_OR_EMULATOR_NOT_AVAILABLE",
+            "adbAvailable": false,
+            "deviceRunPerformed": false
+          },
+          {
+            "code": "SHARED_WEB_CANDIDATE_INTEGRATION_UNVERIFIED",
+            "currentProductionWebCommit": "470dba663677f0df7fbc3c07843b0371758b7f32"
+          }
+        ],
+        "scope": {
+          "releaseAabCreated": false,
+          "realBackendValidationPerformed": false,
+          "deviceValidationPerformed": false,
+          "storeSubmission": false,
+          "productionDataWrites": false,
+          "productionSettingsChanged": false,
+          "productionDeployment": false,
+          "existingSupabaseFilesChanged": false,
+          "newPaidResourcesCreated": false,
+          "otherRemoteFilesPreserved": 223,
+          "defaultAndWebCandidateBranchesUnchanged": true
+        }
+      }
+    },
+    {
+      "kind": "previous-branded-candidate-before-ugc",
+      "recordedAtUtc": "2026-11-23T11:35:27Z",
+      "candidateSourceCommit": "959836f6a19bc4729d49b20237092384a2417728",
+      "actualInputPreparation": {
+        "manifestRecordedStatus": "prepared-not-native-validated",
+        "preparedAt": "2026-11-23T11:08:04.136Z",
+        "sourceCommit": "959836f6a19bc4729d49b20237092384a2417728",
+        "preparationManifestSha256": "5888f0d28b76eec1ad59a7eaddd3fe2c2d15fe8bbaf514735b7cee2757aa9ba6",
+        "sourceFileCount": 147,
+        "assetFileCount": 184,
+        "nativeFileCount": 69,
+        "typecheckPassed": true,
+        "freshWebBuildPassed": true,
+        "androidSyncPassed": true,
+        "preparedFilesVerified": true,
+        "backendContacted": false,
+        "subsequentNativeBuildVerified": true,
+        "verificationRunId": 45162298044
+      },
+      "signedReleaseCandidate": {
+        "status": "signed-awaiting-device-and-store-review",
+        "deliveredFile": "Genie-Android-1.0.0-1-candidate.aab",
+        "verificationFile": "Genie-Android-1.0.0-1-verification.json",
+        "sizeBytes": 4158468,
+        "sha256": "c737b458e8e606bd616ee5f5b8698ac6e2ca886d04c474e3a47a1a2fffddb56c",
+        "brandingIncluded": true,
+        "nativeBuild": {
+          "runId": 45162298044,
+          "runAttempt": 1,
+          "jobId": 137650483659,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45162298044",
+          "sourceCommit": "959836f6a19bc4729d49b20237092384a2417728",
+          "conclusion": "success",
+          "nativeCompilation": true,
+          "unsignedVerified": true,
+          "packagedAssetsMatch": true,
+          "finalBinaryManifestIdentityVerified": true,
+          "sourceSnapshotVerified": true,
+          "productionSigningKeyUsedInCi": false,
+          "backendContacted": false
+        },
+        "unsignedDelivery": {
+          "artifactId": 14810724317,
+          "artifactSha256": "ef7cbbeaa6daa3b8d965661d225e77e817b572c3963484da1ed1224e9fc3aad6",
+          "sizeBytes": 4166735,
+          "retentionDays": 1,
+          "unsignedAabSha256": "bbef80c3dd9806bde081e533a0ac9f4d573c54cf130d3b8908b5f6268ba49bd8",
+          "unsignedArtifactUploaded": true,
+          "privateSigningKeyUploaded": false,
+          "ciTemporaryFilesDeleted": true
+        },
+        "localSigningReceipt": {
+          "schemaVersion": 1,
+          "status": "signed-awaiting-device-and-store-review",
+          "repository": "jmpark0611-art/bestchoice",
+          "sourceRef": "refs/heads/codex/genie-android-native-check-20261123",
+          "sourceCommit": "959836f6a19bc4729d49b20237092384a2417728",
+          "runId": "45162298044",
+          "runAttempt": "1",
+          "artifactSha256": "ef7cbbeaa6daa3b8d965661d225e77e817b572c3963484da1ed1224e9fc3aad6",
+          "applicationId": "com.jmpark0611.genie",
+          "versionCode": 1,
+          "versionName": "1.0.0",
+          "file": "app-release-signed.aab",
+          "sha256": "c737b458e8e606bd616ee5f5b8698ac6e2ca886d04c474e3a47a1a2fffddb56c",
+          "unsignedAabSha256": "bbef80c3dd9806bde081e533a0ac9f4d573c54cf130d3b8908b5f6268ba49bd8",
+          "manifestSha256": "162678b2a3ba55c256eb282b5ccb716c7dc92c7654e1a772a6289db877bf90de",
+          "originalIdentityReceiptSha256": "c7c9a714fdd481f464513e24a7b02446847ab36b9707744712f33642b8074af2",
+          "releaseManifestSha256": "5888f0d28b76eec1ad59a7eaddd3fe2c2d15fe8bbaf514735b7cee2757aa9ba6",
+          "signerCertificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+          "signatureVerified": true,
+          "payloadUnchanged": true,
+          "binaryManifestIdentityPreserved": true,
+          "binaryManifestReparsed": false,
+          "artifactUploaded": false,
+          "storeSubmission": false
+        },
+        "signedReleaseDeviceValidated": false,
+        "physicalDeviceValidated": false,
+        "operationalBackendValidated": false,
+        "storeSubmitted": false
+      }
+    }
+  ],
+  "qaInstallablePackage": {
+    "schemaVersion": 1,
+    "status": "qa-resigned-apk-from-exact-candidate-not-device-verified",
+    "sourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
+    "candidateAabSha256": "347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3",
+    "candidateAabSignerCertificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+    "candidateAabSignatureVerified": true,
+    "applicationId": "com.jmpark0611.genie",
+    "versionCode": "1",
+    "versionName": "1.0.0",
+    "candidateManifestIdentityVerified": true,
+    "apkManifestIdentityVerified": true,
+    "file": "Genie-Android-candidate-QA.apk",
+    "sha256": "8fafa2908355ac1fed1c024ff2908c85e8cd721c9a28667ecf170807874f5cf8",
+    "sizeBytes": 4305320,
+    "bundletool": {
+      "version": "1.18.3",
+      "sizeBytes": 32520401,
+      "sha256": "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29",
+      "sourceCommit": "586a43a450712a1067f3d92cf7574dee68226302",
+      "releaseUrl": "https://github.com/google/bundletool/releases/tag/1.18.3"
+    },
+    "payload": {
+      "payloadMatch": true,
+      "assets": 185,
+      "dex": 1,
+      "nativeLibraries": 0,
+      "baselineProfiles": 2
+    },
+    "apkSignature": {
+      "verified": true,
+      "manifestIdentityVerified": true,
+      "debuggable": false,
+      "signerCertificateSha256": "32c7b92e805536d96cbfb977ea16e48c32f61fb5d04eac00a5342cdb80167baf",
+      "v1": false,
+      "v2": true,
+      "v3": true
+    },
+    "qaSigningKeyEphemeral": true,
+    "originalUploadKeyRead": false,
+    "apkUsesOriginalUploadSigner": false,
+    "playSigningIdentityVerified": false,
+    "deviceInstalled": false,
+    "appLaunched": false,
+    "nativeShareVerified": false,
+    "clipboardDenialVerified": false,
+    "deviceScreenshotsCaptured": false,
+    "backendContacted": false,
+    "uploaded": false,
+    "storeSubmitted": false,
+    "qaSigningKeyRemoved": true
+  },
+  "questionSafetyIntegration": {
+    "status": "passed-actual-disposable-http-not-production",
+    "runId": 45183793270,
+    "jobId": 137724044227,
+    "sourceCommit": "eeb87ed8dd5a05800aba5eb4c49fdc701b64151d",
+    "guardTestsPassed": 49,
+    "receiptRecordedAtUtc": "2026-11-23T13:26:37.4770233Z",
+    "cleanupConfirmedAtUtc": "2026-11-23T13:26:37.5410725Z",
+    "receiptFile": "qa/question-safety-http-2026-11-23.json",
+    "checks": {
+      "actualHttp": true,
+      "syntheticSessions": 3,
+      "syntheticPolls": 2,
+      "anonymousNewRpcsDenied": 5,
+      "preVoteQuestionReportReceived": true,
+      "hiddenAiResultRemainsHiddenAfterReport": true,
+      "ownerAndUnknownLinkDenied": true,
+      "directHttpPrivateSchemaDenied": true,
+      "parallelHttpRequests": 2,
+      "identicalServerReceipts": true,
+      "rowsAndUserAndGlobalQuotaAfterParallel": 1,
+      "consentAndChangedPayloadDenied": true,
+      "postVoteQuestionReportReceived": true,
+      "userDailyLimitVerified": 10,
+      "idempotentRetryAtLimitVerified": true,
+      "authorBlockIdempotent": true,
+      "otherAuthorLinksBlocked": true,
+      "blockedVoteDidNotWrite": true,
+      "otherUserUnaffected": true,
+      "selfBlockDenied": true,
+      "sameLinkUnblockVerified": true,
+      "sourceDeletionCascadesReportsOnly": true,
+      "quotaRetainedAfterSourceDeletion": true,
+      "authorBlockSurvivesSourceDeletion": true,
+      "clearAllOwnBlocksAfterLinkDeletion": true,
+      "clearAllLeavesOtherUsersBlocks": true,
+      "allDatabaseSchedulesClaimed": false,
+      "legacyRpcsChanged": false,
+      "legacyClientsCanBypassPreference": true,
+      "globalQuotaBoundaryHttpTested": false,
+      "blockCapBoundaryHttpTested": false,
+      "verified": true,
+      "sourceSha256": "b1394b91284d6882238570afa28f2b8c8290652679cd63564ac81f651c855dba",
+      "directPostgresRoleDenialsVerified": true,
+      "roleCheckTransactionRolledBack": true,
+      "appliedOnlyToDisposableDatabase": true
+    },
+    "modelCalled": false,
+    "hostedProjectContacted": false,
+    "disposableResourcesDeleted": true,
+    "productionApplied": false
+  },
+  "focusedUiVerification": {
+    "sourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
+    "node": "24.22.3",
+    "typecheckPassed": true,
+    "reportApiComponentVoteAndExistingAuditPassed": 50,
+    "questionPermissionMessageCasePassed": 1,
+    "newPolicyApiAndShareGatePassed": 10,
+    "existingSharingCasesPassed": 5,
+    "existingReportRoutingCasesPassed": 4,
+    "previous83FullAppSuiteRepeated": false,
+    "newSqlPGliteGroupsPassed": 11,
+    "pgliteVersion": "0.5.17",
+    "pglitePostgresVersion": "18.7",
+    "newHttpHelperInjectedTestsPassed": 7,
+    "changedRuntimeCasesPassed": 5
+  },
+  "productionReadOnlyCors": {
+    "record": "qa/native-cors-read-2026-11-23.json",
+    "sourceCommit": "d9ffb9ad80783e7cec01e6ff8b772e021f91e38d",
+    "checkedAtUtc": "2026-11-23T13:23:23.788Z",
+    "method": "OPTIONS",
+    "bodySent": false,
+    "authenticationSent": false,
+    "applicationDataWritten": false,
+    "modelCalled": false,
+    "invocationScope": "deployed-preflight-only-not-an-integration-test",
+    "results": [
+      {
+        "client": "android",
+        "origin": "https://localhost",
+        "httpStatus": 403,
+        "allowedOrigin": null,
+        "postAllowed": true,
+        "requiredHeadersAllowed": true,
+        "knownError": "ORIGIN_DENIED",
+        "preflightAllowed": false
+      },
+      {
+        "client": "existing-web",
+        "origin": "https://genie-web-rosy.vercel.app",
+        "httpStatus": 204,
+        "allowedOrigin": "https://genie-web-rosy.vercel.app",
+        "postAllowed": true,
+        "requiredHeadersAllowed": true,
+        "knownError": null,
+        "preflightAllowed": true
+      }
+    ]
+  },
+  "productionMetadataReadOnly": {
+    "record": "qa/operational-readiness-2026-11-23.json",
+    "existingNineVsFunctionsMatchedCanonical": true,
+    "lastFivePurgeCronRunsSucceeded": true,
+    "productionAiReportRpcAbsent": true,
+    "productionDataRead": false,
+    "productionWrites": false
+  },
+  "playConsoleAccess": {
+    "status": "blocked-by-automatic-approval-review",
+    "requestedOrigin": "https://play.google.com",
+    "rejectedRedirectOrigin": "https://google.play",
+    "accountViewed": false,
+    "loginPerformed": false,
+    "appRegistered": false,
+    "storeSubmitted": false,
+    "bypassAttempted": false
+  },
+  "operationalMigrationPreparation": {
+    "record": "qa/production-server-preparation-2026-11-24.json",
+    "cliFilesCreated": true,
+    "narrowChecksPassed": 8,
+    "userOperationalAuthorizationReceived": true,
+    "firstApplyResult": "aborted by user after 2390.4s",
+    "productionApplied": false,
+    "newObjectsAbsentVerified": true,
+    "automaticRetry": false,
+    "corsChanged": false
+  }
+}

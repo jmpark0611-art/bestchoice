@@ -1,0 +1,180 @@
+{
+  "recordedAtUtc": "2026-11-23T13:26:37.4770233Z",
+  "repository": "jmpark0611-art/bestchoice",
+  "branch": "codex/genie-android-native-check-20261123",
+  "runId": 45183793270,
+  "jobId": 137724044227,
+  "conclusion": "success",
+  "guardTestsPassed": 49,
+  "cleanupConfirmedAtUtc": "2026-11-23T13:26:37.5410725Z",
+  "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45183793270",
+  "receipt": {
+    "status": "local-supabase-integration-passed-not-a-release",
+    "sourceCommit": "eeb87ed8dd5a05800aba5eb4c49fdc701b64151d",
+    "cliVersion": "3.2.0",
+    "cliArchiveSha256": "fb88b175a817563505be02c60872060bcb8d5c869a1aa5656eaeb085d4a2f1e4",
+    "dockerVersion": "28.0.4",
+    "node": "v24.22.3",
+    "approvedOrigin": "http://127.0.0.1:55321",
+    "schemaSha256": "a11c228c811cf8f04030a6507755863a4a3c6a771f86caa5268db59c77a136f1",
+    "fixtureHashes": {
+      "vs-decide/index.ts": "551873443d4fca3f1aa2ab86aa07c302f9f4b0b837a1ef0ecfd70f3bd8c28b67",
+      "vs-decide/fixture.mjs": "9ad05b9b26906bc3fa508eaef0f9f8a4e8c003d0da6c9ac7297ef948c883627b"
+    },
+    "serviceImages": {
+      "public.ecr.aws/supabase/postgres:17.12.0.000": {
+        "id": "sha256:3becc5088e9fa402400aaa9c8823f19af3140bd01c92de0cb75b477bf1cdbd35",
+        "digests": [
+          "public.ecr.aws/supabase/postgres@sha256:8630950b489ecc70563300180287a98c192a4a48f5ae00b4febdaeea1abe85de"
+        ]
+      },
+      "public.ecr.aws/supabase/gotrue:v2.198.0": {
+        "id": "sha256:68f9d8079dbfc35e784a97faeb39e36918aa662e3f1b5ea326cdda5c4b042993",
+        "digests": [
+          "public.ecr.aws/supabase/gotrue@sha256:ba8c0c82c574756c835c696df2a2c698020cc408a42034013d3712e34de7964d"
+        ]
+      },
+      "public.ecr.aws/supabase/postgrest:v16.5": {
+        "id": "sha256:f9bffe857637b7f388451218ce8f10d8718b91952a4585c79a9f3c7c701df508",
+        "digests": [
+          "public.ecr.aws/supabase/postgrest@sha256:1347d7552b88f17832912c06afbf7c43209af6eeeb60834b04aae12c9bd9d5cc"
+        ]
+      },
+      "public.ecr.aws/supabase/kong:2.8.1": {
+        "id": "sha256:3cefb958bcd694597b65adc00053a762b1f9a6df3c6031af528d052d75a64e1a",
+        "digests": [
+          "public.ecr.aws/supabase/kong@sha256:1b53405d8680a09d6f44494b7990bf7da2ea43f84a258c59717d4539abf09f6d"
+        ]
+      },
+      "public.ecr.aws/supabase/edge-runtime:v1.79.1": {
+        "id": "sha256:a46dc36d6c993ccc4f5657608d3bd8b179076668758072973b3e69d4724f4e5c",
+        "digests": [
+          "public.ecr.aws/supabase/edge-runtime@sha256:185b4039d8e8ffe0a3a41b425bd299a51100a590d04e05aa4c2be1d66d09cb5d"
+        ]
+      },
+      "node:24.22.3-bookworm-slim": {
+        "id": "sha256:5ba3c1ded6eada2ea16582327a87c672fb3889fca362ee3ac0d78ed742b583c0",
+        "digests": [
+          "node@sha256:dc26ae92c9fb15cf6b1d63e20f0944b2efe0f115b20e00be48fb23fceb061c54"
+        ]
+      }
+    },
+    "networkProof": [
+      {
+        "phase": "core-network",
+        "internal": true,
+        "hostBlocked": true,
+        "otherNetworkBlocked": true,
+        "externalNameLookupFailed": true,
+        "upstreamDns": "container-loopback-only"
+      },
+      {
+        "phase": "edge-network",
+        "internal": true,
+        "hostBlocked": true,
+        "otherNetworkBlocked": true,
+        "externalNameLookupFailed": true,
+        "upstreamDns": "container-loopback-only"
+      }
+    ],
+    "loopbackProxies": [
+      {
+        "service": "db",
+        "host": "127.0.0.1",
+        "port": 55322,
+        "listening": true,
+        "target": {
+          "containerId": "c609fcd70b8bed4f3d27ebc54111764ca2b52e3a6363b45e377d9cf36aac9282",
+          "ip": "172.30.240.2",
+          "port": 5432
+        },
+        "forwardedConnections": 2,
+        "missingTargetConnections": 0,
+        "connectFailures": 2
+      },
+      {
+        "service": "kong",
+        "host": "127.0.0.1",
+        "port": 55321,
+        "listening": true,
+        "target": {
+          "containerId": "8dcda969d7b8857bdc6e51d9d0685eacdc1651bc22fe966c58bb3e9b442d5e82",
+          "ip": "172.30.240.3",
+          "port": 8000
+        },
+        "forwardedConnections": 3,
+        "missingTargetConnections": 2,
+        "connectFailures": 0
+      }
+    ],
+    "loopbackProxiesClosed": true,
+    "realLocalAuthPostgrestAndEdge": true,
+    "twoSessionFlowVerified": true,
+    "reportingProposal": {
+      "actualHttp": true,
+      "syntheticSessions": 3,
+      "anonymousRpcDenied": true,
+      "preVoteAndForeignOwnerDenied": true,
+      "directHttpPrivateSchemaDenied": true,
+      "ownerAndVotedGuestReceipts": true,
+      "parallelHttpRequests": 2,
+      "identicalServerReceipts": true,
+      "ownerRowsAfterParallel": 1,
+      "ownerQuotaAfterParallel": 1,
+      "globalQuotaAfterParallel": 1,
+      "changedPayloadAndMissingConsentDenied": true,
+      "rowsAfterSourceDeletion": 0,
+      "quotasRetainedAfterDeletion": true,
+      "allDatabaseSchedulesClaimed": false,
+      "verified": true,
+      "sourceSha256": "c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c",
+      "directPostgresRoleDenialsVerified": true,
+      "roleCheckTransactionRolledBack": true,
+      "appliedOnlyToDisposableDatabase": true
+    },
+    "questionSafetyProposal": {
+      "actualHttp": true,
+      "syntheticSessions": 3,
+      "syntheticPolls": 2,
+      "anonymousNewRpcsDenied": 5,
+      "preVoteQuestionReportReceived": true,
+      "hiddenAiResultRemainsHiddenAfterReport": true,
+      "ownerAndUnknownLinkDenied": true,
+      "directHttpPrivateSchemaDenied": true,
+      "parallelHttpRequests": 2,
+      "identicalServerReceipts": true,
+      "rowsAndUserAndGlobalQuotaAfterParallel": 1,
+      "consentAndChangedPayloadDenied": true,
+      "postVoteQuestionReportReceived": true,
+      "userDailyLimitVerified": 10,
+      "idempotentRetryAtLimitVerified": true,
+      "authorBlockIdempotent": true,
+      "otherAuthorLinksBlocked": true,
+      "blockedVoteDidNotWrite": true,
+      "otherUserUnaffected": true,
+      "selfBlockDenied": true,
+      "sameLinkUnblockVerified": true,
+      "sourceDeletionCascadesReportsOnly": true,
+      "quotaRetainedAfterSourceDeletion": true,
+      "authorBlockSurvivesSourceDeletion": true,
+      "clearAllOwnBlocksAfterLinkDeletion": true,
+      "clearAllLeavesOtherUsersBlocks": true,
+      "allDatabaseSchedulesClaimed": false,
+      "legacyRpcsChanged": false,
+      "legacyClientsCanBypassPreference": true,
+      "globalQuotaBoundaryHttpTested": false,
+      "blockCapBoundaryHttpTested": false,
+      "verified": true,
+      "sourceSha256": "b1394b91284d6882238570afa28f2b8c8290652679cd63564ac81f651c855dba",
+      "directPostgresRoleDenialsVerified": true,
+      "roleCheckTransactionRolledBack": true,
+      "appliedOnlyToDisposableDatabase": true
+    },
+    "modelCalled": false,
+    "hostedProjectContacted": false,
+    "productionFilesChanged": false,
+    "nativeDeviceVerified": false,
+    "storeSubmitted": false,
+    "disposableResourcesDeleted": true
+  }
+}

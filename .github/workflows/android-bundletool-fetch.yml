@@ -1,0 +1,103 @@
+name: Genie official Bundletool fetch (no app inputs)
+
+# Retrieve the unmodified public tool only. No checkout, app bundle, signing
+# key, deployment, paid runner, cache, or Android SDK license acceptance.
+on:
+  push:
+    branches:
+      - codex/genie-android-native-check-20261123
+    paths:
+      - '.github/workflows/android-bundletool-fetch.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: genie-official-bundletool-fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch-public-tool:
+    if: >-
+      github.repository == 'jmpark0611-art/bestchoice' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/codex/genie-android-native-check-20261123'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24.22.3'
+      - name: Download and verify the exact official public tool
+        run: |
+          test -x "${JAVA_HOME_21_X64}/bin/java"
+          work="${RUNNER_TEMP}/genie-bundletool-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          test ! -e "$work"
+          mkdir -m 700 "$work"
+          printf 'GENIE_BUNDLETOOL_WORK=%s\n' "$work" >> "$GITHUB_ENV"
+          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --max-time 180 \
+            https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar \
+            --output "$work/bundletool-all-1.18.3.jar"
+          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --max-time 60 \
+            https://raw.githubusercontent.com/google/bundletool/586a43a450712a1067f3d92cf7574dee68226302/LICENSE \
+            --output "$work/LICENSE"
+          GENIE_BUNDLETOOL_WORK="$work" node --input-type=module <<'JS'
+          import { createHash } from 'node:crypto';
+          import { lstatSync, readFileSync, readdirSync, chmodSync, appendFileSync } from 'node:fs';
+          import { spawnSync } from 'node:child_process';
+          import path from 'node:path';
+          const work = process.env.GENIE_BUNDLETOOL_WORK;
+          if (!path.isAbsolute(work) || path.dirname(work) !== process.env.RUNNER_TEMP ||
+              !/^genie-bundletool-[0-9]+-[0-9]+$/.test(path.basename(work)) ||
+              !lstatSync(work).isDirectory() || lstatSync(work).isSymbolicLink()) throw new Error('TOOL_WORKSPACE_INVALID');
+          if (JSON.stringify(readdirSync(work).sort()) !== JSON.stringify(['LICENSE', 'bundletool-all-1.18.3.jar'])) throw new Error('TOOL_ALLOWLIST_MISMATCH');
+          for (const name of readdirSync(work)) {
+            const file = path.join(work, name);
+            if (!lstatSync(file).isFile() || lstatSync(file).isSymbolicLink()) throw new Error('TOOL_FILE_INVALID');
+            chmodSync(file, 0o400);
+          }
+          const jar = readFileSync(path.join(work, 'bundletool-all-1.18.3.jar'));
+          const expected = 'a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29';
+          if (jar.length !== 32520401 || createHash('sha256').update(jar).digest('hex') !== expected) throw new Error('OFFICIAL_TOOL_DIGEST_MISMATCH');
+          const license = readFileSync(path.join(work, 'LICENSE'));
+          const licenseBlob = createHash('sha1').update(`blob ${license.length}\0`).update(license).digest('hex');
+          if (licenseBlob !== 'd645695673349e3947e8e5ae42332d0ac3164cd7') throw new Error('OFFICIAL_LICENSE_MISMATCH');
+          const version = spawnSync(path.join(process.env.JAVA_HOME_21_X64, 'bin/java'),
+            ['-jar', path.join(work, 'bundletool-all-1.18.3.jar'), 'version'],
+            { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000 });
+          if (version.status !== 0 || version.stdout.trim() !== '1.18.3') throw new Error('TOOL_VERSION_MISMATCH');
+          const receipt = { version: '1.18.3', sha256: expected, sizeBytes: jar.length,
+            upstreamCommit: '586a43a450712a1067f3d92cf7574dee68226302',
+            license: 'Apache-2.0', licenseGitBlob: licenseBlob, upstreamNoticeFile: false,
+            appSourcePresent: false, candidateBundlePresent: false, signingKeyPresent: false };
+          console.log(JSON.stringify(receipt));
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## Official Bundletool only\n\n```json\n' + JSON.stringify(receipt, null, 2) + '\n```\n');
+          JS
+      - name: Keep only the unchanged public JAR and its upstream license for one day
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: genie-official-bundletool-1.18.3-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.GENIE_BUNDLETOOL_WORK }}/bundletool-all-1.18.3.jar
+            ${{ env.GENIE_BUNDLETOOL_WORK }}/LICENSE
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 1
+          compression-level: 0
+          overwrite: false
+      - name: Remove this run's public tool copies
+        if: always()
+        run: |
+          node --input-type=module <<'JS'
+          import { existsSync, lstatSync, rmSync } from 'node:fs';
+          import path from 'node:path';
+          const work = process.env.GENIE_BUNDLETOOL_WORK;
+          if (!work || !existsSync(work)) process.exit(0);
+          if (!path.isAbsolute(work) || path.dirname(work) !== process.env.RUNNER_TEMP ||
+              !/^genie-bundletool-[0-9]+-[0-9]+$/.test(path.basename(work)) || lstatSync(work).isSymbolicLink()) throw new Error('TOOL_CLEANUP_REFUSED');
+          rmSync(work, { recursive: true });
+          JS

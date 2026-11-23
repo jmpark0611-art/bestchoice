@@ -1,0 +1,807 @@
+{
+  "schemaVersion": 1,
+  "kind": "genie-play-submission-preparation-not-google-import-format",
+  "status": "prepared-not-submitted-signed-ugc-candidate-confirmed",
+  "recordedAtUtc": "2026-11-23T13:36:30.776244+00:00",
+  "displayTimeZone": "Asia/Seoul",
+  "readyToSubmit": false,
+  "consoleOpenedOrChanged": false,
+  "nullMeaning": "Unresolved; never interpret as a No answer.",
+  "candidate": {
+    "appName": "결정해지니",
+    "applicationId": "com.jmpark0611.genie",
+    "versionCode": 1,
+    "versionName": "1.0.0",
+    "sourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
+    "status": "signed-ugc-candidate-confirmed-not-store-ready",
+    "file": "Genie-Android-1.0.0-1-ugc-candidate.aab",
+    "sizeBytes": 4161285,
+    "sha256": "347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3",
+    "nativeBuildRunId": 45184417729,
+    "ugcFollowUpIncludedInSource": true,
+    "signedArtifactConfirmed": true,
+    "candidateChangedByThisPacket": false,
+    "refreshIfRuntimeOrPublicPolicyLinkChanges": true,
+    "exactSignedCandidateDeviceValidated": false,
+    "physicalDeviceValidated": false,
+    "previousArtifactMustNotBeTreatedAsThisCandidate": true,
+    "nativeBuildJobId": 137726190042,
+    "nativeBuildConclusion": "success",
+    "nativeBuildRunUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45184417729",
+    "preparation": {
+      "sourceFiles": 159,
+      "webAssets": 184,
+      "nativeFiles": 69,
+      "preparedAtUtc": "2026-11-23T13:29:42.225Z"
+    },
+    "verificationFile": "Genie-Android-1.0.0-1-ugc-verification.json",
+    "ugcFollowUpIncludedInSignedArtifact": true,
+    "signedJarVerified": true,
+    "nonSignaturePayloadUnchanged": true,
+    "sameUploadCertificateAsPreviousCandidate": true,
+    "qaApkConversionStatus": "completed-qa-resigned-payload-verified-not-device-validation",
+    "operationalBackendValidated": false,
+    "qaApkFile": "Genie-Android-candidate-QA.apk",
+    "qaApkSha256": "8fafa2908355ac1fed1c024ff2908c85e8cd721c9a28667ecf170807874f5cf8",
+    "qaApkSizeBytes": 4305320,
+    "candidateManifestReparsedDuringQaConversion": true,
+    "apkManifestIdentityVerified": true,
+    "qaApkUsesUploadSigner": false,
+    "originalLocalSigningReceiptBinaryManifestReparsed": false
+  },
+  "previousCandidate": {
+    "appName": "결정해지니",
+    "applicationId": "com.jmpark0611.genie",
+    "versionCode": 1,
+    "versionName": "1.0.0",
+    "sourceCommit": "959836f6a19bc4729d49b20237092384a2417728",
+    "file": "Genie-Android-1.0.0-1-candidate.aab",
+    "sizeBytes": 4158468,
+    "sha256": "c737b458e8e606bd616ee5f5b8698ac6e2ca886d04c474e3a47a1a2fffddb56c",
+    "candidateChangedByThisPacket": false,
+    "refreshIfRuntimeOrPublicPolicyLinkChanges": true,
+    "localFollowUpRequiresNewCandidate": true,
+    "localFollowUpIncludedInRecordedSignedAab": false,
+    "status": "previous-signed-candidate-does-not-include-ugc-follow-up",
+    "nativeExportRunId": 45162298044,
+    "nativeExportJobId": 137650483659,
+    "evidence": "ANDROID-RELEASE-PROFILE.json and the previously verified candidate receipt"
+  },
+  "operator": {
+    "name": "에스제이컴퍼니",
+    "representative": "박지민",
+    "supportEmail": "jmpark0611@gmail.com",
+    "source": "src/screens/AboutScreen.tsx"
+  },
+  "storeListing": {
+    "appName": {
+      "value": "결정해지니",
+      "status": "prepared"
+    },
+    "defaultLanguage": {
+      "value": "ko-KR",
+      "status": "prepared-draft"
+    },
+    "appOrGame": {
+      "value": "app",
+      "status": "prepared"
+    },
+    "category": {
+      "value": "Productivity",
+      "status": "feature-based-proposal"
+    },
+    "shortDescription": {
+      "value": "두 선택지와 중요한 기준을 적고, AI 제안과 친구 투표를 참고해 내 선택을 정리하세요.",
+      "characterCount": 49,
+      "status": "prepared-existing-copy"
+    },
+    "fullDescription": {
+      "value": null,
+      "sourceDocument": "PLAY-STORE-PREPARATION.md",
+      "sourceSection": "상세 설명",
+      "status": "use-existing-copy-after-release-gates"
+    },
+    "supportEmail": {
+      "value": "jmpark0611@gmail.com",
+      "status": "prepared"
+    },
+    "supportWebsite": {
+      "value": "https://genie-web-rosy.vercel.app",
+      "status": "existing-public-app-url-not-privacy-policy"
+    },
+    "privacyPolicyUrl": {
+      "value": null,
+      "status": "public-html-and-in-app-access-required"
+    },
+    "containsAds": {
+      "value": false,
+      "status": "current-candidate-code-verified"
+    },
+    "inAppPurchasesOrSubscriptions": {
+      "value": false,
+      "status": "no-billing-sdk-permission-screen-or-payment-flow"
+    },
+    "downloadPriceAndCountries": {
+      "value": null,
+      "status": "not-configured-by-this-packet",
+      "newUserQuestionAdded": false
+    },
+    "releaseNotes": {
+      "locale": "ko-KR",
+      "text": "결정해지니 첫 버전입니다.\n두 선택지와 중요한 기준으로 AI 제안을 받고, 친구 투표와 함께 내 선택을 정리할 수 있어요.\n실제 선택을 기록하고, 이 기기에 초안과 회고를 보관할 수 있어요.",
+      "status": "draft"
+    },
+    "assets": {
+      "icon": "genie-play-icon.png",
+      "featureGraphic": "genie-play-feature.png",
+      "phoneScreenshots": null,
+      "phoneScreenshotsReady": false
+    }
+  },
+  "contentRatingFacts": {
+    "userWrittenContentVisibleToOthers": true,
+    "linkSharingAndVotes": true,
+    "aiGeneratedText": true,
+    "publicFeed": false,
+    "userSearch": false,
+    "comments": false,
+    "directMessages": false,
+    "voiceOrVideoChat": false,
+    "contactUploads": false,
+    "ads": false,
+    "inAppPurchases": false,
+    "cashPrizesOrGambling": false,
+    "locationFeatures": false,
+    "ageRating": null,
+    "status": "facts-for-actual-questionnaire-not-a-rating",
+    "moderationFullyOperational": false
+  },
+  "dataSafety": {
+    "collectsOrSharesUserData": {
+      "value": true,
+      "status": "confirmed-collection"
+    },
+    "encryptedInTransit": {
+      "value": true,
+      "status": "confirmed-code-paths-revalidate-final-configuration",
+      "basis": "HTTPS app-to-Supabase and deployed Edge-to-OpenAI; not a complete operational app-flow claim."
+    },
+    "userCanRequestDataDeletion": {
+      "value": null,
+      "status": "individual-decision-and-local-deletion-exist-full-request-scope-unconfirmed"
+    },
+    "accountCreation": {
+      "value": false,
+      "status": "code-based-interpretation-of-user-facing-account-definition",
+      "basis": "No registration, password, linked login, cross-device recovery or account UI; an internal anonymous Auth user is automatically created.",
+      "automaticAnonymousAuthUserCreated": true,
+      "userFacingAccountCreatedByUser": false,
+      "explicitAnonymousAuthExemptionClaimed": false,
+      "doesNotChangeUserIdsCollection": true,
+      "accountDeletionFeatureDeclaredRequired": false,
+      "reassessIfLinkedOrRecoverableAccountsAdded": true,
+      "policySource": "G3"
+    },
+    "independentSecurityReview": {
+      "value": false,
+      "status": "no-external-accredited-security-review"
+    },
+    "collectedTypes": [
+      {
+        "category": "Personal info",
+        "type": "User IDs",
+        "collected": true,
+        "required": true,
+        "processedEphemerally": false,
+        "purposes": [
+          "App functionality",
+          "Account management",
+          "Fraud prevention, security, and compliance"
+        ],
+        "examples": [
+          "Supabase anonymous user UUID",
+          "authenticated author/voter linkage"
+        ],
+        "evidence": [
+          "src/lib/supabase.ts",
+          "src/lib/api.ts",
+          "qa/operational-readiness-2026-11-23.md"
+        ],
+        "status": "implementation-based-declaration-draft",
+        "shared": null,
+        "sharingStatus": "verify-provider-role-and-any-user-initiated-sharing-exemption"
+      },
+      {
+        "category": "App activity",
+        "type": "Other user-generated content",
+        "collected": true,
+        "required": true,
+        "processedEphemerally": false,
+        "purposes": [
+          "App functionality",
+          "Fraud prevention, security, and compliance"
+        ],
+        "examples": [
+          "option A and B",
+          "criterion plus note",
+          "explicit report details when operational reporting is enabled"
+        ],
+        "requiredReason": "The main decision feature requires A/B text even though note and report details are optional.",
+        "securityPurposeScope": "AI safety/report handling; reporting RPC is not yet deployed.",
+        "evidence": [
+          "src/lib/api.ts",
+          "src/lib/decisionCriteria.ts",
+          "src/lib/decisionReports.ts",
+          "qa/operational-readiness-2026-11-23.md"
+        ],
+        "status": "implementation-based-declaration-draft",
+        "shared": null,
+        "sharingStatus": "verify-provider-role-and-any-user-initiated-sharing-exemption"
+      },
+      {
+        "category": "App activity",
+        "type": "Other actions",
+        "collected": true,
+        "required": false,
+        "processedEphemerally": false,
+        "purposes": [
+          "App functionality",
+          "Fraud prevention, security, and compliance"
+        ],
+        "examples": [
+          "guest vote",
+          "author actual choice",
+          "sharing and explicit report action",
+          "author block/unblock in the follow-up candidate"
+        ],
+        "optionalReason": "The main AI decision can be used without voting, sharing, setting an actual choice or reporting.",
+        "securityPurposeScope": "Report handling and author block/unblock when the new contracts are enabled.",
+        "evidence": [
+          "src/lib/api.ts",
+          "src/lib/decisionReports.ts"
+        ],
+        "status": "implementation-based-declaration-draft",
+        "shared": null,
+        "sharingStatus": "verify-provider-role-and-any-user-initiated-sharing-exemption"
+      },
+      {
+        "category": "App activity",
+        "type": "App interactions",
+        "collected": true,
+        "required": true,
+        "processedEphemerally": false,
+        "purposes": [
+          "App functionality",
+          "Fraud prevention, security, and compliance"
+        ],
+        "examples": [
+          "per-user daily decision count and date",
+          "report quota when reporting is enabled"
+        ],
+        "notAnalyticsAssumption": true,
+        "evidence": [
+          "qa/operational-readiness-2026-11-23.md",
+          "supabase/proposals/vs-report-result.sql"
+        ],
+        "status": "implementation-based-declaration-draft",
+        "shared": null,
+        "sharingStatus": "verify-provider-role-and-any-user-initiated-sharing-exemption"
+      }
+    ],
+    "localOnlyExcluded": [
+      "unsubmitted home draft",
+      "reflection and reflection draft",
+      "saved default criterion before it is included in a decision request",
+      "local history search text",
+      "shared-content policy version and accepted flag"
+    ],
+    "notImplementedAsStructuredCollection": [
+      "name",
+      "email address",
+      "phone number",
+      "location",
+      "contacts",
+      "photo or video upload",
+      "audio recording",
+      "files or documents upload",
+      "calendar",
+      "health or fitness record",
+      "payment details"
+    ],
+    "unconfirmedInfrastructureLogTypes": [
+      "Device or other IDs",
+      "Crash logs",
+      "Diagnostics"
+    ],
+    "logReviewNeeded": "Confirm actual IP/UA/error/performance fields, purposes and retention before making a global non-collection statement. Do not infer location collection solely from IP presence.",
+    "advertisingOrMarketingPurposeConfirmed": false,
+    "analyticsPurposeConfirmed": false,
+    "dataSharing": {
+      "defaultAnswer": null,
+      "serviceProviderExceptionConfirmed": false,
+      "userInitiatedLinkShareExceptionToEvaluate": true,
+      "anonymousUserIdIsNotFullyAnonymized": true,
+      "policySource": "G2"
+    },
+    "contentPolicyAcknowledgment": {
+      "version": "shared-content-v1",
+      "fields": [
+        "version",
+        "accepted"
+      ],
+      "storedOnDeviceOnly": true,
+      "containsQuestionOrUserId": false,
+      "serverRequestForThisRecord": false,
+      "storageDenialDoesNotGrantConsent": true,
+      "includedInRecordedSignedCandidate": true
+    }
+  },
+  "providerProcessing": {
+    "evidenceSource": "qa/operational-readiness-2026-11-23.md",
+    "deployedFunction": "vs-decide",
+    "deployedVersion": 2,
+    "status": "ACTIVE",
+    "provider": "OpenAI",
+    "endpoint": "https://api.openai.com/v1/responses",
+    "inputFields": [
+      "a",
+      "b",
+      "note"
+    ],
+    "noteMayBeNull": true,
+    "store": false,
+    "maxOutputTokens": 400,
+    "actualModel": null,
+    "modelSource": "server environment OPENAI_MODEL; value not inspected",
+    "userUuidSentToProvider": false,
+    "voterIdSentToProvider": false,
+    "userJwtSentToProvider": false,
+    "explicitFunctionLogs": [
+      "event",
+      "model",
+      "promptVersion"
+    ],
+    "explicitFunctionLogsUserContentOrIdOrToken": false,
+    "platformLogContentsOrRetentionVerified": false,
+    "providerRetentionTrainingAndContractTermsVerified": false,
+    "storeFalseDoesNotMeanNoRetentionEverywhere": true
+  },
+  "deletionAndRetention": {
+    "individualDecisionDeletionImplemented": true,
+    "decisionVotesCascade": true,
+    "localRelatedDraftAndReflectionCleanupImplemented": true,
+    "allLocalDraftsAndReflectionsDeletionControls": true,
+    "anonymousAuthUserDeletedByCurrentDeleteOrPurge": false,
+    "accountWideDeletionClaimed": false,
+    "publicDeletionRequestUrl": null,
+    "decisionPurge": {
+      "condition": "created_at older than two calendar months",
+      "cronActive": true,
+      "scheduleUtc": "10 18 * * *",
+      "scheduleKst": "03:10 every day",
+      "recentSuccessfulRunsObserved": 5,
+      "latestObservedSuccessfulRunAtUtc": "2026-11-22T18:10:00.113912Z",
+      "latestObservedSuccessfulRunAtKst": "2026-11-23T03:10:00.113912+09:00",
+      "notExactAnniversaryDeletion": true
+    },
+    "decisionQuotaPurge": {
+      "condition": "UTC date older than seven days",
+      "coveredTables": [
+        "vs_user_limits",
+        "vs_daily_total"
+      ]
+    },
+    "authLogsBackupsAndProviderRetention": null,
+    "dataDeletionVsAccountDeletionSeparated": true
+  },
+  "appAccess": {
+    "status": "prepared-for-confirmed-signed-ugc-candidate-operational-and-device-access-pending-not-submitted",
+    "credentialRequired": false,
+    "username": null,
+    "password": null,
+    "otp": null,
+    "precreatedReviewerAccount": null,
+    "sessionType": "automatic anonymous session",
+    "accessConditions": [
+      "Owner records require the same app session.",
+      "Guest AI result and totals are visible only after a vote."
+    ],
+    "instructions": [
+      {
+        "number": 1,
+        "title": "Start and create a decision",
+        "language": "en",
+        "text": "No username, password, OTP or payment is required. The app creates an anonymous session. Keep this app's data until review is complete. Enter Tea in A and Coffee in B, then tap 딱 정해줘 (Decide). If 빠른 결정 (Quick mode) is enabled, tap 빠르게 결정하기. The result shows an AI choice and reason. Do not use personal information in test inputs.",
+        "characterCount": 330
+      },
+      {
+        "number": 2,
+        "title": "Share and vote with a separate session",
+        "language": "en",
+        "text": "In the owner app, tap 친구한테 물어보기. If prompted, read the policy, check 공유 콘텐츠 이용정책을 확인했고 동의해요., and tap 동의하고 공유하기. Copy the link (링크 복사). Open it in a separate browser/private session. Before voting only the question is shown; tap an option to see AI results and totals. Return to the owner app and tap 새로 고침. The owner cannot vote on this decision.",
+        "characterCount": 347
+      },
+      {
+        "number": 3,
+        "title": "Report the AI result",
+        "language": "en",
+        "text": "Before voting, tap 질문 신고 to report the question; AI 답변 신고 is available after voting or to the owner. Select 다른 문제가 있어요, enter Google Play review - synthetic report, tap 보낼 내용 확인, review, consent and tap 신고 보내기. Confirm the receipt ID. If the result is uncertain, use 같은 신고 다시 보내기. The preview only shows information available in that screen.",
+        "characterCount": 341
+      },
+      {
+        "number": 4,
+        "title": "Actual choice and local reflection",
+        "language": "en",
+        "text": "In the owner app, select an option under 그래서, 뭘로 했어요? (Actual choice). After saving, the local reflection form appears. Select 만족, 보통 or 아쉬움, enter an optional note, and tap 회고 저장. The actual choice is sent to the server; the reflection stays on this device. Open 결정 기록 보기 to see the record. The guest session cannot access the owner's reflection.",
+        "characterCount": 347
+      },
+      {
+        "number": 5,
+        "title": "Drafts, blocks and cleanup",
+        "language": "en",
+        "text": "Home drafts restore via 초안 이어쓰기. 안내 보기 / 초안 저장 설정 opens local-data controls. On a shared question, 이 작성자 차단 asks for confirmation and hides that author's questions; 차단 해제하고 보기 restores access after confirmation. About has 작성자 차단 모두 해제. After review, delete only your test decision from 결정 기록 전체 보기 in the owner session. Keep the owner session until cleanup. Contact jmpark0611@gmail.com.",
+        "characterCount": 387
+      }
+    ],
+    "twoSessionMethod": "Owner Android app plus a separate external browser/private session; not two tabs with shared storage.",
+    "doNotClearOwnerSessionBeforeCleanup": true,
+    "reviewData": "Tea/Coffee and explicitly labelled synthetic review report only",
+    "operationalPrerequisites": [
+      "Resolve the observed Android https://localhost preflight 403 ORIGIN_DENIED through an approved setting change.",
+      "AI decision available within quota",
+      "current public voting web compatible with candidate",
+      "report RPC deployed and operational review procedure active",
+      "Question reporting, author blocks and guarded shared-read/vote contract applied.",
+      "The new signed UGC candidate and QA APK conversion are complete. APK signature, AAB/APK manifest identity and unchanged payload were verified; exact candidate device, native sharing/clipboard and operational-backend checks remain pending."
+    ],
+    "requiredFieldsIfConsoleDiffers": "Map by meaning; do not invent account credentials or treat technical anonymous Auth as a reusable supplied login.",
+    "knownDecisionLimits": {
+      "perAnonymousUserPerUtcDay": 30,
+      "globalPerUtcDay": 300,
+      "quotaBypassRecommended": false
+    },
+    "failureGuidance": {
+      "unknownDecisionResult": "Check recent decisions before retrying.",
+      "unknownReportResult": "Retry the same report ID/content through 같은 신고 다시 보내기.",
+      "reportUnavailable": "Not a successful report; resolve the operational release gate."
+    },
+    "pendingReportGuardScope": [
+      "current-screen links",
+      "refresh",
+      "vote",
+      "block actions",
+      "beforeunload where supported"
+    ],
+    "browserOrOsHistoryBackAlwaysCancelled": false,
+    "reportRetryStateRestoredAfterForceStop": false
+  },
+  "ugcAssessment": {
+    "ugcPresent": true,
+    "basis": "A/B/note are shown to other users through /v/:code before voting.",
+    "publicFeed": false,
+    "verifiedClosedUserGroup": false,
+    "publiclyAccessibleUgcSubtypeDetermination": null,
+    "blanketUserBlockingRequirementClaimed": false,
+    "minimumPreparation": [
+      "Explicit content policy acceptance before first public share; no share RPC before consent.",
+      "Report a question before voting without forcing a vote, with a validated receipt.",
+      "Author block/unblock resolves the author from share code on the server without exposing the author UUID; the new UI uses only guarded read/vote RPCs.",
+      "Activate actual report reception and review/response procedure through separately approved operational work."
+    ],
+    "policySources": [
+      "G5",
+      "G6"
+    ],
+    "newRuntimeImplementationPerformed": true,
+    "localUiImplemented": {
+      "explicitSharePolicyConsent": true,
+      "policyRoute": "/content-policy",
+      "preAndPostVoteQuestionReport": true,
+      "questionReportRpc": "vs_report_question",
+      "questionReportArgumentCount": 5,
+      "hiddenAiFieldsNotIncludedInPreviewOrRequest": true,
+      "separateQuestionAndAiPendingFlags": true,
+      "authorBlockWithConfirmation": true,
+      "unblockWithFreshRead": true,
+      "unknownBlockHidesContent": true,
+      "bulkUnblockFromAbout": true,
+      "guardedReadAndVoteWithoutLegacyFallback": true
+    },
+    "implementationScope": "UGC UI is included in the confirmed new signed candidate; server proposals passed disposable real HTTP verification and remain unapplied to production. The previous signed artifact has no follow-up UI.",
+    "remainingWork": [
+      "Apply reviewed reporting, question-safety and guarded API contracts only through separately approved operational work.",
+      "Resolve the confirmed Android Origin rejection while preserving existing allowed origins.",
+      "Activate report review/handling and make the public shared web use the guarded contract; legacy clients can bypass the new block preference.",
+      "Validate the exact new signed candidate on a device and obtain actual phone screenshots."
+    ],
+    "previousCandidateGapsAtSignedSource": [
+      "No explicit content-policy acceptance before sharing.",
+      "No question-report action before voting.",
+      "No author block/hide flow.",
+      "No operational report RPC or confirmed review process."
+    ],
+    "isolatedServerContractVerified": true,
+    "isolatedServerEvidence": "isolatedQuestionSafetyEvidence"
+  },
+  "operationalReadOnlyEvidence": {
+    "referenceMarkdown": "qa/operational-readiness-2026-11-23.md",
+    "referenceJson": "qa/operational-readiness-2026-11-23.json",
+    "observedAtUtc": "2026-11-23T13:01:00Z",
+    "timePrecision": "minute",
+    "canonicalVsTableCount": 4,
+    "canonicalVsFunctionCount": 9,
+    "contractMatchesCanonical": true,
+    "reportRpcExists": false,
+    "reportPrivateSchemaExists": false,
+    "anonymousAuthSettingsVerified": false,
+    "reasonAuthSettingsUnverified": "No configuration-read capability exposed in the available connector.",
+    "androidOrigin": "https://localhost",
+    "defaultCorsContainsAndroidOrigin": false,
+    "effectiveCorsOverrideVerified": false,
+    "userRowsOrContentLogsRead": false,
+    "productionWritePerformed": false,
+    "laterCorsEvidence": "operationalCorsEvidence; separate later preflight observation, original catalog audit preserved"
+  },
+  "remainingExecutionGates": [
+    {
+      "id": "operational-cors-and-reporting",
+      "scope": "separately-approved-operational-change",
+      "nextResult": "Preserve existing allowed origins and add https://localhost; apply reviewed reporting/question-safety/guarded RPC contracts and activate review/handling. Real isolated server QA has passed; production remains unchanged."
+    },
+    {
+      "id": "privacy-data-handling",
+      "scope": "public-policy-and-provider-facts",
+      "nextResult": "Publish an app-specific privacy policy and deletion instructions; finalize sharing/log/retention declarations from actual facts."
+    },
+    {
+      "id": "new-candidate-and-access",
+      "scope": "exact-new-signed-candidate-and-public-web",
+      "nextResult": "Use the completed QA APK in an approved isolated device environment, verify actual app behavior and shared-web compatibility, and capture genuine phone screenshots after server readiness. QA APK conversion is not device validation."
+    },
+    {
+      "id": "play-console-access",
+      "scope": "access-not-confirmed-automatic-approval-rejection",
+      "nextResult": "Obtain an available approved path to inspect the current Console. No successful login, form inspection, app registration, save or submission was observed."
+    },
+    {
+      "id": "play-entry-and-submission",
+      "scope": "separate-console-action",
+      "nextResult": "After the prior gates and target-age decision, enter the prepared answers and complete the actual form and review; no Console submission is performed by this packet."
+    }
+  ],
+  "userDecisions": [
+    {
+      "id": "target-age-groups",
+      "questionKo": "결정해지니를 실제로 어떤 연령대를 위한 앱으로 출시할까요?",
+      "value": null,
+      "targetAgeGroups": null,
+      "status": "requires-user-choice",
+      "defaultSelected": false,
+      "policySource": "G7"
+    }
+  ],
+  "policySources": {
+    "G1": {
+      "title": "Prepare your app for review",
+      "url": "https://support.google.com/googleplay/android-developer/answer/9859455?hl=en",
+      "checkedOn": "2026-11-23"
+    },
+    "G2": {
+      "title": "Provide information for Google Play’s Data safety section",
+      "url": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en",
+      "checkedOn": "2026-11-23"
+    },
+    "G3": {
+      "title": "Understanding Google Play’s app account deletion requirements",
+      "url": "https://support.google.com/googleplay/android-developer/answer/13327111?hl=en",
+      "checkedOn": "2026-11-23"
+    },
+    "G4": {
+      "title": "Requirements for providing sign-in details for review",
+      "url": "https://support.google.com/googleplay/android-developer/answer/15748846?hl=en",
+      "checkedOn": "2026-11-23"
+    },
+    "G5": {
+      "title": "User Generated Content",
+      "url": "https://support.google.com/googleplay/android-developer/answer/9876937?hl=en",
+      "checkedOn": "2026-11-23"
+    },
+    "G6": {
+      "title": "AI-Generated Content",
+      "url": "https://support.google.com/googleplay/android-developer/answer/13985936?hl=en",
+      "checkedOn": "2026-11-23"
+    },
+    "G7": {
+      "title": "Manage target audience and app content settings",
+      "url": "https://support.google.com/googleplay/android-developer/answer/9867159?hl=en",
+      "checkedOn": "2026-11-23"
+    }
+  },
+  "codeEvidence": [
+    "src/lib/api.ts",
+    "src/lib/supabase.ts",
+    "src/lib/shareUrl.ts",
+    "src/lib/decisionReports.ts",
+    "src/lib/decisionDrafts.ts",
+    "src/lib/decisionReflections.ts",
+    "src/screens/HomeScreen.tsx",
+    "src/screens/PollScreen.tsx",
+    "src/screens/VoteScreen.tsx",
+    "src/screens/HistoryScreen.tsx",
+    "src/screens/AboutScreen.tsx",
+    "src/components/DecisionReport.tsx",
+    "src/components/DecisionReflection.tsx",
+    "package.json",
+    "package-lock.json",
+    "android/app/src/main/AndroidManifest.xml",
+    "src/lib/contentPolicy.ts",
+    "src/screens/ContentPolicyScreen.tsx"
+  ],
+  "workScope": {
+    "newFiles": [
+      "PLAY-SUBMISSION-PACKET.md",
+      "PLAY-SUBMISSION-PACKET.json"
+    ],
+    "existingRuntimeOrDocumentsChanged": false,
+    "old83AppTestsRepeated": false,
+    "deviceOrBackendTestsRepeated": false,
+    "signingRepeated": false,
+    "remoteAccountsChanged": false,
+    "productionWrites": false,
+    "paymentsChanged": false,
+    "storeSubmission": false,
+    "subsequentAuthorizedUiWork": {
+      "localOnly": true,
+      "ownedFiles": [
+        "src/lib/decisionReports.ts",
+        "src/lib/decisionReports.test.ts",
+        "src/components/DecisionReport.tsx",
+        "src/components/DecisionReport.test.tsx",
+        "src/screens/VoteScreen.tsx",
+        "src/screens/VoteScreen.question-report.test.tsx"
+      ],
+      "focusedTestsPassed": 50,
+      "additionalQuestionPermissionTestPassed": 1,
+      "old83AppTestsRepeated": false,
+      "newBackendIntegrationPerformedByThisWork": false
+    },
+    "description": "Documentation update only; records separate completed QA/CORS observations and confirmed candidate build/signature without repeating them.",
+    "externalEvidenceRecorded": [
+      "isolatedQuestionSafetyEvidence",
+      "operationalCorsEvidence"
+    ]
+  },
+  "consoleAccess": {
+    "status": "read-access-rejected-by-automatic-approval-review",
+    "actualFormInspected": false,
+    "successfulLoginObserved": false,
+    "appRegistrationCompleted": false,
+    "consoleDataSaved": false,
+    "storeSubmissionPerformed": false,
+    "rejectionReasonRecordedHere": null,
+    "nextStep": "Use an available approved access path to inspect the actual Console requirements; do not infer a successful login or registration."
+  },
+  "operationalCorsEvidence": {
+    "referenceJson": "qa/native-cors-read-2026-11-23.json",
+    "referenceMarkdown": "qa/native-cors-read-2026-11-23.md",
+    "sourceCommit": "d9ffb9ad80783e7cec01e6ff8b772e021f91e38d",
+    "runId": 45183387009,
+    "jobId": 137722656206,
+    "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45183387009",
+    "checkedAtUtc": "2026-11-23T13:23:23.788Z",
+    "method": "OPTIONS",
+    "requestCount": 2,
+    "results": [
+      {
+        "client": "android",
+        "origin": "https://localhost",
+        "httpStatus": 403,
+        "allowedOrigin": null,
+        "postAllowed": true,
+        "requiredHeadersAllowed": true,
+        "knownError": "ORIGIN_DENIED",
+        "preflightAllowed": false
+      },
+      {
+        "client": "existing-web",
+        "origin": "https://genie-web-rosy.vercel.app",
+        "httpStatus": 204,
+        "allowedOrigin": "https://genie-web-rosy.vercel.app",
+        "postAllowed": true,
+        "requiredHeadersAllowed": true,
+        "knownError": null,
+        "preflightAllowed": true
+      }
+    ],
+    "effectiveOriginsEnvironmentValueRead": false,
+    "productionApplicationDataWritten": false,
+    "actualPostOrAuthFlowTested": false,
+    "modelCalled": false,
+    "signedCandidateDeviceTested": false,
+    "requiredChange": "Preserve existing effective origins and add exactly https://localhost through a separately approved operational setting change, then confirm the result.",
+    "pendingChangesDocument": "ANDROID-SERVER-CHANGES-PENDING.md"
+  },
+  "isolatedQuestionSafetyEvidence": {
+    "referenceJson": "qa/question-safety-http-2026-11-23.json",
+    "sourceCommit": "eeb87ed8dd5a05800aba5eb4c49fdc701b64151d",
+    "runId": 45183793270,
+    "jobId": 137724044227,
+    "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45183793270",
+    "conclusion": "success",
+    "guardTestsPassed": 49,
+    "recordedAtUtc": "2026-11-23T13:26:37.4770233Z",
+    "cleanupConfirmedAtUtc": "2026-11-23T13:26:37.5410725Z",
+    "status": "local-supabase-integration-passed-not-a-release",
+    "realLocalAuthPostgrestAndEdge": true,
+    "twoSessionFlowVerified": true,
+    "reportingProposal": {
+      "actualHttp": true,
+      "syntheticSessions": 3,
+      "anonymousRpcDenied": true,
+      "preVoteAndForeignOwnerDenied": true,
+      "directHttpPrivateSchemaDenied": true,
+      "ownerAndVotedGuestReceipts": true,
+      "parallelHttpRequests": 2,
+      "identicalServerReceipts": true,
+      "ownerRowsAfterParallel": 1,
+      "ownerQuotaAfterParallel": 1,
+      "globalQuotaAfterParallel": 1,
+      "changedPayloadAndMissingConsentDenied": true,
+      "rowsAfterSourceDeletion": 0,
+      "quotasRetainedAfterDeletion": true,
+      "allDatabaseSchedulesClaimed": false,
+      "verified": true,
+      "sourceSha256": "c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c",
+      "directPostgresRoleDenialsVerified": true,
+      "roleCheckTransactionRolledBack": true,
+      "appliedOnlyToDisposableDatabase": true
+    },
+    "questionSafetyProposal": {
+      "actualHttp": true,
+      "syntheticSessions": 3,
+      "syntheticPolls": 2,
+      "anonymousNewRpcsDenied": 5,
+      "preVoteQuestionReportReceived": true,
+      "hiddenAiResultRemainsHiddenAfterReport": true,
+      "ownerAndUnknownLinkDenied": true,
+      "directHttpPrivateSchemaDenied": true,
+      "parallelHttpRequests": 2,
+      "identicalServerReceipts": true,
+      "rowsAndUserAndGlobalQuotaAfterParallel": 1,
+      "consentAndChangedPayloadDenied": true,
+      "postVoteQuestionReportReceived": true,
+      "userDailyLimitVerified": 10,
+      "idempotentRetryAtLimitVerified": true,
+      "authorBlockIdempotent": true,
+      "otherAuthorLinksBlocked": true,
+      "blockedVoteDidNotWrite": true,
+      "otherUserUnaffected": true,
+      "selfBlockDenied": true,
+      "sameLinkUnblockVerified": true,
+      "sourceDeletionCascadesReportsOnly": true,
+      "quotaRetainedAfterSourceDeletion": true,
+      "authorBlockSurvivesSourceDeletion": true,
+      "clearAllOwnBlocksAfterLinkDeletion": true,
+      "clearAllLeavesOtherUsersBlocks": true,
+      "allDatabaseSchedulesClaimed": false,
+      "legacyRpcsChanged": false,
+      "legacyClientsCanBypassPreference": true,
+      "globalQuotaBoundaryHttpTested": false,
+      "blockCapBoundaryHttpTested": false,
+      "verified": true,
+      "sourceSha256": "b1394b91284d6882238570afa28f2b8c8290652679cd63564ac81f651c855dba",
+      "directPostgresRoleDenialsVerified": true,
+      "roleCheckTransactionRolledBack": true,
+      "appliedOnlyToDisposableDatabase": true
+    },
+    "modelCalled": false,
+    "hostedProjectContacted": false,
+    "productionFilesChanged": false,
+    "storeSubmitted": false,
+    "disposableResourcesDeleted": true,
+    "loopbackProxiesClosed": true,
+    "operationalContractsApplied": false,
+    "exactSignedCandidateDeviceValidated": false,
+    "scope": "Disposable real HTTP and PostgreSQL verification using synthetic sessions; not hosted production, real model or a signed-candidate device test."
+  }
+}

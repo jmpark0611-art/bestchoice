@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "purpose": "disposable-local-integration-only",
+  "sourceArchiveSha256": "2b48c6b2aa5620ed92a53eaa531bde0d194c9237a8d3406e7dd991cd235a3a62",
+  "canonicalSchemaPath": "supabase/migrations/20261115000000_vs_polls_and_votes.sql",
+  "canonicalSchemaSha256": "a11c228c811cf8f04030a6507755863a4a3c6a771f86caa5268db59c77a136f1",
+  "canonicalSchemaGitBlob": "c2a91f8f3dfc69598907faf1109fae41be0c638a",
+  "originalFiles": {
+    "vs-decide/index.ts": "133ea8488e633a3fe275beba274eb997ef59b2a76e04b2185fa2c86f02c28efb",
+    "vs-decide/fixture.mjs": "47aa80573c6d8c8c51ae95d9af379b2806765d1d31d2035c25ba3089677dce1a"
+  },
+  "files": {
+    "vs-decide/fixture.mjs": "9ad05b9b26906bc3fa508eaef0f9f8a4e8c003d0da6c9ac7297ef948c883627b",
+    "vs-decide/index.ts": "551873443d4fca3f1aa2ab86aa07c302f9f4b0b837a1ef0ecfd70f3bd8c28b67",
+    "fixture.test.mjs": "7883e8019afb0937ce800bc7180e8166b02e0c8c125af5614c0678870c11876f"
+  },
+  "adaptation": "Require GENIE_EDGE_NETGUARD=docker-internal-verified, passed only after runtime network inspection/probes. Origin and endpoint allowlists remain unchanged."
+}

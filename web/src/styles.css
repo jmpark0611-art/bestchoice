@@ -43,7 +43,7 @@ body {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
-button, input { font: inherit; color: inherit; }
+button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 a { color: inherit; }
 :focus-visible { outline: 3px solid var(--a); outline-offset: 2px; }
@@ -99,7 +99,7 @@ h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 18px; 
 .chip { padding: 5px 11px; border: 2px solid var(--ink); border-radius: 99px; background: var(--surface); font-size: 13px; }
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: 13px; color: var(--sub); }
-.field input { padding: 12px 14px; border: 2px solid var(--ink); border-radius: 12px; background: var(--surface); font-size: 16px; }
+.field input, .field select { width: 100%; min-width: 0; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 12px; background: var(--surface); font-size: 16px; }
 
 .btn {
   display: block; width: 100%; padding: 15px; text-align: center; text-decoration: none;
@@ -178,3 +178,63 @@ h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 18px; 
   .pick { font-size: 42px; }
   .screen { gap: 10px; padding-top: 16px; }
 }
+
+
+/* Long vote URLs remain selectable and never overflow narrow mobile screens. */
+.sharebox .share-url { display: block; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
+
+/* Narrow devices: long user options and share links must not force horizontal scrolling. */
+.screen, .sharebox, .three, .share-url { min-width: 0; }
+.share-url { white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+@media (max-width: 360px) {
+  .wrap { padding-left: 10px; padding-right: 10px; }
+  .screen { padding-left: 12px; padding-right: 12px; }
+  .three { grid-template-columns: minmax(0, 1fr); }
+  .three button { min-height: 42px; }
+}
+
+/* Optional criteria, explicit defaults, and private local reflections. */
+.quick-mode, .criteria-panel, .reflection-form, .decision-comparison { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.mode-toggle { align-self: flex-start; min-height: 44px; font-weight: 700; }
+.mode-toggle[aria-pressed='true'] { color: var(--surface); background: var(--ink); }
+.criteria-panel { margin: 0; padding: 10px; border: 2px solid var(--ink); border-radius: 12px; }
+.criteria-panel legend { padding: 0 5px; font-size: 14px; font-weight: 700; }
+.criteria-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.criterion-option { display: flex; align-items: center; gap: 6px; min-height: 44px; min-width: 0; font-size: 13px; cursor: pointer; }
+.criterion-option input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: var(--a); }
+.criterion-option span { min-width: 0; overflow-wrap: anywhere; }
+.criterion-option input:checked + span { font-weight: 800; }
+.saved-criterion { display: flex; flex-direction: column; gap: 4px; }
+.decision-context { font-size: 13px; }
+.decision-context summary { cursor: pointer; padding: 8px 0; }
+.context-text { white-space: pre-line; overflow-wrap: anywhere; }
+.decision-comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.decision-comparison-card { min-width: 0; padding: 12px; border: 2px solid var(--ink); border-radius: 12px; overflow-wrap: anywhere; }
+.decision-comparison-label { margin: 0 0 8px; font-size: 13px; color: var(--sub); }
+.decision-comparison-choice { margin: 0 0 8px; font-weight: 800; font-size: 18px; overflow-wrap: anywhere; }
+.decision-comparison-choice.a { color: var(--a); }
+.decision-comparison-choice.b { color: var(--b); }
+.decision-comparison-reason, .decision-comparison-summary { margin: 0; font-size: 14px; }
+.decision-comparison-summary { font-weight: 700; }
+.reflection, .history-entry, .history-reflection { overflow-wrap: anywhere; }
+.history-entry p { margin: 0; }
+.history-reflection { display: flex; flex-direction: column; gap: 4px; padding: 10px; background: var(--a-weak); border-radius: 8px; }
+.reflection .three button { min-height: 44px; }
+.criteria-panel .btn.text, .reflection .btn.text { min-height: 44px; }
+@media (max-width: 360px) {
+  .decision-comparison-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Draft choices and report previews remain readable in compact app WebViews. */
+.draft-panel, .reconsider-panel, .decision-report form, .report-preview {
+  display: flex; flex-direction: column; gap: 12px; min-width: 0; overflow-wrap: anywhere;
+}
+.draft-panel, .reconsider-panel { padding: 14px; border: 2px solid var(--ink); border-radius: 12px; }
+.draft-panel h1 { font-size: 28px; }
+.draft-panel p, .reconsider-panel p, .report-preview p { margin: 0; }
+.report-details { width: 100%; min-width: 0; resize: vertical; padding: 12px; border: 2px solid var(--ink); border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; }
+.report-preview blockquote { margin: 0; padding: 10px; border-left: 3px solid var(--ink); white-space: pre-wrap; }
+.report-preview h4 { margin: 0; }
+.report-consent, .setting-toggle { display: flex; align-items: flex-start; gap: 10px; min-height: 44px; padding: 8px 0; cursor: pointer; }
+.report-consent input, .setting-toggle input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--a); }
+.decision-report .btn.text { min-height: 44px; }
