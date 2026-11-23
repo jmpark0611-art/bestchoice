@@ -346,7 +346,7 @@ function HomeForm({ reconsideration }: { reconsideration: ReconsiderInput | null
           {error}
         </p>
       )}
-      <p className="small">입력 중인 결정과 회고는 기본으로 이 기기에 초안 저장해요. 마지막 수정 후 24시간 동안 이어 쓸 수 있어요. <Link to="/about">초안 저장 설정</Link></p>
+      <p className="small">입력 중인 결정과 회고는 기본으로 이 기기에 초안 저장해요. 마지막 수정 후 24시간 동안 이어 쓸 수 있어요. <Link id="home-draft-settings-link" to="/about">초안 저장 설정</Link></p>
       {initialAutosave.ok && !initialAutosave.value && <p className="small">초안 자동 저장이 꺼져 있어요.</p>}
       {draftNotice && <p className="small" aria-live="polite">{draftNotice}</p>}
       {draftError && <div>

@@ -64,7 +64,7 @@ export function AboutScreen() {
   return (
     <Screen>
       <Brand />
-      <h2>이용 안내</h2>
+      <h2 id="about-title">이용 안내</h2>
       <ul className="help">
         <li>적은 두 선택지, 고른 기준과 상황 한 줄은 결론을 만들기 위해 외부 AI 서비스(OpenAI)로 전송돼요. 빠른 결정에서는 상황 한 줄을 생략해요.</li>
         <li>이름, 연락처, 계좌·건강 정보 같은 민감한 개인정보는 적지 마세요.</li>

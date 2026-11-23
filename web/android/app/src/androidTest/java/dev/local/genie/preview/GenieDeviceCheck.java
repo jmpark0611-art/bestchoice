@@ -47,6 +47,14 @@ public class GenieDeviceCheck {
     private static final String B = "기기 검증 B";
     private static final String NOTE = "임시 기기 검증 초안";
     private static final String DRAFT_KEY = "genie:decision-drafts:v1";
+    private static final String ABOUT_LINK = "a#home-draft-settings-link[href=\"/about\"]";
+    private static final String ABOUT_CLICK = "(() => {const events=window.__genieTapEvents;"
+        + "return Array.isArray(events)?events.find(e=>e.type==='click' && e.trusted===true"
+        + " && e.anchorId==='home-draft-settings-link' && e.anchorPath==='/about')??null:null;})()";
+    private static final String ABOUT_RENDERED = "(() => {const h=document.querySelector('h2#about-title');"
+        + "if(!h || h.textContent.trim()!=='이용 안내')return false;"
+        + "const r=h.getBoundingClientRect(),s=getComputedStyle(h);"
+        + "return r.width>0 && r.height>0 && s.visibility==='visible' && Number(s.opacity)>0;})()";
     private Instrumentation instrumentation;
     private MainActivity activity;
 
@@ -117,6 +125,30 @@ public class GenieDeviceCheck {
             SystemClock.sleep(100);
         } while (SystemClock.elapsedRealtime() < deadline);
         throw new AssertionError(reason);
+    }
+
+    private AssertionError navigationFailure(AssertionError original, String context, boolean includeNativeState) {
+        String observed = "unavailable", nativeState = "not-requested";
+        try {
+            observed = evaluate("({path:location.pathname.slice(0,80),activation:navigator.userActivation.hasBeenActive,"
+                + "aboutRendered:" + ABOUT_RENDERED + ",events:Array.isArray(window.__genieTapEvents)"
+                + "?window.__genieTapEvents.slice(0,4):[]})");
+        } catch (Exception | AssertionError diagnosticFailure) {
+            if (diagnosticFailure instanceof InterruptedException) Thread.currentThread().interrupt();
+            original.addSuppressed(diagnosticFailure);
+        }
+        if (includeNativeState) {
+            try {
+                nativeState = String.valueOf(nativeBackState());
+            } catch (Exception | AssertionError diagnosticFailure) {
+                original.addSuppressed(diagnosticFailure);
+                nativeState = "unavailable";
+            }
+        }
+        // Evidence is best effort. Its failure must never hide the stage that
+        // failed or turn a missing touch, route, render, or Back into a pass.
+        return new AssertionError(original.getMessage() + "; " + context
+            + "; observed=" + observed + "; nativeState=" + nativeState, original);
     }
 
     private void report(String caseId, JSONObject evidence) throws Exception {
@@ -223,7 +255,8 @@ public class GenieDeviceCheck {
             + "document.addEventListener(type,e=>{if(window.__genieTapEvents.length>=4)return;"
             + "const t=e.target instanceof Element?e.target:null,a=t?.closest('a');"
             + "window.__genieTapEvents.push({type:e.type,trusted:e.isTrusted,tag:t?.tagName??'',"
-            + "id:(t?.id??'').slice(0,40),anchorPath:a?new URL(a.href).pathname.slice(0,80):null,"
+            + "id:(t?.id??'').slice(0,40),anchorId:(a?.id??'').slice(0,40),"
+            + "anchorPath:a?new URL(a.href).pathname.slice(0,80):null,"
             + "x:e.clientX,y:e.clientY});},{capture:true,once:true,passive:true});}return true;})()"));
         long downAt = SystemClock.uptimeMillis();
         MotionEvent down = MotionEvent.obtain(downAt, downAt, MotionEvent.ACTION_DOWN, nativePoint[0], nativePoint[1], 0);
@@ -263,16 +296,18 @@ public class GenieDeviceCheck {
 
         // A real OS touch supplies user activation. A synthetic JS click makes
         // Chromium skip the resulting history entry in native Back navigation.
-        JSONObject aboutTap = tapWebElement("a[href=\"/about\"]");
+        JSONObject aboutTap = tapWebElement(ABOUT_LINK);
         try {
-            awaitTrue("location.pathname==='/about' && !!document.querySelector('h2')", "About did not open");
+            awaitTrue("(" + ABOUT_CLICK + ")!==null",
+                "ABOUT_TOUCH_NOT_DELIVERED: the About link did not receive a trusted click");
+            aboutTap.put("trustedClick", new JSONObject(evaluate(ABOUT_CLICK)));
+            awaitTrue("location.pathname==='/about'", "ABOUT_ROUTE_TIMEOUT: the About route did not open");
+            awaitTrue(ABOUT_RENDERED, "ABOUT_RENDER_TIMEOUT: the About heading did not render");
+            assertEquals("ABOUT_USER_ACTIVATION_MISSING: the About link did not activate the document", "true",
+                evaluate("navigator.userActivation.hasBeenActive"));
         } catch (AssertionError failure) {
-            throw new AssertionError("About did not open; planned=" + aboutTap + "; observed="
-                + evaluate("({path:location.pathname.slice(0,80),activation:navigator.userActivation.hasBeenActive,"
-                    + "events:window.__genieTapEvents??[]})"), failure);
+            throw navigationFailure(failure, "planned=" + aboutTap, false);
         }
-        assertEquals("The About link did not receive real user activation", "true",
-            evaluate("navigator.userActivation.hasBeenActive"));
         UiAutomation automation = instrumentation.getUiAutomation();
         assertNotNull("Android system UI automation is unavailable", automation);
         JSONObject beforeBack = awaitNativeBackReady();
@@ -281,10 +316,10 @@ public class GenieDeviceCheck {
         assertTrue("The Android system rejected the Back action: " + beforeBack,
             automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK));
         try {
-            awaitTrue("location.pathname==='/' && !!document.getElementById('in-a')", "Native Android Back did not return Home");
+            awaitTrue("location.pathname==='/' && !!document.getElementById('in-a')",
+                "NATIVE_BACK_TIMEOUT: Native Android Back did not return Home");
         } catch (AssertionError failure) {
-            throw new AssertionError("Native Android Back did not return Home; before=" + beforeBack
-                + "; after=" + nativeBackState() + "; path=" + evaluate("location.pathname.slice(0,80)"), failure);
+            throw navigationFailure(failure, "before=" + beforeBack, true);
         }
         report("native-back", new JSONObject().put("from", "/about").put("to", "/")
             .put("systemAction", "GLOBAL_ACTION_BACK").put("before", beforeBack).put("aboutTap", aboutTap));

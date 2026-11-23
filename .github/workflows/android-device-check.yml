@@ -8,7 +8,16 @@ on:
     branches:
       - codex/genie-android-native-check-20261123
     paths:
-      - 'web/android/app/src/androidTest/java/dev/local/genie/preview/GenieDeviceCheck.java'
+      # Keep this list aligned with the inputs copied by copyFixture().
+      - 'web/src/**'
+      - 'web/public/**'
+      - 'web/index.html'
+      - 'web/package*.json'
+      - 'web/tsconfig*.json'
+      - 'web/vite.config.*'
+      - 'web/capacitor.config.*'
+      - 'web/android/**'
+      - 'web/scripts/build-native-preview.mjs'
       - 'web/scripts/android-device-check*.mjs'
       - '.github/workflows/android-device-check.yml'
   workflow_dispatch:
@@ -57,7 +66,7 @@ jobs:
           node-version: '24.22.3'
       - name: Install only locked build dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Verify only the new fixture driver's guards
+      - name: Verify the fixture driver's guards
         run: node --test scripts/android-device-check.test.mjs
       - name: Resolve official pins, check existing licenses, and build fixture APKs
         run: |
