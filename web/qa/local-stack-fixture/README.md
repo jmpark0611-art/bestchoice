@@ -47,10 +47,18 @@ Docker 내부망에서는 `-p`만으로 호스트 포트 연결을 기대하지 
 
 ## 실행과 검증 범위
 
+### 공유 질문 신고·작성자 차단의 추가 단계
+
+기존 baseline과 AI 신고 증거는 유지합니다. 그 뒤 새 `vs-question-safety.proposal.sql`을 명시적인 `genie.allow_local_question_safety_proposal=on` 세션에만 적용하고, 별도 `questionSafetyProposal` receipt 필드에 검증 결과를 기록하도록 준비했습니다. 복사본은 `supabase/proposals/vs-question-safety.sql`과 바이트 동일하며 SHA-256은 `b1394b91284d6882238570afa28f2b8c8290652679cd63564ac81f651c855dba`입니다. 기존 fixture `manifest.json`을 바꾸지 않고 실행기의 별도 PINS에 새 제안을 고정합니다.
+
+새 helper는 실제 요청 전후에 소유권을 다시 확인하고 3개 합성 세션·같은 작성자의 2개 링크만 사용합니다. 투표 전 신고와 AI 비공개 유지, 같은 UUID 두 HTTP 요청의 receipt·1행·1quota, 입력/권한 거부, 사용자 10회 한도, 투표 후 신고, 작성자 차단/해제 및 다른 링크·다른 사용자 범위, 원본 삭제 후 신고 cascade·quota/차단 유지, 삭제된 링크 때문에 막히지 않는 자기 차단 전체 해제를 검사합니다. 직접 DB 역할 검사는 별도 롤백 트랜잭션으로 처리합니다. 이 결과도 실제 CI 실행과 전용 리소스 정리가 끝나야 PASS입니다.
+
+구버전 `vs_shared_poll`·`vs_vote`는 바뀌지 않아 개인 차단 선호를 우회할 수 있습니다. 새 클라이언트는 `_guarded` RPC를 쓰고 미설치 시 닫힌 상태로 안내해야 합니다. SQL·보관·오류·테스트 범위의 상세 계약은 `supabase/proposals/vs-question-safety.README.md`에 있습니다.
+
 로컬 집중 검사(외부 연결 없음, proxy lifecycle 검사는 소유한 loopback echo 서버만 사용):
 
 ```sh
-node --test web/scripts/local-stack-check.test.mjs web/scripts/verify-local-reporting.test.mjs web/qa/local-stack-fixture/fixture.test.mjs
+node --test web/scripts/local-stack-check.test.mjs web/scripts/verify-local-reporting.test.mjs web/scripts/verify-local-question-safety.test.mjs web/qa/local-stack-fixture/fixture.test.mjs
 ```
 
 실제 Docker 실행은 `.github/workflows/genie-local-integration.yml`이 담당합니다. 실행 결과가 나오기 전에는 실제 Supabase 통합 통과로 표시하지 않습니다.

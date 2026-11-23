@@ -418,6 +418,8 @@ test('restored fixture provenance and copied byte hashes are accurate', () => {
   assert.match(fixture, /GENIE_EDGE_NETGUARD/);
   assert.equal(fixture.includes('openai.com'), false);
   assert.equal(sha(readFileSync(path.join(fixtureRoot, 'vs-report-result.proposal.sql'))), PINS.reportingProposalSha256);
+  assert.equal(sha(readFileSync(path.join(fixtureRoot, 'vs-question-safety.proposal.sql'))), PINS.questionSafetyProposalSha256);
+  assert.equal(sha(readFileSync(new URL('../../supabase/proposals/vs-question-safety.sql', import.meta.url))), PINS.questionSafetyProposalSha256);
 });
 
 test('report proposal SQL is gated by baseline and exact live ownership, uses stdin opt-in, and rolls role probes back', async () => {
@@ -457,8 +459,44 @@ test('report proposal SQL is gated by baseline and exact live ownership, uses st
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
+test('question proposal follows baseline/report verification and uses exact local opt-in, ownership and rollback', async () => {
+  const runtime = new DockerStackRuntime({ repoRoot: workspace, env: approved() });
+  runtime.state = { ...runtime.state, ...identity, networkName: network };
+  runtime.network = { id: networkId }; runtime.tools = { docker: '/synthetic/docker' };
+  runtime.proxies = proxyProof().map(proof => ({ proof: () => proof }));
+  runtime.inputs = { questionSafetyProposal: fileURLToPath(new URL('../qa/local-stack-fixture/vs-question-safety.proposal.sql', import.meta.url)) };
+  let label = nonce; const commands = [];
+  runtime.inspect = async kind => kind === 'network'
+    ? [{ ...makeNetwork(), Labels: { 'genie.local.integration': label } }] : makeContainers(true);
+  runtime.docker = async () => ({ stdout: makeContainers(true).map(value => value.Id).join('\n') });
+  runtime.command = async (stage, command, args, options) => {
+    commands.push({ stage, command, args, input: options.input });
+    return { status: 0, stdout: stage === 'LOCAL_QUESTION_ROLE_CHECK_FAILED' ? 'QUESTION_ROLE_CHECKS_PASSED\n' : '' };
+  };
+  await assert.rejects(runtime.installQuestionSafetyProposal(), /REPORTING_REQUIRED/);
+  runtime.reportingVerified = true;
+  await assert.rejects(runtime.installQuestionSafetyProposal(), /BASELINE_REQUIRED/);
+  runtime.integrationVerified = true; runtime.edgeVerified = true; label = 'other';
+  await assert.rejects(runtime.installQuestionSafetyProposal(), /REPORT_DATABASE_NETWORK_IDENTITY_FAILED/);
+  assert.equal(commands.length, 0);
+  label = nonce; await runtime.installQuestionSafetyProposal();
+  assert.equal(commands.length, 2); assert.equal(runtime.questionSafetyApplied, true);
+  assert.equal(commands[0].input, "set genie.allow_local_question_safety_proposal = 'on';\n" +
+    readFileSync(runtime.inputs.questionSafetyProposal, 'utf8') + "\nnotify pgrst, 'reload schema';\n");
+  assert.deepEqual(commands[0].args.slice(0, 6), ['exec', '--user', 'postgres', '-i', '1'.repeat(64), 'psql']);
+  assert.equal(commands[0].args.some(value => value.includes('question_safety')), false);
+  assert.match(commands[1].input, /^begin;/); assert.match(commands[1].input, /set local role authenticated;/);
+  assert.match(commands[1].input, /rollback;\n$/);
+  const dir = mkdtempSync(path.join(tmpdir(), 'genie-question-source-test-'));
+  try {
+    runtime.inputs.questionSafetyProposal = path.join(dir, 'changed.sql'); writeFileSync(runtime.inputs.questionSafetyProposal, 'select 1;');
+    await assert.rejects(runtime.installQuestionSafetyProposal(), /PINNED_QUESTION_PROPOSAL_REQUIRED/);
+    assert.equal(commands.length, 2);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
 const stages = ['preflight', 'prepare', 'isolate', 'startCore', 'verifyCore', 'installFixture', 'startEdge', 'verifyEdge',
-  'verifyIntegration', 'installReportingProposal', 'verifyReporting'];
+  'verifyIntegration', 'installReportingProposal', 'verifyReporting', 'installQuestionSafetyProposal', 'verifyQuestionSafety'];
 function fakeRuntime(failAt, cleanup = true) {
   const calls = [];
   const runtime = Object.fromEntries(stages.map(stage => [stage, async () => {

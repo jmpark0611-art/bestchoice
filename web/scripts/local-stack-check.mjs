@@ -15,6 +15,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { verifyLocalIntegration } from './verify-local-integration.mjs';
 import { verifyLocalReporting, reportingAuditSql, REPORT_ROLE_CHECK_SQL, REPORT_CHECK_CODES,
   REPORT_HTTP_CHECKS } from './verify-local-reporting.mjs';
+import { verifyLocalQuestionSafety, questionSafetyAuditSql, QUESTION_ROLE_CHECK_SQL, QUESTION_CHECK_CODES,
+  QUESTION_HTTP_CHECKS } from './verify-local-question-safety.mjs';
 
 export const PINS = Object.freeze({
   cliVersion: '3.2.0',
@@ -25,6 +27,8 @@ export const PINS = Object.freeze({
   schemaGitBlob: 'c2a91f8f3dfc69598907faf1109fae41be0c638a',
   reportingProposalPath: 'web/qa/local-stack-fixture/vs-report-result.proposal.sql',
   reportingProposalSha256: 'c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c',
+  questionSafetyProposalPath: 'web/qa/local-stack-fixture/vs-question-safety.proposal.sql',
+  questionSafetyProposalSha256: 'b1394b91284d6882238570afa28f2b8c8290652679cd63564ac81f651c855dba',
   probeImage: 'node:24.22.3-bookworm-slim',
   networkCidr: '172.30.240.0/24', gateway: '172.30.240.1',
   probeCidr: '172.30.241.0/24', probeGateway: '172.30.241.1',
@@ -426,7 +430,10 @@ export function readPinnedInputs(repoRoot) {
   const reportingProposal = path.join(repoRoot, PINS.reportingProposalPath);
   ensure(regular(reportingProposal) && digest(readFileSync(reportingProposal)) === PINS.reportingProposalSha256,
     'PINNED_REPORT_PROPOSAL_REQUIRED');
-  return { schema, fixtureRoot, hashes, manifest, reportingProposal };
+  const questionSafetyProposal = path.join(repoRoot, PINS.questionSafetyProposalPath);
+  ensure(regular(questionSafetyProposal) && digest(readFileSync(questionSafetyProposal)) === PINS.questionSafetyProposalSha256,
+    'PINNED_QUESTION_PROPOSAL_REQUIRED');
+  return { schema, fixtureRoot, hashes, manifest, reportingProposal, questionSafetyProposal };
 }
 
 function executable(name, env) {
@@ -860,9 +867,10 @@ export class DockerStackRuntime {
     return containers.db;
   }
   async reportingSql(stage, input) {
-    ensure(['LOCAL_REPORT_PROPOSAL_APPLY_FAILED', 'LOCAL_REPORT_ROLE_CHECK_FAILED', 'LOCAL_REPORT_AUDIT_FAILED'].includes(stage) &&
+    ensure(['LOCAL_REPORT_PROPOSAL_APPLY_FAILED', 'LOCAL_REPORT_ROLE_CHECK_FAILED', 'LOCAL_REPORT_AUDIT_FAILED',
+      'LOCAL_QUESTION_PROPOSAL_APPLY_FAILED', 'LOCAL_QUESTION_ROLE_CHECK_FAILED', 'LOCAL_QUESTION_AUDIT_FAILED'].includes(stage) &&
       typeof input === 'string' && input.length < 32_000, 'LOCAL_REPORT_SQL_REFUSED');
-    const db = await this.reportingDatabase();
+    const db = stage.startsWith('LOCAL_QUESTION_') ? await this.questionSafetyDatabase() : await this.reportingDatabase();
     // This is the exact owned container, not a host/remote DB connection. SQL and
     // UUID parameters go through stdin, never process argv or diagnostic output.
     return this.command(stage, this.tools.docker,
@@ -919,6 +927,58 @@ export class DockerStackRuntime {
       fail('LOCAL_REPORTING_CHECK_FAILED');
     }
   }
+  async questionSafetyDatabase() {
+    ensure(this.reportingVerified === true, 'REPORTING_REQUIRED_BEFORE_QUESTION_PROPOSAL');
+    return this.reportingDatabase();
+  }
+  async installQuestionSafetyProposal() {
+    await this.questionSafetyDatabase();
+    const proposal = readFileSync(this.inputs.questionSafetyProposal);
+    ensure(digest(proposal) === PINS.questionSafetyProposalSha256, 'PINNED_QUESTION_PROPOSAL_REQUIRED');
+    await this.reportingSql('LOCAL_QUESTION_PROPOSAL_APPLY_FAILED',
+      "set genie.allow_local_question_safety_proposal = 'on';\n" + proposal.toString('utf8') + "\nnotify pgrst, 'reload schema';\n");
+    const roles = await this.reportingSql('LOCAL_QUESTION_ROLE_CHECK_FAILED', QUESTION_ROLE_CHECK_SQL);
+    ensure(roles.stdout.trim() === 'QUESTION_ROLE_CHECKS_PASSED', 'LOCAL_QUESTION_ROLE_CHECK_FAILED');
+    this.questionSafetyApplied = true;
+  }
+  async verifyQuestionSafety() {
+    ensure(this.questionSafetyApplied === true, 'LOCAL_QUESTION_PROPOSAL_NOT_APPLIED');
+    const requests = [];
+    try {
+      this.questionSafetyProof = await verifyLocalQuestionSafety({ GENIE_SUPABASE_URL: ORIGIN,
+        GENIE_CONFIRM: 'isolated-genie-synthetic-only', GENIE_SUPABASE_PUBLIC_KEY: this.keys.anon }, '--run', {
+        verifyOwnership: async () => { await this.questionSafetyDatabase(); },
+        inspectState: async scope => {
+          const sql = questionSafetyAuditSql(scope);
+          ensure(!this.questionSafetyScope || JSON.stringify(scope) === JSON.stringify(this.questionSafetyScope), 'LOCAL_QUESTION_SCOPE_CHANGED');
+          this.questionSafetyScope ??= Object.freeze({ ...scope });
+          const result = await this.reportingSql('LOCAL_QUESTION_AUDIT_FAILED', sql);
+          try { return JSON.parse(result.stdout.trim()); } catch { fail('QUESTION_QA_AUDIT_INVALID'); }
+        },
+        send: (url, options) => {
+          ensure(!this.signal?.aborted, 'LOCAL_CHECK_INTERRUPTED');
+          return this.send(url, { ...options,
+            signal: this.signal ? AbortSignal.any([options.signal, this.signal]) : options.signal });
+        },
+        observe: item => {
+          if (!QUESTION_HTTP_CHECKS.includes(item.check)) return;
+          requests.push({ number: item.number, check: item.check, method: item.method, route: item.route,
+            status: Number.isInteger(item.status) && item.status >= 100 && item.status <= 599 ? item.status : null,
+            ...(item.transportFailed === true ? { transportFailed: true } : {}) });
+          if (requests.length > 12) requests.shift();
+        },
+      });
+      await this.questionSafetyDatabase(); readPinnedInputs(this.repoRoot);
+      this.questionSafetyVerified = true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      const assertion = [...QUESTION_CHECK_CODES, 'LOCAL_QUESTION_SCOPE_CHANGED', 'LOCAL_QUESTION_AUDIT_FAILED',
+        'REPORT_DATABASE_NETWORK_IDENTITY_FAILED', 'LOCAL_CHECK_INTERRUPTED'].includes(message)
+        ? message : 'QUESTION_QA_RUNTIME_FAILED';
+      this.diagnostics.push({ stage: 'LOCAL_QUESTION_SAFETY_CHECK_FAILED', assertion, requests });
+      fail('LOCAL_QUESTION_SAFETY_CHECK_FAILED');
+    }
+  }
   receipt() {
     return { status: 'local-supabase-integration-passed-not-a-release',
       sourceCommit: /^[0-9a-f]{40}$/.test(this.env.GITHUB_SHA ?? '') ? this.env.GITHUB_SHA : null,
@@ -929,6 +989,9 @@ export class DockerStackRuntime {
       realLocalAuthPostgrestAndEdge: true, twoSessionFlowVerified: this.integrationVerified === true,
       reportingProposal: { ...this.reportingProof, verified: this.reportingVerified === true,
         sourceSha256: PINS.reportingProposalSha256, directPostgresRoleDenialsVerified: this.reportingApplied === true,
+        roleCheckTransactionRolledBack: true, appliedOnlyToDisposableDatabase: true },
+      questionSafetyProposal: { ...this.questionSafetyProof, verified: this.questionSafetyVerified === true,
+        sourceSha256: PINS.questionSafetyProposalSha256, directPostgresRoleDenialsVerified: this.questionSafetyApplied === true,
         roleCheckTransactionRolledBack: true, appliedOnlyToDisposableDatabase: true },
       modelCalled: false, hostedProjectContacted: false, productionFilesChanged: false,
       nativeDeviceVerified: false, storeSubmitted: false, disposableResourcesDeleted: true };
@@ -992,7 +1055,7 @@ export class DockerStackRuntime {
     if (okay) {
       try { rmSync(this.state.workspace, { recursive: true, force: true }); rmSync(statePath(this.env), { force: true }); } catch { okay = false; }
     }
-    this.keys = undefined; this.edgeEnv = undefined; this.reportingScope = undefined;
+    this.keys = undefined; this.edgeEnv = undefined; this.reportingScope = undefined; this.questionSafetyScope = undefined;
     return okay;
   }
 }
@@ -1005,7 +1068,7 @@ export async function runLocalStackCheck({ repoRoot = defaultRepo, env = process
   let error, complete = false, cleaned = false;
   try {
     for (const stage of ['preflight', 'prepare', 'isolate', 'startCore', 'verifyCore', 'installFixture', 'startEdge', 'verifyEdge',
-      'verifyIntegration', 'installReportingProposal', 'verifyReporting']) {
+      'verifyIntegration', 'installReportingProposal', 'verifyReporting', 'installQuestionSafetyProposal', 'verifyQuestionSafety']) {
       progress(stage); await actions[stage]();
     }
     complete = true;
