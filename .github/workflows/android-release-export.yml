@@ -3,8 +3,10 @@ name: Genie Android unsigned candidate export
 # A single short-lived unsigned export from the approved PUBLIC repository.
 # No signing secrets, backend interaction, cache, deployment or store submission.
 # Only edits to this workflow trigger a new export; app changes do not upload it.
-# Candidate revision: shared-content consent, pre-vote question reports and author blocks.
-# The candidate includes new guarded RPCs; production activation remains pending.
+# Refresh the candidate from build inputs validated at eaf89c29c2bd06e3123e7c822a453d1a23b2153c.
+# Device run 45278517165 passed all four cases in attempts 1, 3 and 4.
+# About touch stages and the prepared-process force-stop boundary are verified.
+# Guarded reporting RPCs and Android CORS still require production validation.
 on:
   push:
     branches:
