@@ -55,6 +55,27 @@ public class GenieDeviceCheck {
         + "if(!h || h.textContent.trim()!=='이용 안내')return false;"
         + "const r=h.getBoundingClientRect(),s=getComputedStyle(h);"
         + "return r.width>0 && r.height>0 && s.visibility==='visible' && Number(s.opacity)>0;})()";
+    private static final String DRAFT_STATE = "(() => {const s={"
+        + "origin:location.origin==='https://localhost'?'https://localhost':'unexpected',"
+        + "path:location.pathname.slice(0,80),readyState:document.readyState,"
+        + "promptPresent:!!document.querySelector('[aria-label=\"이전 결정 초안\"]'),"
+        + "formPresent:!!document.getElementById('in-a') && !!document.getElementById('in-b') && !!document.getElementById('in-note'),"
+        + "storageReadable:false,draftKeyPresent:false,parseable:false,versionValid:false,homePresent:false,"
+        + "expectedFieldsMatch:{a:false,b:false,note:false},preferenceState:'unknown',"
+        + "revisionValid:false,updatedAtValid:false,ageMs:null};"
+        + "try {const raw=localStorage.getItem(" + JSONObject.quote(DRAFT_KEY) + ");s.storageReadable=true;"
+        + "s.draftKeyPresent=raw!==null;if(raw===null){s.preferenceState='default-enabled';return s;}"
+        + "let d;try{d=JSON.parse(raw);s.parseable=true;}catch{return s;}"
+        + "if(!d || typeof d!=='object' || Array.isArray(d))return s;"
+        + "s.versionValid=d.version===1;s.preferenceState=typeof d.enabled==='boolean'?(d.enabled?'enabled':'disabled'):'invalid';"
+        + "s.homePresent=!!d.home && typeof d.home==='object' && !Array.isArray(d.home);"
+        + "if(s.homePresent){const h=d.home,now=Date.now();"
+        + "s.expectedFieldsMatch={a:h.a===" + JSONObject.quote(A) + ",b:h.b===" + JSONObject.quote(B)
+        + ",note:h.note===" + JSONObject.quote(NOTE) + "};"
+        + "s.revisionValid=typeof h.revision==='string' && /^[A-Za-z0-9_-]{1,128}$/.test(h.revision);"
+        + "s.updatedAtValid=Number.isSafeInteger(h.updatedAt) && h.updatedAt>=0 && h.updatedAt<=now+300000;"
+        + "if(Number.isSafeInteger(h.updatedAt) && Number.isSafeInteger(now-h.updatedAt))s.ageMs=now-h.updatedAt;"
+        + "}return s;}catch{return s;}})()";
     private Instrumentation instrumentation;
     private MainActivity activity;
 
@@ -149,6 +170,18 @@ public class GenieDeviceCheck {
         // failed or turn a missing touch, route, render, or Back into a pass.
         return new AssertionError(original.getMessage() + "; " + context
             + "; observed=" + observed + "; nativeState=" + nativeState, original);
+    }
+
+    private String draftState(String phase, AssertionError original) {
+        try {
+            // Only schema/fixture-match flags and relative age leave the WebView.
+            // Never log raw storage, draft text, revisions, or unexpected origins.
+            return new JSONObject(evaluate(DRAFT_STATE)).put("phase", phase).toString();
+        } catch (Exception | AssertionError diagnosticFailure) {
+            if (diagnosticFailure instanceof InterruptedException) Thread.currentThread().interrupt();
+            if (original != null) original.addSuppressed(diagnosticFailure);
+            return "{\"phase\":" + JSONObject.quote(phase) + ",\"captureError\":\"DRAFT_STATE_UNAVAILABLE\"}";
+        }
     }
 
     private void report(String caseId, JSONObject evidence) throws Exception {
@@ -332,6 +365,13 @@ public class GenieDeviceCheck {
             + JSONObject.quote(A) + " && d.home.b===" + JSONObject.quote(B) + " && d.home.note===" + JSONObject.quote(NOTE)
             + " && typeof d.home.revision==='string'; })()", "The real draft autosave did not persist the current form");
         assertFalse("A decision must not have started", "true".equals(evaluate("location.pathname!=='/'")));
+        Bundle draftStatus = new Bundle();
+        draftStatus.putString("stream", "\nGENIE_DRAFT_STATE " + draftState("prepared", null) + "\n");
+        try {
+            instrumentation.sendStatus(2, draftStatus);
+        } catch (RuntimeException ignored) {
+            // Diagnostic delivery must not change the original success criteria.
+        }
         // The following is preparation evidence, not a fourth passed case. Only
         // the separately launched method can prove persistence after force-stop.
         Bundle status = new Bundle();
@@ -342,8 +382,12 @@ public class GenieDeviceCheck {
     @Test
     public void restoreDraftAfterHostForceStop() throws Exception {
         launch();
-        awaitTrue("location.origin==='https://localhost' && location.pathname==='/' && !!document.querySelector('[aria-label=\"이전 결정 초안\"]')",
-            "The persisted draft restore prompt did not appear after force-stop");
+        try {
+            awaitTrue("location.origin==='https://localhost' && location.pathname==='/' && !!document.querySelector('[aria-label=\"이전 결정 초안\"]')",
+                "The persisted draft restore prompt did not appear after force-stop");
+        } catch (AssertionError failure) {
+            throw new AssertionError(failure.getMessage() + "; draftState=" + draftState("restore", failure), failure);
+        }
         assertEquals("Private draft content was shown before explicit restoration", "true", evaluate("(() => {"
             + "const text=document.body.innerText;return !document.getElementById('in-a') && !document.getElementById('in-b')"
             + " && !document.getElementById('in-note') && !text.includes(" + JSONObject.quote(A) + ")"
