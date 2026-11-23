@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "status": "ugc-signed-candidate-and-qa-apk-verified-production-cors-and-reporting-blocked",
-  "recordedAtUtc": "2026-11-23T13:38:38.950342+00:00",
+  "status": "operational-apply-cancelled-verified-unapplied-cors-login-required",
+  "recordedAtUtc": "2026-11-23T16:55:47.827588Z",
   "candidateSourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
   "buildOnlyBranch": "codex/genie-android-native-check-20261123",
   "candidateInputs": {
@@ -281,15 +281,16 @@
       "evidenceRunId": 45183387009,
       "httpStatus": 403,
       "error": "ORIGIN_DENIED",
-      "next": "Read and preserve actual effective VS_ALLOWED_ORIGINS, then separately approve adding exactly https://localhost."
+      "next": "Operational scope authorized. Dashboard authentication and authoritative current VS_ALLOWED_ORIGINS still required; preserve current origins and add exactly https://localhost."
     },
     {
-      "code": "NEW_REPORTING_AND_GUARDED_RPCS_NOT_DEPLOYED",
+      "code": "OPERATIONAL_MIGRATION_APPLY_CANCELLED",
       "proposalSources": [
         "supabase/proposals/vs-report-result.sql",
         "supabase/proposals/vs-question-safety.sql"
       ],
-      "next": "Prepare and review new CLI-created migrations; retain canonical functions and both original proposals; operational approval and moderation procedure required."
+      "next": "Prepared exact CLI-generated migrations passed narrow checks. Confirm resumption of the cancelled apply, re-read history/collisions, then apply once and reconcile actual remote versions.",
+      "evidence": "qa/production-server-preparation-2026-11-24.json"
     },
     {
       "code": "SHARED_WEB_CANDIDATE_INTEGRATION_UNVERIFIED",
@@ -723,5 +724,16 @@
     "appRegistered": false,
     "storeSubmitted": false,
     "bypassAttempted": false
+  },
+  "operationalMigrationPreparation": {
+    "record": "qa/production-server-preparation-2026-11-24.json",
+    "cliFilesCreated": true,
+    "narrowChecksPassed": 8,
+    "userOperationalAuthorizationReceived": true,
+    "firstApplyResult": "aborted by user after 2390.4s",
+    "productionApplied": false,
+    "newObjectsAbsentVerified": true,
+    "automaticRetry": false,
+    "corsChanged": false
   }
 }

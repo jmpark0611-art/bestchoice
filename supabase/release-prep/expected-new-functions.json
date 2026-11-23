@@ -1,0 +1,646 @@
+{
+  "schemaVersion": 1,
+  "kind": "expected-catalog-values-not-execution-evidence",
+  "generatedAtUtc": "2026-11-23T16:18:59.743960+00:00",
+  "sources": [
+    {
+      "path": "supabase/release-prep/vs-report-result.release.sql",
+      "sha256": "0472a96417bfe838e82f904fcfe5fe8e72f88b9df07fe20eeecd359cfe3a6019"
+    },
+    {
+      "path": "supabase/release-prep/vs-question-safety.release.sql",
+      "sha256": "75edfca4b958df0560e90f50ac983cf7c81620b9aef565d5109d9bb2c853fc8f"
+    }
+  ],
+  "expectedNewFunctionCount": 13,
+  "expectedNewPublicFunctionCount": 6,
+  "expectedNewPrivateFunctionCount": 7,
+  "expectedNewTableCount": 7,
+  "functions": [
+    {
+      "signature": "genie_reporting_private.submit_result_report(uuid,text,text,boolean,uuid,text)",
+      "schema": "genie_reporting_private",
+      "name": "submit_result_report",
+      "argumentNames": [
+        "p_request_id",
+        "p_category",
+        "p_details",
+        "p_consent",
+        "p_poll_id",
+        "p_share_code"
+      ],
+      "argumentTypes": [
+        "uuid",
+        "text",
+        "text",
+        "boolean",
+        "uuid",
+        "text"
+      ],
+      "returnType": "jsonb",
+      "language": "plpgsql",
+      "securityDefiner": true,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "0d8780a192c4ca52371a986cc50ef179",
+      "bodyCharacters": 3716,
+      "bodySha256": "fda2440ad99deff0b0d9b1cf64db9a2474bf4f109262a597421d5c14158149a9",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "public.vs_report_result(uuid,text,text,boolean,uuid,text)",
+      "schema": "public",
+      "name": "vs_report_result",
+      "argumentNames": [
+        "p_request_id",
+        "p_category",
+        "p_details",
+        "p_consent",
+        "p_poll_id",
+        "p_share_code"
+      ],
+      "argumentTypes": [
+        "uuid",
+        "text",
+        "text",
+        "boolean",
+        "uuid",
+        "text"
+      ],
+      "returnType": "jsonb",
+      "language": "sql",
+      "securityDefiner": false,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "c7cab5436a0a4f25b0ea19c1df641048",
+      "bodyCharacters": 129,
+      "bodySha256": "a2d3935a19d3bb814fc71472a3d0ac97cb7821616a05fa021c24f54decbca085",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "genie_question_safety_private.submit_question_report(uuid,text,text,boolean,text)",
+      "schema": "genie_question_safety_private",
+      "name": "submit_question_report",
+      "argumentNames": [
+        "p_request_id",
+        "p_category",
+        "p_details",
+        "p_consent",
+        "p_share_code"
+      ],
+      "argumentTypes": [
+        "uuid",
+        "text",
+        "text",
+        "boolean",
+        "text"
+      ],
+      "returnType": "jsonb",
+      "language": "plpgsql",
+      "securityDefiner": true,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "dccf627560bb272c54821b7bf63252c1",
+      "bodyCharacters": 3128,
+      "bodySha256": "ff2ddd8570ff2cd68b65f9b5c19dca974c1b742d01373947eb81594a2b49d829",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "genie_question_safety_private.set_author_block(text,boolean)",
+      "schema": "genie_question_safety_private",
+      "name": "set_author_block",
+      "argumentNames": [
+        "p_share_code",
+        "p_blocked"
+      ],
+      "argumentTypes": [
+        "text",
+        "boolean"
+      ],
+      "returnType": "jsonb",
+      "language": "plpgsql",
+      "securityDefiner": true,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "b6f6a5aba04e2abdc1e4343b36059e8e",
+      "bodyCharacters": 1404,
+      "bodySha256": "05d459271205e3556c616e84de1289a63856f33ef8dbb5aa7c4dbb936e0483e5",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "genie_question_safety_private.clear_author_blocks()",
+      "schema": "genie_question_safety_private",
+      "name": "clear_author_blocks",
+      "argumentNames": [],
+      "argumentTypes": [],
+      "returnType": "jsonb",
+      "language": "plpgsql",
+      "securityDefiner": true,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "8ee43874b8de913e27bb596291d60c18",
+      "bodyCharacters": 388,
+      "bodySha256": "6738dd90628b9f46e121dd0fd6c23deece22fd998efc0f07af74d120fbdf47a2",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "genie_question_safety_private.assert_author_allowed(text)",
+      "schema": "genie_question_safety_private",
+      "name": "assert_author_allowed",
+      "argumentNames": [
+        "p_code"
+      ],
+      "argumentTypes": [
+        "text"
+      ],
+      "returnType": "void",
+      "language": "plpgsql",
+      "securityDefiner": true,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "88499582782cceef5a0583cdc0dcc6d4",
+      "bodyCharacters": 818,
+      "bodySha256": "0e47355b096a4b5c2a7e1c3c18e5eea280f7e2e6617d9996f18da814225b2087",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": false
+      }
+    },
+    {
+      "signature": "genie_question_safety_private.shared_poll_guarded(text)",
+      "schema": "genie_question_safety_private",
+      "name": "shared_poll_guarded",
+      "argumentNames": [
+        "p_code"
+      ],
+      "argumentTypes": [
+        "text"
+      ],
+      "returnType": "jsonb",
+      "language": "plpgsql",
+      "securityDefiner": true,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "b1f3661433654ba26d32b905007cbd10",
+      "bodyCharacters": 122,
+      "bodySha256": "0d1f767ff2095355283c7acb1edc0d2eb45769afa39a41059b62c9ece87087fd",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "genie_question_safety_private.vote_guarded(text,text)",
+      "schema": "genie_question_safety_private",
+      "name": "vote_guarded",
+      "argumentNames": [
+        "p_code",
+        "p_choice"
+      ],
+      "argumentTypes": [
+        "text",
+        "text"
+      ],
+      "returnType": "jsonb",
+      "language": "plpgsql",
+      "securityDefiner": true,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "e9f4c5d2ea1624856bbceabd228ea275",
+      "bodyCharacters": 125,
+      "bodySha256": "32c369c9f992d882685869a9919c8cca81cb9e8a90071ff8ae47c3f21b94c38f",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "public.vs_report_question(uuid,text,text,boolean,text)",
+      "schema": "public",
+      "name": "vs_report_question",
+      "argumentNames": [
+        "p_request_id",
+        "p_category",
+        "p_details",
+        "p_consent",
+        "p_share_code"
+      ],
+      "argumentTypes": [
+        "uuid",
+        "text",
+        "text",
+        "boolean",
+        "text"
+      ],
+      "returnType": "jsonb",
+      "language": "sql",
+      "securityDefiner": false,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "1c72e2b35eea74098a3ed29cb1cbfc7d",
+      "bodyCharacters": 120,
+      "bodySha256": "6b80d92d10cd74938472fef738fe19a22f2fb221ff7033651884eb91b246a1f5",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "public.vs_set_question_author_block(text,boolean)",
+      "schema": "public",
+      "name": "vs_set_question_author_block",
+      "argumentNames": [
+        "p_share_code",
+        "p_blocked"
+      ],
+      "argumentTypes": [
+        "text",
+        "boolean"
+      ],
+      "returnType": "jsonb",
+      "language": "sql",
+      "securityDefiner": false,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "49ef8a50dacf0ac8944bf2516ca8d7d7",
+      "bodyCharacters": 80,
+      "bodySha256": "c79b8a2c558ae751660180622ce0d6e9d965669b536c9daa09f427d8ae178168",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "public.vs_clear_question_author_blocks()",
+      "schema": "public",
+      "name": "vs_clear_question_author_blocks",
+      "argumentNames": [],
+      "argumentTypes": [],
+      "returnType": "jsonb",
+      "language": "sql",
+      "securityDefiner": false,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "92cbb0fc3e38eb8b11e74ddf290a0e31",
+      "bodyCharacters": 61,
+      "bodySha256": "b6e5b3979f5f44c5a5e0170ecafc0bf0d7c3b5aa4c970a7b04405e27b1a26873",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "public.vs_shared_poll_guarded(text)",
+      "schema": "public",
+      "name": "vs_shared_poll_guarded",
+      "argumentNames": [
+        "p_code"
+      ],
+      "argumentTypes": [
+        "text"
+      ],
+      "returnType": "jsonb",
+      "language": "sql",
+      "securityDefiner": false,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "3ff87dea2fa31bf4f0d9a34506c3db60",
+      "bodyCharacters": 67,
+      "bodySha256": "9e5bbd6822de43f42a8ae8ef033b918fafca725b8d0c3e81ffda6b9e22bd1b66",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    },
+    {
+      "signature": "public.vs_vote_guarded(text,text)",
+      "schema": "public",
+      "name": "vs_vote_guarded",
+      "argumentNames": [
+        "p_code",
+        "p_choice"
+      ],
+      "argumentTypes": [
+        "text",
+        "text"
+      ],
+      "returnType": "jsonb",
+      "language": "sql",
+      "securityDefiner": false,
+      "owner": "postgres",
+      "searchPathConfig": [
+        "search_path=\"\""
+      ],
+      "bodyMd5": "4efd5881788961efdd164af281209b89",
+      "bodyCharacters": 69,
+      "bodySha256": "a6d89f63a6a27846bc08aaeb49004609df4fac1c7fcbafc6117ae2a7535c44d7",
+      "volatility": "v",
+      "parallel": "u",
+      "strict": false,
+      "leakproof": false,
+      "returnsSet": false,
+      "kind": "f",
+      "argumentDefaults": 0,
+      "expectedClientExecute": {
+        "PUBLIC": false,
+        "anon": false,
+        "authenticated": true
+      }
+    }
+  ],
+  "newTables": [
+    {
+      "name": "genie_reporting_private.result_reports",
+      "owner": "postgres",
+      "relkind": "r",
+      "rlsEnabled": true,
+      "forceRls": false,
+      "clientPolicies": 0,
+      "directPublicOrAnonOrAuthenticatedPrivileges": []
+    },
+    {
+      "name": "genie_reporting_private.user_daily_limits",
+      "owner": "postgres",
+      "relkind": "r",
+      "rlsEnabled": true,
+      "forceRls": false,
+      "clientPolicies": 0,
+      "directPublicOrAnonOrAuthenticatedPrivileges": []
+    },
+    {
+      "name": "genie_reporting_private.daily_limits",
+      "owner": "postgres",
+      "relkind": "r",
+      "rlsEnabled": true,
+      "forceRls": false,
+      "clientPolicies": 0,
+      "directPublicOrAnonOrAuthenticatedPrivileges": []
+    },
+    {
+      "name": "genie_question_safety_private.question_reports",
+      "owner": "postgres",
+      "relkind": "r",
+      "rlsEnabled": true,
+      "forceRls": false,
+      "clientPolicies": 0,
+      "directPublicOrAnonOrAuthenticatedPrivileges": []
+    },
+    {
+      "name": "genie_question_safety_private.user_daily_limits",
+      "owner": "postgres",
+      "relkind": "r",
+      "rlsEnabled": true,
+      "forceRls": false,
+      "clientPolicies": 0,
+      "directPublicOrAnonOrAuthenticatedPrivileges": []
+    },
+    {
+      "name": "genie_question_safety_private.daily_limits",
+      "owner": "postgres",
+      "relkind": "r",
+      "rlsEnabled": true,
+      "forceRls": false,
+      "clientPolicies": 0,
+      "directPublicOrAnonOrAuthenticatedPrivileges": []
+    },
+    {
+      "name": "genie_question_safety_private.author_blocks",
+      "owner": "postgres",
+      "relkind": "r",
+      "rlsEnabled": true,
+      "forceRls": false,
+      "clientPolicies": 0,
+      "directPublicOrAnonOrAuthenticatedPrivileges": []
+    }
+  ],
+  "privateSchemas": [
+    {
+      "name": "genie_reporting_private",
+      "owner": "postgres",
+      "authenticatedUsage": true,
+      "anonUsage": false,
+      "publicUsage": false,
+      "publicOrAnonOrAuthenticatedCreate": false
+    },
+    {
+      "name": "genie_question_safety_private",
+      "owner": "postgres",
+      "authenticatedUsage": true,
+      "anonUsage": false,
+      "publicUsage": false,
+      "publicOrAnonOrAuthenticatedCreate": false
+    }
+  ],
+  "canonicalSha256": "a11c228c811cf8f04030a6507755863a4a3c6a771f86caa5268db59c77a136f1",
+  "existingVsFunctions": [
+    {
+      "signature": "public.vs_claim(uuid)",
+      "bodyMd5": "3e527d77cdd07e6e762c6b629f712dec",
+      "bodyCharacters": 875
+    },
+    {
+      "signature": "public.vs_poll_json(public.vs_polls,uuid)",
+      "bodyMd5": "2c2e689d88599f3103b52955ffdef59e",
+      "bodyCharacters": 858
+    },
+    {
+      "signature": "public.vs_my_poll(uuid)",
+      "bodyMd5": "d87800080660ccba2ea8aec692b25820",
+      "bodyCharacters": 373
+    },
+    {
+      "signature": "public.vs_share(uuid)",
+      "bodyMd5": "632772f742d01131f718d23d742c705f",
+      "bodyCharacters": 683
+    },
+    {
+      "signature": "public.vs_shared_poll(text)",
+      "bodyMd5": "5a9cbf86abff3e172d5bad3664fccd1e",
+      "bodyCharacters": 380
+    },
+    {
+      "signature": "public.vs_vote(text,text)",
+      "bodyMd5": "af4c5e177c35ad17289a30101ff09d9f",
+      "bodyCharacters": 909
+    },
+    {
+      "signature": "public.vs_set_did(uuid,text)",
+      "bodyMd5": "858627d6a0c120ed2fe7a4d1d8d428b1",
+      "bodyCharacters": 414
+    },
+    {
+      "signature": "public.vs_delete_poll(uuid)",
+      "bodyMd5": "62896e04aced60587a083faf82936aa7",
+      "bodyCharacters": 202
+    },
+    {
+      "signature": "public.vs_purge_expired()",
+      "bodyMd5": "ffabf01d1ef16f17ed9b1b19e343a4df",
+      "bodyCharacters": 258
+    }
+  ],
+  "existingVsTables": [
+    "public.vs_polls",
+    "public.vs_votes",
+    "public.vs_user_limits",
+    "public.vs_daily_total"
+  ],
+  "verificationLimits": [
+    "Body MD5 plus character count compares prosrc; independent local SHA-256 binds the source bytes. No function body is executed.",
+    "ACL checks enforce PUBLIC/anon/authenticated contracts and owner; additional explicit grantees are returned for separate review, not silently approved.",
+    "The original four table catalog definitions/policies/custom triggers are returned for baseline comparison. No relation rows or row counts are read.",
+    "Data API schemas are reported only from visible database/role settings. No setting found is unknown, not proof that the private schemas are excluded by the gateway.",
+    "This catalog check does not replace security advisors or Auth/PostgREST behavior evidence."
+  ],
+  "catalogQuerySha256": "26aaab44b4e38679f5fd78b6c81838f22a5d7bfdb80d53015aa21561360fe873",
+  "catalogQueryBytes": 14994,
+  "localQuerySyntaxValidation": {
+    "checkedAtUtc": "2026-11-23T16:20:44.977Z",
+    "engine": "PGlite 0.5.17 / PostgreSQL 18.7",
+    "singleCatalogQueryPassed": true,
+    "newFunctionCount": 13,
+    "newTableCount": 7,
+    "originalFunctionHashesMatched": 9,
+    "originalTablesReturned": 4,
+    "appRpcCalled": false,
+    "applicationRowsRead": false,
+    "applicationRowsWritten": false,
+    "productionAccessed": false,
+    "networkUsed": false
+  }
+}

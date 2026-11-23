@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "status": "production-apply-cancelled-confirmed-unapplied",
+  "recordedAtUtc": "2026-11-23 16:55:47.827588+00",
+  "displayTimeZone": "Asia/Seoul",
+  "projectId": "njrtcxohbkfgrgwhlvua",
+  "requestedScope": "Two additive report/block migrations plus existing-origins-preserving Android CORS addition.",
+  "userOperationalAuthorizationReceived": true,
+  "applicationAttempt": {
+    "tool": "supabase.apply_migration",
+    "name": "genie_result_reporting",
+    "sqlSha256": "92d40ba68d582bd442ff8d0b3b7d2b70759a2b7b0bf9c3d5fe8f7ad1516a89b6",
+    "result": "aborted by user after 2390.4s",
+    "successReceived": false,
+    "automaticRetry": false,
+    "questionMigrationAttempted": false
+  },
+  "postCancellationVerification": {
+    "migrationCount": 7,
+    "migrations": [
+      {
+        "version": "20260926043902",
+        "name": "init_bestchoice_schema"
+      },
+      {
+        "version": "20260926043926",
+        "name": "index_composite_fks"
+      },
+      {
+        "version": "20260929051831",
+        "name": "bc_ai_retry_and_user_limit"
+      },
+      {
+        "version": "20260929093527",
+        "name": "bc_retention_and_account_delete"
+      },
+      {
+        "version": "20261016144810",
+        "name": "bc_free_quota_and_ad_bonus"
+      },
+      {
+        "version": "20261016150131",
+        "name": "bc_decision_context"
+      },
+      {
+        "version": "20261117014529",
+        "name": "vs_polls_and_votes"
+      }
+    ],
+    "catalog": {
+      "observed_at": "2026-11-23 16:55:47.827588+00",
+      "ai_schema_exists": false,
+      "question_schema_exists": false,
+      "new_public_functions": []
+    },
+    "newMigrationHistoryRecorded": false,
+    "newSchemasInstalled": false,
+    "newPublicRpcsInstalled": false,
+    "applicationRowsRead": false
+  },
+  "preconditions": {
+    "source": "This-turn read-only execute_sql observation before apply attempt",
+    "currentUser": "postgres",
+    "sessionUser": "postgres",
+    "currentDatabase": "postgres",
+    "defaultTransactionIsolation": "read committed",
+    "transactionIsolation": "read committed",
+    "roleIsolationOverrides": [],
+    "databaseRoleIsolationOverrides": [],
+    "newSchemaCollisions": [],
+    "newPublicFunctionNameCollisions": [],
+    "baselineRecord": "production-server-baseline-2026-11-24.json"
+  },
+  "preservedSourceProposals": [
+    {
+      "path": "supabase/proposals/vs-report-result.sql",
+      "sha256": "c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c"
+    },
+    {
+      "path": "supabase/proposals/vs-question-safety.sql",
+      "sha256": "b1394b91284d6882238570afa28f2b8c8290652679cd63564ac81f651c855dba"
+    }
+  ],
+  "preparedMigrations": [
+    {
+      "cliGeneratedFile": "20261123161249_genie_result_reporting.sql",
+      "derivedSource": "vs-report-result.release.sql",
+      "derivedSha256": "0472a96417bfe838e82f904fcfe5fe8e72f88b9df07fe20eeecd359cfe3a6019",
+      "migrationSha256": "92d40ba68d582bd442ff8d0b3b7d2b70759a2b7b0bf9c3d5fe8f7ad1516a89b6",
+      "bodyIdenticalExceptFirstComment": true,
+      "obsoletePreparedSha256": "bf7ddfda21fc5394e5022fa8dd679c486c17b0d7309c65ec86d7e671248380af",
+      "obsoletePreparedApplied": false,
+      "runnerManagedTransaction": true,
+      "productionApplied": false
+    },
+    {
+      "cliGeneratedFile": "20261123161257_genie_question_safety.sql",
+      "derivedSource": "vs-question-safety.release.sql",
+      "derivedSha256": "75edfca4b958df0560e90f50ac983cf7c81620b9aef565d5109d9bb2c853fc8f",
+      "migrationSha256": "fc424dadada0dfd074b39dfb12c835adc58ad9880d0637e6370844f4513c9698",
+      "bodyIdenticalExceptFirstComment": true,
+      "obsoletePreparedSha256": "83667f5285ed08022287337ae3f9fb58ea40967bd336f0711c534f358db82baa",
+      "obsoletePreparedApplied": false,
+      "runnerManagedTransaction": true,
+      "productionApplied": false
+    }
+  ],
+  "transactionCorrection": {
+    "topLevelBeginCommitRemoved": true,
+    "functionBodiesAndGrantsPreserved": true,
+    "source": "https://supabase.com/kb/troubleshooting/partial-migrations-and-schema-inconsistencies-from-embedded-transactions-13ae82",
+    "narrowChecksPassed": 8,
+    "historyFailureRollbackVerifiedInPglite": true,
+    "original83AppSuiteRepeated": false,
+    "originalDisposableHttpSuitesRepeated": false
+  },
+  "cli": {
+    "fetchWorkflowReceipt": {
+      "versionPin": "3.2.0",
+      "upstreamCommit": "c3c7a586b11b6605358177efabbc1b1cb7589b23",
+      "officialReleaseAssetId": 755638030,
+      "archiveSha256": "fb88b175a817563505be02c60872060bcb8d5c869a1aa5656eaeb085d4a2f1e4",
+      "archiveSizeBytes": 64347996,
+      "binaryFile": "supabase",
+      "binarySha256": "0ed73393ce16dc967c1cafe824929bd97c8d11de0a5bc41e174710858860d1fe",
+      "binarySizeBytes": 141670576,
+      "license": "MIT",
+      "licenseGitBlob": "f1802dffa876e2c43f6eeb74540b8afe10e39e68",
+      "cliExecuted": false,
+      "appSourcePresent": false,
+      "projectCredentialsPresent": false,
+      "backendContacted": false,
+      "migrationCreated": false,
+      "repository": "jmpark0611-art/bestchoice",
+      "sourceCommit": "8bbe628961cd9d0a06c0638742f2c51ca6568148",
+      "runId": "45213569888",
+      "runAttempt": "1"
+    },
+    "artifactId": 14837660770,
+    "artifactZipSha256": "3bea8a652ac54871eb8f2c6562f9c8af3f22a44f303d59b3d24864a7587f88c4",
+    "localVersionObserved": "3.2.0",
+    "localVersionAndHelpExecuted": true,
+    "localMigrationNewExecuted": true,
+    "remoteLoginPerformed": false,
+    "hostedChangesByCli": false
+  },
+  "cors": {
+    "status": "blocked-on-dashboard-authentication-and-effective-original-value",
+    "setting": "VS_ALLOWED_ORIGINS",
+    "addOrigin": "https://localhost",
+    "currentOverrideExistenceKnown": false,
+    "currentValueKnown": false,
+    "changed": false,
+    "secretValuesRead": false,
+    "dashboardObserved": "sign-in",
+    "browserAuthRequested": false,
+    "loginPerformed": false,
+    "functionRedeployed": false,
+    "lastPreflightEvidence": "native-cors-read-2026-11-23.json",
+    "preflightRepeatedThisTurn": false
+  },
+  "candidate": {
+    "sourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
+    "signedAabSha256": "347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3",
+    "rebuilt": false,
+    "storeSubmitted": false
+  },
+  "scope": {
+    "productionDdlApplied": false,
+    "productionDataWrites": false,
+    "testUsersCreated": false,
+    "modelCalled": false,
+    "operationalSecretsChanged": false,
+    "existingEdgeFunctionOverwritten": false,
+    "existingMigrationsOverwritten": false,
+    "defaultBranchMerged": false,
+    "webDeployed": false,
+    "storeSubmitted": false,
+    "paidResourcesCreated": false
+  },
+  "nextSteps": [
+    "Confirm resumption of the cancelled exact additive migration operation, then re-read collisions/history before executing once.",
+    "Apply AI report migration then question safety migration with a transactional migration runner; verify actual recorded version after each success and preserve matching filename.",
+    "Complete secure Supabase Dashboard authentication; establish actual VS_ALLOWED_ORIGINS presence and original value without dumping unrelated secrets.",
+    "Preserve every existing origin and add exactly https://localhost; verify only fixed Android and existing-web OPTIONS.",
+    "Use prepared catalog query to verify new contracts and compare original nine VS functions; do not create production application test rows."
+  ]
+}

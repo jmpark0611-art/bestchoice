@@ -1,0 +1,173 @@
+--- supabase/proposals/vs-report-result.sql
++++ supabase/release-prep/vs-report-result.release.sql
+@@ -1,21 +1,55 @@
+--- LOCAL PROPOSAL ONLY. Not a migration and not deployed to any Supabase project.
+--- Local PostgreSQL WASM verification is recorded in the accompanying README; no real Auth/PostgREST validation.
+--- Review against the actual isolated database, then generate a migration with the installed CLI.
+--- Do not overwrite any existing vs_* migration or vs-decide function.
+--- For deliberate use in a disposable LOCAL database only, set in the same session:
+---   set genie.allow_local_reporting_proposal = 'on';
+-begin;
++-- REVIEWED ADDITIVE RELEASE BODY; not a CLI-generated migration filename.
++-- Derives from supabase/proposals/vs-report-result.sql at SHA-256 c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c.
++-- Original proposal unchanged; only release preamble and outer transaction control differ.
++-- The migration runner must own the transaction for both DDL and migration history.
++-- Apply only through the parent's explicitly approved operational migration process.
++-- Existing VS tables/functions, vs-decide, cron and application rows are not altered here.
+ 
+-do $guard$
++do $release_guard$
+ begin
+-  if current_setting('genie.allow_local_reporting_proposal', true) is distinct from 'on' then
+-    raise exception 'LOCAL_PROPOSAL_REQUIRES_EXPLICIT_SESSION_OPT_IN';
++  -- Catalog-only prerequisites. Do not read application rows or change existing objects.
++  if not exists (select 1 from pg_catalog.pg_roles where rolname = 'anon') or
++     not exists (select 1 from pg_catalog.pg_roles where rolname = 'authenticated') then
++    raise exception 'RELEASE_REQUIRED_ROLES_MISSING';
+   end if;
+-  if to_regclass('public.vs_polls') is null or to_regclass('public.vs_votes') is null then
+-    raise exception 'EXISTING_VS_SCHEMA_REQUIRED';
++  if not exists (select 1 from pg_catalog.pg_proc
++    where oid = pg_catalog.to_regprocedure('auth.uid()')
++      and prorettype = 'pg_catalog.uuid'::pg_catalog.regtype and prokind = 'f') then
++    raise exception 'RELEASE_AUTH_UID_CONTRACT_REQUIRED';
++  end if;
++  if exists (
++    select 1 from (values
++      ('auth.users', 'id', 'pg_catalog.uuid'),
++      ('public.vs_polls', 'id', 'pg_catalog.uuid'),
++      ('public.vs_polls', 'user_id', 'pg_catalog.uuid'),
++      ('public.vs_polls', 'share_code', 'pg_catalog.text'),
++      ('public.vs_votes', 'poll_id', 'pg_catalog.uuid'),
++      ('public.vs_votes', 'voter_id', 'pg_catalog.uuid')
++    ) as expected(relation_name, column_name, type_name)
++    left join pg_catalog.pg_class c on c.oid = pg_catalog.to_regclass(expected.relation_name)
++    left join pg_catalog.pg_attribute a on a.attrelid = c.oid
++      and a.attname = expected.column_name and a.attnum > 0 and not a.attisdropped
++    where c.oid is null or c.relkind <> 'r' or a.attnum is null or
++      a.atttypid <> pg_catalog.to_regtype(expected.type_name)
++  ) then
++    raise exception 'RELEASE_VS_COLUMN_CONTRACT_REQUIRED';
++  end if;
++  if exists (select 1 from pg_catalog.pg_class
++    where oid in (pg_catalog.to_regclass('public.vs_polls'), pg_catalog.to_regclass('public.vs_votes'))
++      and not relrowsecurity) then
++    raise exception 'RELEASE_EXISTING_VS_RLS_REQUIRED';
++  end if;
++  if pg_catalog.to_regnamespace('genie_reporting_private') is not null then
++    raise exception 'RELEASE_NEW_SCHEMA_ALREADY_EXISTS';
++  end if;
++  -- Reject any same-name public overload, not just the intended exact signature.
++  if exists (select 1 from pg_catalog.pg_proc p
++    join pg_catalog.pg_namespace n on n.oid = p.pronamespace
++    where n.nspname = 'public' and p.proname in ('vs_report_result')) then
++    raise exception 'RELEASE_PUBLIC_RPC_NAME_COLLISION';
+   end if;
+ end
+-$guard$;
++$release_guard$;
+ 
+ -- A new non-exposed schema keeps reports and the privileged implementation out of public.
+ -- CREATE (not CREATE OR REPLACE / IF NOT EXISTS) prevents silently modifying prior objects.
+@@ -152,4 +186,3 @@
+ revoke all on function public.vs_report_result(uuid, text, text, boolean, uuid, text) from public, anon, authenticated;
+ grant execute on function public.vs_report_result(uuid, text, text, boolean, uuid, text) to authenticated;
+ 
+-commit;
+--- supabase/proposals/vs-question-safety.sql
++++ supabase/release-prep/vs-question-safety.release.sql
+@@ -1,21 +1,71 @@
+--- LOCAL PROPOSAL ONLY. Not a migration; never apply to a hosted/production project.
+--- Existing vs_* objects and the separate AI-result reporting proposal are unchanged.
+--- A disposable LOCAL session must explicitly opt in before executing this exact file:
+---   set genie.allow_local_question_safety_proposal = 'on';
+-begin;
+-
+-do $guard$
+-begin
+-  if current_setting('genie.allow_local_question_safety_proposal', true) is distinct from 'on' then
+-    raise exception 'LOCAL_QUESTION_SAFETY_REQUIRES_EXPLICIT_SESSION_OPT_IN';
+-  end if;
+-  if to_regclass('public.vs_polls') is null or
+-     to_regprocedure('public.vs_shared_poll(text)') is null or
+-     to_regprocedure('public.vs_vote(text,text)') is null then
+-    raise exception 'EXISTING_VS_SCHEMA_REQUIRED';
+-  end if;
+-end
+-$guard$;
++-- REVIEWED ADDITIVE RELEASE BODY; not a CLI-generated migration filename.
++-- Derives from supabase/proposals/vs-question-safety.sql at SHA-256 b1394b91284d6882238570afa28f2b8c8290652679cd63564ac81f651c855dba.
++-- Original proposal unchanged; only release preamble and outer transaction control differ.
++-- The migration runner must own the transaction for both DDL and migration history.
++-- Apply only through the parent's explicitly approved operational migration process.
++-- Existing VS tables/functions, vs-decide, cron and application rows are not altered here.
++
++do $release_guard$
++begin
++  -- Catalog-only prerequisites. Do not read application rows or change existing objects.
++  if not exists (select 1 from pg_catalog.pg_roles where rolname = 'anon') or
++     not exists (select 1 from pg_catalog.pg_roles where rolname = 'authenticated') then
++    raise exception 'RELEASE_REQUIRED_ROLES_MISSING';
++  end if;
++  if not exists (select 1 from pg_catalog.pg_proc
++    where oid = pg_catalog.to_regprocedure('auth.uid()')
++      and prorettype = 'pg_catalog.uuid'::pg_catalog.regtype and prokind = 'f') then
++    raise exception 'RELEASE_AUTH_UID_CONTRACT_REQUIRED';
++  end if;
++  if exists (
++    select 1 from (values
++      ('auth.users', 'id', 'pg_catalog.uuid'),
++      ('public.vs_polls', 'id', 'pg_catalog.uuid'),
++      ('public.vs_polls', 'user_id', 'pg_catalog.uuid'),
++      ('public.vs_polls', 'share_code', 'pg_catalog.text'),
++      ('public.vs_votes', 'poll_id', 'pg_catalog.uuid'),
++      ('public.vs_votes', 'voter_id', 'pg_catalog.uuid')
++    ) as expected(relation_name, column_name, type_name)
++    left join pg_catalog.pg_class c on c.oid = pg_catalog.to_regclass(expected.relation_name)
++    left join pg_catalog.pg_attribute a on a.attrelid = c.oid
++      and a.attname = expected.column_name and a.attnum > 0 and not a.attisdropped
++    where c.oid is null or c.relkind <> 'r' or a.attnum is null or
++      a.atttypid <> pg_catalog.to_regtype(expected.type_name)
++  ) then
++    raise exception 'RELEASE_VS_COLUMN_CONTRACT_REQUIRED';
++  end if;
++  if exists (select 1 from pg_catalog.pg_class
++    where oid in (pg_catalog.to_regclass('public.vs_polls'), pg_catalog.to_regclass('public.vs_votes'))
++      and not relrowsecurity) then
++    raise exception 'RELEASE_EXISTING_VS_RLS_REQUIRED';
++  end if;
++  -- Guarded methods delegate to these tested definitions; drift requires a new review.
++  if exists (
++    select 1 from (values
++
++      ('public.vs_poll_json(public.vs_polls,uuid)', '2c2e689d88599f3103b52955ffdef59e', 858),
++      ('public.vs_shared_poll(text)', '5a9cbf86abff3e172d5bad3664fccd1e', 380),
++      ('public.vs_vote(text,text)', 'af4c5e177c35ad17289a30101ff09d9f', 909)
++    ) as expected(signature, body_md5, body_characters)
++    left join pg_catalog.pg_proc p on p.oid = pg_catalog.to_regprocedure(expected.signature)
++    where p.oid is null or p.prorettype <> 'pg_catalog.jsonb'::pg_catalog.regtype or
++      not p.prosecdef or not coalesce(p.proconfig @> array['search_path=""'], false) or
++      pg_catalog.md5(p.prosrc) <> expected.body_md5 or
++      pg_catalog.char_length(p.prosrc) <> expected.body_characters
++  ) then
++    raise exception 'RELEASE_CANONICAL_SHARED_FUNCTIONS_REQUIRED';
++  end if;
++  if pg_catalog.to_regnamespace('genie_question_safety_private') is not null then
++    raise exception 'RELEASE_NEW_SCHEMA_ALREADY_EXISTS';
++  end if;
++  -- Reject any same-name public overload, not just the intended exact signature.
++  if exists (select 1 from pg_catalog.pg_proc p
++    join pg_catalog.pg_namespace n on n.oid = p.pronamespace
++    where n.nspname = 'public' and p.proname in ('vs_report_question', 'vs_set_question_author_block', 'vs_clear_question_author_blocks', 'vs_shared_poll_guarded', 'vs_vote_guarded')) then
++    raise exception 'RELEASE_PUBLIC_RPC_NAME_COLLISION';
++  end if;
++end
++$release_guard$;
+ 
+ -- CREATE without OR REPLACE prevents silently replacing an earlier deployment.
+ create schema genie_question_safety_private;
+@@ -233,4 +283,3 @@
+ -- Source-poll deletion cascades reports, never quotas or author blocks. The clear
+ -- RPC allows recovery even after a link disappears. Auth-user deletion cascades
+ -- that user's reports/quota/blocks; the global quota is deliberately retained.
+-commit;

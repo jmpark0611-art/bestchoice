@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-23T16:14:12.731Z",
+  "node": "v24.22.3",
+  "pgliteVersion": "0.5.17",
+  "canonicalSourceSha256": "a11c228c811cf8f04030a6507755863a4a3c6a771f86caa5268db59c77a136f1",
+  "derivedSql": [
+    {
+      "path": "supabase/release-prep/vs-report-result.release.sql",
+      "sha256": "0472a96417bfe838e82f904fcfe5fe8e72f88b9df07fe20eeecd359cfe3a6019"
+    },
+    {
+      "path": "supabase/release-prep/vs-question-safety.release.sql",
+      "sha256": "75edfca4b958df0560e90f50ac983cf7c81620b9aef565d5109d9bb2c853fc8f"
+    }
+  ],
+  "scope": "release preconditions, exact preserved definitions and runner transaction rollback; no repeated business-logic suite",
+  "networkUsed": false,
+  "productionAccessed": false,
+  "applicationRpcInvoked": false,
+  "testUsersCreated": false,
+  "checks": [
+    {
+      "name": "source hashes and all post-guard definitions are unchanged except outer transaction control",
+      "status": "passed"
+    },
+    {
+      "name": "both release guards reject missing role and typed column dependencies",
+      "status": "passed"
+    },
+    {
+      "name": "both release guards reject disabled existing RLS and wrong auth uid contract",
+      "status": "passed"
+    },
+    {
+      "name": "new schema and same-name overload collisions fail without replacing objects",
+      "status": "passed"
+    },
+    {
+      "name": "question release guard requires the exact canonical delegated functions",
+      "status": "passed"
+    },
+    {
+      "name": "runner transaction rolls back all new objects after a simulated migration-history uniqueness failure",
+      "status": "passed"
+    },
+    {
+      "name": "runner-wrapped exact release bodies install without local opt-in and retain nine canonical definitions and grants",
+      "status": "passed"
+    },
+    {
+      "name": "reapplying either derived guard fails on the new schema and creates no duplicate",
+      "status": "passed"
+    }
+  ],
+  "limitations": [
+    "PGlite single connection with synthetic auth.uid, not real Auth/JWT/PostgREST.",
+    "No concurrent session schedules, production gateway settings or hosted migration runner implementation are exercised.",
+    "Original proposal business behavior remains supported by its earlier exact-hash real disposable HTTP evidence."
+  ],
+  "postgresVersion": "PostgreSQL 18.7 (PGlite 0.5.17) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.13 (e13ee988ce3d87a738dd8f3661d02223308c412a), 32-bit",
+  "status": "passed",
+  "checkCount": 8,
+  "disposableDatabaseClosed": true
+}

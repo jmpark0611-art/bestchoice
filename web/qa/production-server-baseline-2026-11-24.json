@@ -1,0 +1,1371 @@
+{
+  "kind": "pre-authorized-additive-production-change-baseline",
+  "userAuthorization": "Current user turn authorizes operational server step 1; no store submission, paid resources, production test users or application data writes.",
+  "project": {
+    "ref": "njrtcxohbkfgrgwhlvua",
+    "name": "bestchoice",
+    "region": "ap-northeast-2",
+    "status": "ACTIVE_HEALTHY"
+  },
+  "observedAtUtc": "2026-11-23 16:05:07.55076+00",
+  "migrations": [
+    {
+      "version": "20260926043902",
+      "name": "init_bestchoice_schema"
+    },
+    {
+      "version": "20260926043926",
+      "name": "index_composite_fks"
+    },
+    {
+      "version": "20260929051831",
+      "name": "bc_ai_retry_and_user_limit"
+    },
+    {
+      "version": "20260929093527",
+      "name": "bc_retention_and_account_delete"
+    },
+    {
+      "version": "20261016144810",
+      "name": "bc_free_quota_and_ad_bonus"
+    },
+    {
+      "version": "20261016150131",
+      "name": "bc_decision_context"
+    },
+    {
+      "version": "20261117014529",
+      "name": "vs_polls_and_votes"
+    }
+  ],
+  "inventory": {
+    "observed_at_utc": "2026-11-23 16:05:07.55076+00",
+    "server_version": "17.6",
+    "reporting_schema_exists": false,
+    "reporting_rpc_exists": false,
+    "pg_cron_version": "1.6.4",
+    "cron_job_catalog_exists": true,
+    "cron_run_catalog_exists": true,
+    "vs_tables": "{vs_daily_total,vs_polls,vs_user_limits,vs_votes}"
+  },
+  "databaseCatalog": {
+    "tables": [
+      {
+        "name": "vs_daily_total",
+        "rls": true,
+        "force_rls": false,
+        "owner": "postgres",
+        "anon_select": false,
+        "anon_insert": false,
+        "authenticated_select": false,
+        "authenticated_insert": false,
+        "authenticated_update": false,
+        "authenticated_delete": false,
+        "service_role_insert": true
+      },
+      {
+        "name": "vs_polls",
+        "rls": true,
+        "force_rls": false,
+        "owner": "postgres",
+        "anon_select": false,
+        "anon_insert": false,
+        "authenticated_select": true,
+        "authenticated_insert": false,
+        "authenticated_update": false,
+        "authenticated_delete": false,
+        "service_role_insert": true
+      },
+      {
+        "name": "vs_user_limits",
+        "rls": true,
+        "force_rls": false,
+        "owner": "postgres",
+        "anon_select": false,
+        "anon_insert": false,
+        "authenticated_select": false,
+        "authenticated_insert": false,
+        "authenticated_update": false,
+        "authenticated_delete": false,
+        "service_role_insert": true
+      },
+      {
+        "name": "vs_votes",
+        "rls": true,
+        "force_rls": false,
+        "owner": "postgres",
+        "anon_select": false,
+        "anon_insert": false,
+        "authenticated_select": false,
+        "authenticated_insert": false,
+        "authenticated_update": false,
+        "authenticated_delete": false,
+        "service_role_insert": true
+      }
+    ],
+    "columns": [
+      {
+        "table": "vs_daily_total",
+        "position": 1,
+        "name": "day",
+        "type": "date",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_daily_total",
+        "position": 2,
+        "name": "used",
+        "type": "integer",
+        "not_null": true,
+        "default": "0"
+      },
+      {
+        "table": "vs_polls",
+        "position": 1,
+        "name": "id",
+        "type": "uuid",
+        "not_null": true,
+        "default": "gen_random_uuid()"
+      },
+      {
+        "table": "vs_polls",
+        "position": 2,
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 3,
+        "name": "option_a",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 4,
+        "name": "option_b",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 5,
+        "name": "note",
+        "type": "text",
+        "not_null": false,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 6,
+        "name": "pick",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 7,
+        "name": "reason",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 8,
+        "name": "share_code",
+        "type": "text",
+        "not_null": false,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 9,
+        "name": "did",
+        "type": "text",
+        "not_null": false,
+        "default": null
+      },
+      {
+        "table": "vs_polls",
+        "position": 10,
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true,
+        "default": "now()"
+      },
+      {
+        "table": "vs_user_limits",
+        "position": 1,
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_user_limits",
+        "position": 2,
+        "name": "day",
+        "type": "date",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_user_limits",
+        "position": 3,
+        "name": "used",
+        "type": "integer",
+        "not_null": true,
+        "default": "0"
+      },
+      {
+        "table": "vs_votes",
+        "position": 1,
+        "name": "poll_id",
+        "type": "uuid",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_votes",
+        "position": 2,
+        "name": "voter_id",
+        "type": "uuid",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_votes",
+        "position": 3,
+        "name": "choice",
+        "type": "text",
+        "not_null": true,
+        "default": null
+      },
+      {
+        "table": "vs_votes",
+        "position": 4,
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true,
+        "default": "now()"
+      }
+    ],
+    "constraints": [
+      {
+        "table": "vs_daily_total",
+        "name": "vs_daily_total_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (day)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_did_check",
+        "type": "c",
+        "definition": "CHECK (did = ANY (ARRAY['a'::text, 'b'::text, 'none'::text]))"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_note_check",
+        "type": "c",
+        "definition": "CHECK (note IS NULL OR char_length(note) >= 1 AND char_length(note) <= 60)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_option_a_check",
+        "type": "c",
+        "definition": "CHECK (char_length(option_a) >= 1 AND char_length(option_a) <= 20)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_option_b_check",
+        "type": "c",
+        "definition": "CHECK (char_length(option_b) >= 1 AND char_length(option_b) <= 20)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_pick_check",
+        "type": "c",
+        "definition": "CHECK (pick = ANY (ARRAY['a'::text, 'b'::text]))"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_reason_check",
+        "type": "c",
+        "definition": "CHECK (char_length(reason) >= 1 AND char_length(reason) <= 300)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_share_code_key",
+        "type": "u",
+        "definition": "UNIQUE (share_code)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "vs_user_limits",
+        "name": "vs_user_limits_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (user_id, day)"
+      },
+      {
+        "table": "vs_user_limits",
+        "name": "vs_user_limits_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_choice_check",
+        "type": "c",
+        "definition": "CHECK (choice = ANY (ARRAY['a'::text, 'b'::text]))"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (poll_id, voter_id)"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_poll_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (poll_id) REFERENCES vs_polls(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_voter_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (voter_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      }
+    ],
+    "indexes": [
+      {
+        "table": "vs_daily_total",
+        "name": "vs_daily_total_pkey",
+        "definition": "CREATE UNIQUE INDEX vs_daily_total_pkey ON public.vs_daily_total USING btree (day)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_pkey",
+        "definition": "CREATE UNIQUE INDEX vs_polls_pkey ON public.vs_polls USING btree (id)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_share_code_key",
+        "definition": "CREATE UNIQUE INDEX vs_polls_share_code_key ON public.vs_polls USING btree (share_code)"
+      },
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_user_created_idx",
+        "definition": "CREATE INDEX vs_polls_user_created_idx ON public.vs_polls USING btree (user_id, created_at DESC)"
+      },
+      {
+        "table": "vs_user_limits",
+        "name": "vs_user_limits_pkey",
+        "definition": "CREATE UNIQUE INDEX vs_user_limits_pkey ON public.vs_user_limits USING btree (user_id, day)"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_pkey",
+        "definition": "CREATE UNIQUE INDEX vs_votes_pkey ON public.vs_votes USING btree (poll_id, voter_id)"
+      },
+      {
+        "table": "vs_votes",
+        "name": "vs_votes_voter_idx",
+        "definition": "CREATE INDEX vs_votes_voter_idx ON public.vs_votes USING btree (voter_id)"
+      }
+    ],
+    "policies": [
+      {
+        "table": "vs_polls",
+        "name": "vs_polls_read_own",
+        "roles": [
+          "authenticated"
+        ],
+        "command": "SELECT",
+        "using": "(user_id = ( SELECT auth.uid() AS uid))",
+        "check": null
+      }
+    ]
+  },
+  "functionCatalog": [
+    {
+      "name": "vs_claim",
+      "identity_arguments": "p_user uuid",
+      "result_type": "void",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "3e527d77cdd07e6e762c6b629f712dec",
+      "source_characters": 875,
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_delete_poll",
+      "identity_arguments": "p_id uuid",
+      "result_type": "void",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "62896e04aced60587a083faf82936aa7",
+      "source_characters": 202,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_my_poll",
+      "identity_arguments": "p_id uuid",
+      "result_type": "jsonb",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "s",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "d87800080660ccba2ea8aec692b25820",
+      "source_characters": 373,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_poll_json",
+      "identity_arguments": "p_poll vs_polls, p_user uuid",
+      "result_type": "jsonb",
+      "language": "sql",
+      "security_definer": true,
+      "volatility": "s",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "2c2e689d88599f3103b52955ffdef59e",
+      "source_characters": 858,
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_purge_expired",
+      "identity_arguments": "",
+      "result_type": "void",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "ffabf01d1ef16f17ed9b1b19e343a4df",
+      "source_characters": 258,
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_set_did",
+      "identity_arguments": "p_id uuid, p_did text",
+      "result_type": "void",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "858627d6a0c120ed2fe7a4d1d8d428b1",
+      "source_characters": 414,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_share",
+      "identity_arguments": "p_id uuid",
+      "result_type": "text",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "632772f742d01131f718d23d742c705f",
+      "source_characters": 683,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_shared_poll",
+      "identity_arguments": "p_code text",
+      "result_type": "jsonb",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "s",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "5a9cbf86abff3e172d5bad3664fccd1e",
+      "source_characters": 380,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    },
+    {
+      "name": "vs_vote",
+      "identity_arguments": "p_code text, p_choice text",
+      "result_type": "jsonb",
+      "language": "plpgsql",
+      "security_definer": true,
+      "volatility": "v",
+      "search_path_settings": [
+        "search_path=\"\""
+      ],
+      "other_setting_count": 0,
+      "source_md5": "af4c5e177c35ad17289a30101ff09d9f",
+      "source_characters": 909,
+      "anon_execute": false,
+      "authenticated_execute": true,
+      "service_role_execute": true,
+      "public_execute": false
+    }
+  ],
+  "behaviorCatalog": {
+    "function_flags": [
+      {
+        "name": "vs_claim",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_delete_poll",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_my_poll",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_poll_json",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_purge_expired",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_set_did",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_share",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_shared_poll",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      },
+      {
+        "name": "vs_vote",
+        "owner": "postgres",
+        "strict": false,
+        "returns_set": false,
+        "default_argument_count": 0,
+        "leakproof": false,
+        "parallel": "u",
+        "kind": "f"
+      }
+    ],
+    "non_internal_triggers": null,
+    "custom_rules": null,
+    "client_privileges": [
+      {
+        "table": "vs_daily_total",
+        "role": "anon",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_daily_total",
+        "role": "authenticated",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_polls",
+        "role": "anon",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_polls",
+        "role": "authenticated",
+        "select": true,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_user_limits",
+        "role": "anon",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_user_limits",
+        "role": "authenticated",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_votes",
+        "role": "anon",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      },
+      {
+        "table": "vs_votes",
+        "role": "authenticated",
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false,
+        "truncate": false,
+        "references": false,
+        "trigger": false
+      }
+    ]
+  },
+  "securityAdvisors": {
+    "lints": [
+      {
+        "name": "rls_enabled_no_policy",
+        "title": "RLS Enabled No Policy",
+        "level": "INFO",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects cases where row level security (RLS) has been enabled on a table but no RLS policies have been created.",
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+        "count": 10,
+        "findings": [
+          {
+            "detail": "Table \\`public.bc_ai_limits\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "bc_ai_limits",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Table \\`public.bc_ai_requests\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "bc_ai_requests",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Table \\`public.bc_ai_user_limits\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "bc_ai_user_limits",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Table \\`public.bc_analytics_events\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "bc_analytics_events",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Table \\`public.bc_app_settings\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "bc_app_settings",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Table \\`public.bc_decision_request_tombstones\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "bc_decision_request_tombstones",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Table \\`public.bc_decision_write_limits\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "bc_decision_write_limits",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Table \\`public.vs_daily_total\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "vs_daily_total",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Table \\`public.vs_user_limits\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "vs_user_limits",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Table \\`public.vs_votes\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "vs_votes",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "title": "Signed-In Users Can Execute SECURITY DEFINER Function",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects `SECURITY DEFINER` functions that are callable by signed-in users. Revoke `EXECUTE`, switch the function to `SECURITY INVOKER`, or move it out of your exposed API schema if signed-in users should not call it.",
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+        "count": 17,
+        "findings": [
+          {
+            "detail": "Function `public.bc_create_decision(p_id uuid, p_concern text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/bc_create_decision`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "bc_create_decision",
+              "schema": "public",
+              "language": "sql",
+              "arguments": "p_id uuid, p_concern text",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.bc_create_decision(p_id uuid, p_concern text, p_category text, p_urgency text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/bc_create_decision`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "bc_create_decision",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_id uuid, p_concern text, p_category text, p_urgency text",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.bc_delete_account()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/bc_delete_account`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "bc_delete_account",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.bc_delete_decision(p_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/bc_delete_decision`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "bc_delete_decision",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_id uuid",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.bc_delete_my_decisions()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/bc_delete_my_decisions`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "bc_delete_my_decisions",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.bc_get_quota()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/bc_get_quota`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "bc_get_quota",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.bc_grant_ad_bonus()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/bc_grant_ad_bonus`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "bc_grant_ad_bonus",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.bc_save_actual_choice(p_decision_id uuid, p_choice_type text, p_note text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/bc_save_actual_choice`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "bc_save_actual_choice",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_decision_id uuid, p_choice_type text, p_note text",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.cast_vote(p_code text, p_option_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/cast_vote`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "cast_vote",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_code text, p_option_id uuid",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.create_share_code(p_decision_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/create_share_code`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "create_share_code",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_decision_id uuid",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.get_shared_decision(p_code text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/get_shared_decision`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "get_shared_decision",
+              "schema": "public",
+              "language": "sql",
+              "arguments": "p_code text",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.vs_delete_poll(p_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/vs_delete_poll`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "vs_delete_poll",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_id uuid",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.vs_my_poll(p_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/vs_my_poll`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "vs_my_poll",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_id uuid",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.vs_set_did(p_id uuid, p_did text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/vs_set_did`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "vs_set_did",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_id uuid, p_did text",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.vs_share(p_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/vs_share`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "vs_share",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_id uuid",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.vs_shared_poll(p_code text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/vs_shared_poll`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "vs_shared_poll",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_code text",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          },
+          {
+            "detail": "Function `public.vs_vote(p_code text, p_choice text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/vs_vote`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "name": "vs_vote",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_code text, p_choice text",
+              "security_definer": true
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `cron.job` has policies enforced on roles that allow access to anonymous users. Policies include `{cron_job_policy}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "job",
+              "type": "table",
+              "schema": "cron"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `cron.job_run_details` has policies enforced on roles that allow access to anonymous users. Policies include `{cron_job_run_details_policy}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "job_run_details",
+              "type": "table",
+              "schema": "cron"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.bc_actual_choices` has policies enforced on roles that allow access to anonymous users. Policies include `{choices_read_self}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "bc_actual_choices",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.bc_decision_answers` has policies enforced on roles that allow access to anonymous users. Policies include `{answers_read_self}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "bc_decision_answers",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.bc_decision_results` has policies enforced on roles that allow access to anonymous users. Policies include `{results_read_self}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "bc_decision_results",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.bc_decisions` has policies enforced on roles that allow access to anonymous users. Policies include `{decisions_read_self}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "bc_decisions",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.bc_users` has policies enforced on roles that allow access to anonymous users. Policies include `{users_read_self}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "bc_users",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.decisions` has policies enforced on roles that allow access to anonymous users. Policies include `{decisions_owner_all}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "decisions",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.options` has policies enforced on roles that allow access to anonymous users. Policies include `{options_owner_all}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "options",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.profiles` has policies enforced on roles that allow access to anonymous users. Policies include `{profiles_select_own,profiles_update_own}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "profiles",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.votes` has policies enforced on roles that allow access to anonymous users. Policies include `{votes_select}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "votes",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_allow_anonymous_sign_ins",
+        "title": "Anonymous Access Policies",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Detects row level security (RLS) policies that allow access to anonymous users.",
+        "remediation": "Table `public.vs_polls` has policies enforced on roles that allow access to anonymous users. Policies include `{vs_polls_read_own}`",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+            "metadata": {
+              "name": "vs_polls",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-11-23T16:03:43.825Z"
+          }
+        ]
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "title": "Leaked Password Protection Disabled",
+        "level": "WARN",
+        "facing": "EXTERNAL",
+        "categories": [
+          "SECURITY"
+        ],
+        "description": "Leaked password protection is currently disabled.",
+        "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "Supabase Auth prevents the use of compromised passwords by checking against HaveIBeenPwned.org. Enable this feature to enhance security.",
+            "metadata": {
+              "type": "auth",
+              "entity": "Auth"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "scope": {
+    "applicationRowsRead": false,
+    "applicationRowCountsRead": false,
+    "applicationDataWritten": false,
+    "serverFilesRead": false,
+    "credentialsRead": false
+  }
+}

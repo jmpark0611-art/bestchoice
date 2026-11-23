@@ -1,0 +1,31 @@
+{
+  "status": "cli-generated-confirmed-unapplied",
+  "files": [
+    {
+      "cliGeneratedFile": "20261123161249_genie_result_reporting.sql",
+      "derivedSource": "vs-report-result.release.sql",
+      "derivedSha256": "0472a96417bfe838e82f904fcfe5fe8e72f88b9df07fe20eeecd359cfe3a6019",
+      "migrationSha256": "92d40ba68d582bd442ff8d0b3b7d2b70759a2b7b0bf9c3d5fe8f7ad1516a89b6",
+      "bodyIdenticalExceptFirstComment": true,
+      "obsoletePreparedSha256": "bf7ddfda21fc5394e5022fa8dd679c486c17b0d7309c65ec86d7e671248380af",
+      "obsoletePreparedApplied": false,
+      "runnerManagedTransaction": true,
+      "productionApplied": false
+    },
+    {
+      "cliGeneratedFile": "20261123161257_genie_question_safety.sql",
+      "derivedSource": "vs-question-safety.release.sql",
+      "derivedSha256": "75edfca4b958df0560e90f50ac983cf7c81620b9aef565d5109d9bb2c853fc8f",
+      "migrationSha256": "fc424dadada0dfd074b39dfb12c835adc58ad9880d0637e6370844f4513c9698",
+      "bodyIdenticalExceptFirstComment": true,
+      "obsoletePreparedSha256": "83667f5285ed08022287337ae3f9fb58ea40967bd336f0711c534f358db82baa",
+      "obsoletePreparedApplied": false,
+      "runnerManagedTransaction": true,
+      "productionApplied": false
+    }
+  ],
+  "cliVersion": "3.2.0",
+  "creationWorkdir": "/workspace/scratch/59b55f9d68c3/validation/production-migration-cli",
+  "remoteVersionAssigned": false,
+  "applicationRecord": "../../../web/qa/production-server-preparation-2026-11-24.json"
+}
