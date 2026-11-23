@@ -52,10 +52,24 @@ const DIAGNOSTIC_STAGES = new Set(['CLI_DOWNLOAD_FAILED', 'CLI_EXTRACTION_FAILED
   'CLI_HELP_FAILED', 'LOCAL_INIT_FAILED', 'LOCAL_CONFIG_INVALID', 'EDGE_CONFIG_INVALID',
   'LOCAL_CORE_START_FAILED', 'LOCAL_EDGE_START_FAILED', 'SCOPED_FIREWALL_SUPPORT_REQUIRED', 'SCOPED_FIREWALL_INSTALL_FAILED']);
 
-/** Only bounded stderr error lines from known startup steps; never status/inspect bodies. */
+/** Bounded known startup errors; never status/inspect bodies or arbitrary stdout. */
 export function sanitizedFailureDiagnostic(stage, result, privateValues = []) {
   if (!DIAGNOSTIC_STAGES.has(stage)) return null;
-  let value = String(result.stderr ?? '').slice(0, 64_000);
+  const structured = [];
+  // Pinned CLI v3.2.0 output.layer.ts emits {_tag:"Error",error:{code,message}}
+  // on stdout in JSON mode. Health failures otherwise begin with a container
+  // name rather than "Error", so filtering text stderr hid the actual reason.
+  if (stage === 'LOCAL_CORE_START_FAILED') {
+    for (const line of String(result.stdout ?? '').slice(-64_000).split(/\r?\n/)) {
+      try {
+        const value = JSON.parse(line);
+        if (value?._tag !== 'Error' || !/^[A-Za-z][A-Za-z0-9_]{0,79}$/.test(value.error?.code ?? '') ||
+          typeof value.error?.message !== 'string') continue;
+        structured.push(...value.error.message.split(/\r?\n/).slice(0, 4).map(message => `Error: ${value.error.code}: ${message}`));
+      } catch {}
+    }
+  }
+  let value = structured.join('\n') + '\n' + String(result.stderr ?? '').slice(0, 64_000);
   for (const secret of privateValues) if (typeof secret === 'string' && secret.length > 0) value = value.split(secret).join('[redacted]');
   value = value.replace(/\u001b\[[0-9;]*m/g, '').replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '')
     .replace(/\b(?:eyJ|e30)[A-Za-z0-9_-]*\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g, '[redacted-jwt]')
@@ -298,6 +312,33 @@ export function parseLocalStatus(value) {
   return { anon: value.ANON_KEY, writer: value.SERVICE_ROLE_KEY };
 }
 
+/** Explicit state projection only: never serialize inspect Env, mounts or raw health output. */
+export function startupContainerStates(values, projectId, nonce) {
+  const errorName = value => {
+    const text = String(value ?? '');
+    for (const [pattern, name] of [[/ECONNREFUSED|connection refused/i, 'CONNECTION_REFUSED'],
+      [/ENOTFOUND|EAI_AGAIN|name resolution/i, 'DNS_LOOKUP_FAILED'], [/ETIMEDOUT|timed out|timeout/i, 'TIMEOUT'],
+      [/no route to host/i, 'NO_ROUTE'], [/permission denied/i, 'PERMISSION_DENIED'],
+      [/password authentication failed/i, 'AUTHENTICATION_FAILED'], [/address already in use/i, 'ADDRESS_IN_USE'],
+      [/exec format error/i, 'EXEC_FORMAT_ERROR'], [/OCI runtime exec failed/i, 'OCI_EXEC_FAILED']]) if (pattern.test(text)) return name;
+    return text.length ? 'UNCLASSIFIED_ERROR' : null;
+  };
+  return (Array.isArray(values) ? values : []).flatMap(item => {
+    const service = [...CORE_SUFFIXES, 'edge_runtime'].find(name => item.Name === `/supabase_${name}_${projectId}`);
+    if (!service || item.Config?.Labels?.[PROJECT_LABEL] !== projectId) return [];
+    const state = item.State ?? {}, health = state.Health;
+    return [{ service, wrapperLabelPresent: item.Config.Labels[RUN_LABEL] === nonce,
+      status: ['created', 'running', 'paused', 'restarting', 'removing', 'exited', 'dead'].includes(state.Status) ? state.Status : 'unknown',
+      running: state.Running === true, exitCode: Number.isInteger(state.ExitCode) ? state.ExitCode : null,
+      oomKilled: state.OOMKilled === true, stateError: errorName(state.Error),
+      health: ['starting', 'healthy', 'unhealthy'].includes(health?.Status) ? health.Status : 'none',
+      recentHealth: (Array.isArray(health?.Log) ? health.Log : []).slice(-3).map(entry => ({
+        exitCode: Number.isInteger(entry.ExitCode) ? entry.ExitCode : null,
+        errorName: entry.ExitCode === 0 ? null : errorName(entry.Output),
+      })) }];
+  });
+}
+
 async function portIsFree(port) {
   const server = createTcpServer();
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(port, '127.0.0.1', resolve); });
@@ -314,7 +355,7 @@ class DockerStackRuntime {
     this.state.networkName = 'genie-local-' + this.state.nonce;
     this.state.probeName = this.state.networkName + '-probe';
     this.state.runId = env.GITHUB_RUN_ID; this.state.runAttempt = env.GITHUB_RUN_ATTEMPT;
-    this.imageProof = {}; this.probeProof = []; this.diagnostics = [];
+    this.imageProof = {}; this.probeProof = []; this.diagnostics = []; this.startupStates = [];
   }
   save() { writeFileSync(statePath(this.env), JSON.stringify(this.state), { mode: 0o600 }); }
   recordFailure(stage, result) {
@@ -377,7 +418,8 @@ class DockerStackRuntime {
     writeFileSync(path.join(this.state.workspace, 'supabase/config.toml'), stackConfig(this.state.projectId), { mode: 0o600 });
     await this.command('LOCAL_CONFIG_INVALID', this.cli, ['config', 'validate', '--workdir', this.state.workspace]);
     const wrapperDir = path.join(this.state.workspace, 'docker-policy'); mkdirSync(wrapperDir);
-    const wrapper = `#!${process.execPath}\nimport {spawnSync} from 'node:child_process';\nimport {dockerPolicyArguments} from ${JSON.stringify(import.meta.url)};\ntry { const args=dockerPolicyArguments(process.argv.slice(2),${JSON.stringify(this.state.networkName)},${JSON.stringify(this.state.nonce)}); const result=spawnSync(${JSON.stringify(this.tools.docker)},args,{env:{...process.env,PATH:${JSON.stringify(this.baseEnv.PATH)}},stdio:'inherit'}); process.exit(result.status??1); } catch { console.error('LOCAL_DOCKER_POLICY_REFUSED'); process.exit(1); }\n`;
+    this.policyRefusals = path.join(wrapperDir, 'refusals');
+    const wrapper = `#!${process.execPath}\nimport {spawnSync} from 'node:child_process';\nimport {appendFileSync} from 'node:fs';\nimport {dockerPolicyArguments} from ${JSON.stringify(import.meta.url)};\ntry { const args=dockerPolicyArguments(process.argv.slice(2),${JSON.stringify(this.state.networkName)},${JSON.stringify(this.state.nonce)}); const result=spawnSync(${JSON.stringify(this.tools.docker)},args,{env:{...process.env,PATH:${JSON.stringify(this.baseEnv.PATH)}},stdio:'inherit'}); process.exit(result.status??1); } catch { try { appendFileSync(${JSON.stringify(this.policyRefusals)},'refused\\n',{mode:0o600}); } catch {} console.error('LOCAL_DOCKER_POLICY_REFUSED'); process.exit(1); }\n`;
     writeFileSync(path.join(wrapperDir, 'docker'), wrapper, { mode: 0o700 });
     this.cliEnv = { ...this.baseEnv, PATH: wrapperDir + path.delimiter + this.baseEnv.PATH };
   }
@@ -399,9 +441,40 @@ class DockerStackRuntime {
       await this.command('SCOPED_FIREWALL_UNCONFIRMED', this.tools.sudo, ['-n', this.tools.iptables, '-w', '5', ...args]);
     }
   }
+  async captureStartupStates() {
+    try {
+      const ids = (await this.docker(['ps', '-aq', '--filter', `label=${PROJECT_LABEL}=${this.state.projectId}`],
+        { timeout: 10_000 })).stdout.trim().split(/\s+/).filter(Boolean);
+      if (!ids.length || !ids.every(id => /^[0-9a-f]{12,64}$/.test(id))) return;
+      const states = startupContainerStates(await this.inspect('container', ids, { timeout: 10_000 }), this.state.projectId, this.state.nonce);
+      if (states.length && JSON.stringify(states) !== JSON.stringify(this.startupStates.at(-1))) {
+        this.startupStates.push(states); this.startupStates = this.startupStates.slice(-2);
+      }
+    } catch { /* Diagnostic sampling cannot turn a failed startup into a pass. */ }
+  }
   async startCore() {
-    await this.command('LOCAL_CORE_START_FAILED', this.cli, ['start', '--workdir', this.state.workspace,
-      '--network-id', this.state.networkName, '--exclude', EXCLUDE], { env: this.cliEnv, timeout: 480_000 });
+    // The CLI rolls back failed containers. Sample safe state while it starts so
+    // rollback does not erase the evidence before our finally cleanup executes.
+    let pending = Promise.resolve(), busy = false, failure;
+    const sample = () => {
+      if (busy) return; busy = true;
+      pending = this.captureStartupStates().finally(() => { busy = false; });
+    };
+    const timer = setInterval(sample, 10_000); sample();
+    try {
+      await this.command('LOCAL_CORE_START_FAILED', this.cli, ['start', '--workdir', this.state.workspace,
+        '--network-id', this.state.networkName, '--exclude', EXCLUDE, '-o', 'json'], { env: this.cliEnv, timeout: 480_000 });
+    } catch (error) { failure = error; }
+    finally { clearInterval(timer); await pending; }
+    if (failure) {
+      const diagnostic = this.diagnostics.at(-1);
+      if (diagnostic?.stage === 'LOCAL_CORE_START_FAILED') {
+        diagnostic.containerStates = this.startupStates;
+        diagnostic.wrapperRefusals = existsSync(this.policyRefusals)
+          ? readFileSync(this.policyRefusals, 'utf8').split('\n').filter(value => value === 'refused').length : 0;
+      }
+      throw failure;
+    }
     this.keys = parseLocalStatus(JSON.parse((await this.command('LOCAL_STATUS_FAILED', this.cli,
       ['status', '--workdir', this.state.workspace, '-o', 'json'], { env: this.cliEnv })).stdout));
   }

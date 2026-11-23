@@ -7,7 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PINS, validateInvocation, localEnvironment, dockerPolicyArguments, validateNetwork,
   validateContainers, firewallPlan, stackConfig, readPinnedInputs, parseLocalStatus,
-  runLocalStackCheck, cleanupInterruptedRun, sanitizedFailureDiagnostic } from './local-stack-check.mjs';
+  runLocalStackCheck, cleanupInterruptedRun, sanitizedFailureDiagnostic, startupContainerStates } from './local-stack-check.mjs';
 
 const nonce = '123456abcdef';
 const network = 'genie-local-' + nonce;
@@ -74,6 +74,38 @@ test('startup diagnostics keep useful error names but redact credentials and nev
   assert.equal(sanitizedFailureDiagnostic('LOCAL_STATUS_FAILED', result), null);
   assert.equal(sanitizedFailureDiagnostic('DOCKER_OPERATION_FAILED', result), null);
   assert.equal(diagnostic.exitCode, 1);
+});
+
+test('structured pinned-CLI health failure exposes only redacted code/message, never success credentials or error context', () => {
+  const result = { status: 1, stderr: 'ordinary progress only', stdout: [
+    JSON.stringify({ API_URL: 'http://127.0.0.1:55321', ANON_KEY: 'private-status-key' }),
+    JSON.stringify({ _tag: 'Error', error: { code: 'HealthCheckTimeoutError',
+      message: 'supabase_rest_genie_it_test unexpected status 503\nsupabase_auth_genie_it_test postgres://user:private@db:5432/database',
+      detail: 'private-detail', suggestion: 'private-suggestion' }, environment: { PRIVATE: 'private-context' } }),
+  ].join('\n') };
+  const diagnostic = sanitizedFailureDiagnostic('LOCAL_CORE_START_FAILED', result);
+  assert.match(diagnostic.lines[0], /HealthCheckTimeoutError: supabase_rest_genie_it_test unexpected status 503/);
+  assert.equal(diagnostic.lines.length, 2);
+  assert.equal(JSON.stringify(diagnostic).includes('private'), false);
+  assert.equal(sanitizedFailureDiagnostic('LOCAL_STATUS_FAILED', result), null);
+  assert.deepEqual(sanitizedFailureDiagnostic('LOCAL_CORE_START_FAILED', { status: 1, stdout: JSON.stringify({
+    error: { code: 'HealthCheckTimeoutError', message: 'untagged-private-message' } }), stderr: '' }).lines, []);
+});
+
+test('startup state projection keeps owned service health and fixed error names without inspect secrets or output', () => {
+  const values = makeContainers();
+  values[0].State = { Running: true, Status: 'running', ExitCode: 0, OOMKilled: false,
+    Error: 'postgres://user:private@db', Health: { Status: 'unhealthy', Log: [{ ExitCode: 1,
+      Output: 'connection refused at postgres://user:private@db, Authorization: secret' }] } };
+  values[0].Config.Env.push('SECRET_KEY=private');
+  values.push({ Name: '/unrelated', Config: { Labels: { 'com.supabase.cli.project': 'other' } }, State: { Error: 'private' } });
+  const snapshot = startupContainerStates(values, projectId, nonce);
+  assert.equal(snapshot.length, 4);
+  assert.equal(snapshot[0].health, 'unhealthy');
+  assert.equal(snapshot[0].wrapperLabelPresent, true);
+  assert.deepEqual(snapshot[0].recentHealth, [{ exitCode: 1, errorName: 'CONNECTION_REFUSED' }]);
+  const text = JSON.stringify(snapshot);
+  for (const secret of ['private', 'Authorization', 'SECRET_KEY', 'Mounts', 'Output', 'Env']) assert.equal(text.includes(secret), false);
 });
 
 test('CLI-scoped Docker policy pins every created container DNS and network without rewriting commands', () => {
