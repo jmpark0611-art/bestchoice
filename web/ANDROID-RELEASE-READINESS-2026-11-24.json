@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-23T23:35:50.569585Z",
+  "status": "signed-awaiting-console-login-backend-preparation-and-device-test",
+  "candidate": {
+    "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
+    "sizeBytes": 4161320,
+    "sha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "applicationId": "com.jmpark0611.genie",
+    "versionCode": 1,
+    "versionName": "1.0.0"
+  },
+  "sourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+  "export": {
+    "repository": "jmpark0611-art/bestchoice",
+    "sourceRef": "refs/heads/codex/genie-android-native-check-20261123",
+    "sourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "runId": "45289031213",
+    "runAttempt": "1",
+    "artifactSha256": "303f9755dd205e31d572158a7e901a6c38f191e44090f7c672f1b50fd762e81c",
+    "artifactId": 14871979624,
+    "jobId": 138092733186,
+    "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45289031213",
+    "conclusion": "success"
+  },
+  "signerCertificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+  "signatureVerified": true,
+  "nonSignaturePayloadUnchanged": true,
+  "binaryManifestIdentityPreserved": true,
+  "binaryManifestReparsedDuringSigning": false,
+  "sourceComparison": {
+    "validatedSourceCommit": "eaf89c29c2bd06e3123e7c822a453d1a23b2153c",
+    "exportSourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "sourceFileCount": 159,
+    "sourceSnapshotSha256": "949f135553920a3d8aaff7b0318893f11eebbcae48cfb99d6b3343f3828645b7",
+    "allBuildInputBytesEqual": true,
+    "commitDifference": "Only comments in .github/workflows/android-release-export.yml changed.",
+    "unsignedAabMatchesValidatedSourceReleaseBuild": true,
+    "validatedSourceReleaseBuildRunId": 45278517310
+  },
+  "emulatorEvidence": {
+    "sourceCommit": "eaf89c29c2bd06e3123e7c822a453d1a23b2153c",
+    "runId": 45278517165,
+    "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165",
+    "passedInstrumentedAttempts": [
+      1,
+      3,
+      4
+    ],
+    "caseCountPerExecutedAttempt": 4,
+    "cases": [
+      "launch",
+      "native-back",
+      "narrow-screen",
+      "draft-restore-after-force-stop"
+    ],
+    "attempt2": {
+      "conclusion": "failure",
+      "stage": "APK build",
+      "cause": "Maven HTTP 429",
+      "instrumentationExecuted": false
+    },
+    "scope": "isolated-preview-emulator-only",
+    "signedReleaseInstalled": false,
+    "physicalDeviceValidated": false,
+    "productionBackendValidated": false
+  },
+  "backend": {
+    "projectId": "njrtcxohbkfgrgwhlvua",
+    "observedAtUtc": "2026-11-23T23:34:04.455989Z",
+    "observedAtKst": "2026-11-24T08:34:04.455989+09:00",
+    "method": [
+      "list_migrations",
+      "read-only catalog SELECT"
+    ],
+    "migrationCount": 7,
+    "reportingMigrationApplied": false,
+    "questionSafetyMigrationApplied": false,
+    "privateSchemasAbsent": [
+      "genie_reporting_private",
+      "genie_question_safety_private"
+    ],
+    "expectedPublicRpcCount": 6,
+    "expectedPublicRpcsFound": 0,
+    "expectedPrivateFunctionCount": 7,
+    "expectedPrivateFunctionsFound": 0,
+    "expectedPrivateTableCount": 7,
+    "expectedPrivateTablesFound": 0,
+    "productionUserRowsRead": false,
+    "productionWritesPerformed": false,
+    "previousMigrationApplyStatus": "aborted-by-user-no-retry-performed",
+    "cors": {
+      "recheckedThisTurn": false,
+      "lastObservedAtUtc": "2026-11-23T13:23:23.788Z",
+      "webOrigin": "https://genie-web-rosy.vercel.app",
+      "webHttpStatus": 204,
+      "androidOrigin": "https://localhost",
+      "androidHttpStatus": 403,
+      "androidError": "ORIGIN_DENIED",
+      "currentAllowedOriginsValueRead": false,
+      "currentState": "requires-recheck",
+      "reasonNotRechecked": "Supabase Edge URL is outside this execution environment network allowlist."
+    }
+  },
+  "playConsole": {
+    "observedOnKst": "2026-11-24",
+    "status": "google-login-required",
+    "authenticatedAppListRead": false,
+    "packageExistingRegistrationConfirmed": false,
+    "versionCodeAvailabilityConfirmed": false,
+    "uploadKeyRegistrationConfirmed": false,
+    "candidateUploaded": false,
+    "internalTrackReleaseCreated": false,
+    "storeSubmission": false
+  },
+  "readyForPublicRelease": false,
+  "readyForProductionBackedEndToEndInternalTest": false,
+  "signedCandidateAvailableForInternalTrackPreparation": true,
+  "nextSequence": [
+    "Authenticate existing Google Play developer account and verify exact package and version code availability.",
+    "Prepare an internal-test draft with this signed AAB after resolving any observed Console requirements.",
+    "Resume previously cancelled backend preparation only with confirmed user intent; preserve existing CORS origins and add only the verified Android origin.",
+    "Verify production auth, AI response, share/vote, reports, blocks and deletion using explicit synthetic test data and cleanup.",
+    "Install the Play-delivered build on a physical Android device and repeat About/back/narrow-screen/draft-restore plus backend flows.",
+    "Complete actual screenshots, public privacy/deletion resources and unresolved Play declarations before review or publication."
+  ]
+}

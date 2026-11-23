@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "kind": "genie-play-submission-preparation-not-google-import-format",
-  "status": "prepared-not-submitted-signed-ugc-candidate-confirmed",
-  "recordedAtUtc": "2026-11-23T13:36:30.776244+00:00",
+  "status": "prepared-not-submitted-latest-signed-candidate-confirmed-console-login-required",
+  "recordedAtUtc": "2026-11-23T23:36:41Z",
   "displayTimeZone": "Asia/Seoul",
   "readyToSubmit": false,
   "consoleOpenedOrChanged": false,
@@ -12,12 +12,12 @@
     "applicationId": "com.jmpark0611.genie",
     "versionCode": 1,
     "versionName": "1.0.0",
-    "sourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
-    "status": "signed-ugc-candidate-confirmed-not-store-ready",
-    "file": "Genie-Android-1.0.0-1-ugc-candidate.aab",
-    "sizeBytes": 4161285,
-    "sha256": "347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3",
-    "nativeBuildRunId": 45184417729,
+    "sourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "status": "signed-candidate-confirmed-awaiting-device-and-store-review",
+    "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
+    "sizeBytes": 4161320,
+    "sha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "nativeBuildRunId": 45289031213,
     "ugcFollowUpIncludedInSource": true,
     "signedArtifactConfirmed": true,
     "candidateChangedByThisPacket": false,
@@ -25,29 +25,60 @@
     "exactSignedCandidateDeviceValidated": false,
     "physicalDeviceValidated": false,
     "previousArtifactMustNotBeTreatedAsThisCandidate": true,
-    "nativeBuildJobId": 137726190042,
+    "nativeBuildJobId": 138092733186,
     "nativeBuildConclusion": "success",
-    "nativeBuildRunUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45184417729",
+    "nativeBuildRunUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45289031213",
     "preparation": {
       "sourceFiles": 159,
       "webAssets": 184,
       "nativeFiles": 69,
-      "preparedAtUtc": "2026-11-23T13:29:42.225Z"
+      "preparedAtUtc": "2026-11-23T23:28:23.245Z"
     },
-    "verificationFile": "Genie-Android-1.0.0-1-ugc-verification.json",
+    "verificationFile": "Genie-Android-1.0.0-1-20261124-verification.json",
     "ugcFollowUpIncludedInSignedArtifact": true,
     "signedJarVerified": true,
     "nonSignaturePayloadUnchanged": true,
     "sameUploadCertificateAsPreviousCandidate": true,
-    "qaApkConversionStatus": "completed-qa-resigned-payload-verified-not-device-validation",
+    "qaApkConversionStatus": "not-performed-for-this-candidate",
     "operationalBackendValidated": false,
-    "qaApkFile": "Genie-Android-candidate-QA.apk",
-    "qaApkSha256": "8fafa2908355ac1fed1c024ff2908c85e8cd721c9a28667ecf170807874f5cf8",
-    "qaApkSizeBytes": 4305320,
-    "candidateManifestReparsedDuringQaConversion": true,
-    "apkManifestIdentityVerified": true,
-    "qaApkUsesUploadSigner": false,
-    "originalLocalSigningReceiptBinaryManifestReparsed": false
+    "qaApkFile": null,
+    "qaApkSha256": null,
+    "qaApkSizeBytes": null,
+    "candidateManifestReparsedDuringQaConversion": false,
+    "apkManifestIdentityVerified": false,
+    "qaApkUsesUploadSigner": null,
+    "originalLocalSigningReceiptBinaryManifestReparsed": false,
+    "unsignedAabSha256": "df2819562154f4dc833a69ae5b7d3e47c8e31a6e7ab94f0a41e5aee7245f46d3",
+    "nativeBuildRunAttempt": 1,
+    "candidateMetadataUpdatedByThisPacket": true,
+    "binaryManifestIdentityPreservedDuringSigning": true,
+    "finalBinaryManifestIdentityVerifiedDuringCompilation": true,
+    "signingStatus": "signed-awaiting-device-and-store-review",
+    "qaApkCreated": false,
+    "storeSubmission": false,
+    "sourceSnapshotComparison": {
+      "emulatorSourceCommit": "eaf89c29c2bd06e3123e7c822a453d1a23b2153c",
+      "exportSourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+      "sourceFileCount": 159,
+      "allSourceFileBytesMatch": true,
+      "comparedSourceSnapshotSha256": "949f135553920a3d8aaff7b0318893f11eebbcae48cfb99d6b3343f3828645b7",
+      "commitDiffScope": "Only comments in .github/workflows/android-release-export.yml.",
+      "compareUrl": "https://github.com/jmpark0611-art/bestchoice/compare/eaf89c29c2bd06e3123e7c822a453d1a23b2153c...b8d9db66c249684842971410f2c7b80dd5bec395",
+      "unsignedAabMatchesEmulatorSourceNoUploadBuild": true,
+      "unsignedAabSha256": "df2819562154f4dc833a69ae5b7d3e47c8e31a6e7ab94f0a41e5aee7245f46d3",
+      "doesNotEstablishSignedCandidateDeviceValidation": true
+    },
+    "compilationReceipt": {
+      "nativeCompilation": true,
+      "unsignedVerified": true,
+      "packagedAssetsMatch": true,
+      "finalBinaryManifestIdentityVerified": true,
+      "sourceSnapshotVerified": true,
+      "backendContacted": false,
+      "storeSubmission": false
+    },
+    "manifestVerificationScope": "The compilation/export receipt verified the final binary AAB Manifest identity. Local signing preserved those bytes and verified the signature without reparsing the binary Manifest. No new-candidate QA APK conversion or APK Manifest verification has been performed.",
+    "signedArtifactUploadedToPlay": false
   },
   "previousCandidate": {
     "appName": "결정해지니",
@@ -452,7 +483,7 @@
       "current public voting web compatible with candidate",
       "report RPC deployed and operational review procedure active",
       "Question reporting, author blocks and guarded shared-read/vote contract applied.",
-      "The new signed UGC candidate and QA APK conversion are complete. APK signature, AAB/APK manifest identity and unchanged payload were verified; exact candidate device, native sharing/clipboard and operational-backend checks remain pending."
+      "The new b8d9db6 signed AAB is confirmed. Compilation verified its binary AAB Manifest identity; local signing verified the signature and preserved payload/Manifest bytes without reparsing. A QA APK for this new candidate, APK Manifest verification, exact candidate device execution, native sharing/clipboard and operational-backend checks remain pending. The old 5efd0a4 QA APK is historical only."
     ],
     "requiredFieldsIfConsoleDiffers": "Map by meaning; do not invent account credentials or treat technical anonymous Auth as a reusable supplied login.",
     "knownDecisionLimits": {
@@ -507,7 +538,7 @@
       "bulkUnblockFromAbout": true,
       "guardedReadAndVoteWithoutLegacyFallback": true
     },
-    "implementationScope": "UGC UI is included in the confirmed new signed candidate; server proposals passed disposable real HTTP verification and remain unapplied to production. The previous signed artifact has no follow-up UI.",
+    "implementationScope": "UGC UI is included in the confirmed current signed candidate. Server proposals passed disposable real HTTP verification and remain unapplied to production according to the preserved observations. The earlier 5efd0a4 UGC candidate and its QA APK are retained in candidateHistory; only the older 959836f previousCandidate predates the UGC UI.",
     "remainingWork": [
       "Apply reviewed reporting, question-safety and guarded API contracts only through separately approved operational work.",
       "Resolve the confirmed Android Origin rejection while preserving existing allowed origins.",
@@ -556,28 +587,33 @@
     {
       "id": "new-candidate-and-access",
       "scope": "exact-new-signed-candidate-and-public-web",
-      "nextResult": "Use the completed QA APK in an approved isolated device environment, verify actual app behavior and shared-web compatibility, and capture genuine phone screenshots after server readiness. QA APK conversion is not device validation."
+      "nextResult": "Prepare an installable QA or Play-delivered APK from the new b8d9db6 signed candidate, verify that exact candidate and shared-web compatibility, and capture genuine phone screenshots after server readiness. The historical 5efd0a4 QA APK and isolated fixture passes are not validation of the new signed file."
     },
     {
       "id": "play-console-access",
-      "scope": "access-not-confirmed-automatic-approval-rejection",
-      "nextResult": "Obtain an available approved path to inspect the current Console. No successful login, form inspection, app registration, save or submission was observed."
+      "scope": "authenticated-console-login-required",
+      "nextResult": "Complete Google sign-in after the observed login wall on 2026-11-24 KST, then inspect the actual Console requirements. The earlier automatic-approval rejection is preserved as history, not the current blocker."
     },
     {
       "id": "play-entry-and-submission",
       "scope": "separate-console-action",
-      "nextResult": "After the prior gates and target-age decision, enter the prepared answers and complete the actual form and review; no Console submission is performed by this packet."
+      "nextResult": "After the prior gates, enter the prepared answers with the confirmed adult-only 18+ target audience, complete the still-unanswered content-rating questionnaire and actual form, and record only observed Console actions. This packet has not been submitted."
     }
   ],
   "userDecisions": [
     {
       "id": "target-age-groups",
-      "questionKo": "결정해지니를 실제로 어떤 연령대를 위한 앱으로 출시할까요?",
-      "value": null,
-      "targetAgeGroups": null,
-      "status": "requires-user-choice",
+      "value": "adults-only",
+      "targetAgeGroups": [
+        "18+"
+      ],
+      "status": "confirmed-user-instruction",
       "defaultSelected": false,
-      "policySource": "G7"
+      "policySource": "G7",
+      "decisionKo": "청소년을 대상에 포함하지 않고 성인(18세 이상)을 대상으로 출시합니다.",
+      "basis": "The user already explicitly excluded adolescents from the intended audience; do not ask the same audience question again.",
+      "contentRatingQuestionnaireCompleted": false,
+      "targetAudienceIsNotAnAssignedContentRating": true
     }
   ],
   "policySources": {
@@ -638,11 +674,8 @@
     "src/screens/ContentPolicyScreen.tsx"
   ],
   "workScope": {
-    "newFiles": [
-      "PLAY-SUBMISSION-PACKET.md",
-      "PLAY-SUBMISSION-PACKET.json"
-    ],
-    "existingRuntimeOrDocumentsChanged": false,
+    "newFiles": [],
+    "existingRuntimeOrDocumentsChanged": true,
     "old83AppTestsRepeated": false,
     "deviceOrBackendTestsRepeated": false,
     "signingRepeated": false,
@@ -665,21 +698,48 @@
       "old83AppTestsRepeated": false,
       "newBackendIntegrationPerformedByThisWork": false
     },
-    "description": "Documentation update only; records separate completed QA/CORS observations and confirmed candidate build/signature without repeating them.",
+    "description": "Documentation update only: records separately completed emulator attempts, the newly exported and locally signed b8d9db6 candidate, the prior adult-only audience instruction and the current Console login wall. Preserves historical signed-candidate/QA APK and backend/CORS evidence; does not perform signing, candidate installation, production writes or Console submission.",
     "externalEvidenceRecorded": [
       "isolatedQuestionSafetyEvidence",
-      "operationalCorsEvidence"
-    ]
+      "operationalCorsEvidence",
+      "latestIsolatedAndroidEmulatorEvidence",
+      "consoleAccess",
+      "candidate"
+    ],
+    "updatedFiles": [
+      "PLAY-SUBMISSION-PACKET.md",
+      "PLAY-SUBMISSION-PACKET.json"
+    ],
+    "runtimeChanged": false,
+    "existingDocumentsChanged": true
   },
   "consoleAccess": {
-    "status": "read-access-rejected-by-automatic-approval-review",
+    "status": "google-login-required",
+    "observedAtLocalDate": "2026-11-24",
+    "displayTimeZone": "Asia/Seoul",
+    "timePrecision": "day",
+    "loginPageObserved": true,
+    "authenticatedConsoleOpened": false,
     "actualFormInspected": false,
     "successfulLoginObserved": false,
     "appRegistrationCompleted": false,
     "consoleDataSaved": false,
     "storeSubmissionPerformed": false,
-    "rejectionReasonRecordedHere": null,
-    "nextStep": "Use an available approved access path to inspect the actual Console requirements; do not infer a successful login or registration."
+    "nextStep": "Complete Google sign-in to inspect the authenticated Console, app registration, available version and signing configuration. A login page is not a successful Console login, registration, save or submission.",
+    "history": [
+      {
+        "observedAtLocalDate": "2026-11-23",
+        "displayTimeZone": "Asia/Seoul",
+        "status": "read-access-rejected-by-automatic-approval-review",
+        "actualFormInspected": false,
+        "successfulLoginObserved": false,
+        "appRegistrationCompleted": false,
+        "consoleDataSaved": false,
+        "storeSubmissionPerformed": false,
+        "rejectionReasonRecordedHere": null,
+        "nextStep": "Use an available approved access path to inspect the actual Console requirements; do not infer a successful login or registration."
+      }
+    ]
   },
   "operationalCorsEvidence": {
     "referenceJson": "qa/native-cors-read-2026-11-23.json",
@@ -803,5 +863,186 @@
     "operationalContractsApplied": false,
     "exactSignedCandidateDeviceValidated": false,
     "scope": "Disposable real HTTP and PostgreSQL verification using synthetic sessions; not hosted production, real model or a signed-candidate device test."
+  },
+  "previousRecordedAtUtc": "2026-11-23T13:36:30.776244+00:00",
+  "consoleOpenAttempted": true,
+  "consoleAuthenticatedAccessObserved": false,
+  "latestIsolatedAndroidEmulatorEvidence": {
+    "status": "all-four-cases-passed-on-three-actual-instrumentation-attempts",
+    "sourceCommit": "eaf89c29c2bd06e3123e7c822a453d1a23b2153c",
+    "runId": 45278517165,
+    "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165",
+    "observedAtLocalDate": "2026-11-24",
+    "displayTimeZone": "Asia/Seoul",
+    "fixtureOnly": true,
+    "applicationId": "dev.local.genie.preview",
+    "testEnvironment": "isolated Android emulator",
+    "expectedCaseIds": [
+      "launch",
+      "native-back",
+      "narrow-screen",
+      "draft-restore-after-force-stop"
+    ],
+    "successfulInstrumentationAttempts": [
+      1,
+      3,
+      4
+    ],
+    "actualInstrumentationAttemptCount": 3,
+    "allExecutedInstrumentationAttemptsPassed": true,
+    "attempts": [
+      {
+        "attempt": 1,
+        "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165/attempts/1",
+        "sourceCommit": "eaf89c29c2bd06e3123e7c822a453d1a23b2153c",
+        "startedAtUtc": "2026-11-23T22:19:12Z",
+        "workflowConclusion": "success",
+        "instrumentationExecuted": true,
+        "allFourCasesPassed": true,
+        "observedPassedCaseIds": [
+          "launch",
+          "native-back",
+          "narrow-screen",
+          "draft-restore-after-force-stop"
+        ],
+        "workflowUpdatedAtUtc": "2026-11-23T22:22:44Z"
+      },
+      {
+        "attempt": 2,
+        "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165/attempts/2",
+        "sourceCommit": "eaf89c29c2bd06e3123e7c822a453d1a23b2153c",
+        "startedAtUtc": "2026-11-23T22:23:13Z",
+        "workflowConclusion": "failure",
+        "instrumentationExecuted": false,
+        "allFourCasesPassed": null,
+        "observedPassedCaseIds": [],
+        "failureStage": "fixture-apk-build-before-instrumentation",
+        "failureReason": "Maven dependency download returned HTTP 429.",
+        "appBehaviorFailureObserved": false,
+        "workflowUpdatedAtUtc": "2026-11-23T22:25:37Z"
+      },
+      {
+        "attempt": 3,
+        "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165/attempts/3",
+        "sourceCommit": "eaf89c29c2bd06e3123e7c822a453d1a23b2153c",
+        "startedAtUtc": "2026-11-23T22:26:02Z",
+        "workflowConclusion": "success",
+        "instrumentationExecuted": true,
+        "allFourCasesPassed": true,
+        "observedPassedCaseIds": [
+          "launch",
+          "native-back",
+          "narrow-screen",
+          "draft-restore-after-force-stop"
+        ],
+        "workflowUpdatedAtUtc": "2026-11-23T22:29:24Z"
+      },
+      {
+        "attempt": 4,
+        "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165/attempts/4",
+        "sourceCommit": "eaf89c29c2bd06e3123e7c822a453d1a23b2153c",
+        "startedAtUtc": "2026-11-23T22:30:19Z",
+        "workflowConclusion": "success",
+        "instrumentationExecuted": true,
+        "allFourCasesPassed": true,
+        "observedPassedCaseIds": [
+          "launch",
+          "native-back",
+          "narrow-screen",
+          "draft-restore-after-force-stop"
+        ],
+        "workflowUpdatedAtUtc": "2026-11-23T22:33:43Z"
+      }
+    ],
+    "signedReleaseTested": false,
+    "physicalDeviceTested": false,
+    "productionBackendTested": false,
+    "sharedVotingOrReportingTested": false,
+    "storePhoneScreenshotsProduced": false,
+    "scopeNote": "Actual eaf89c isolated fixture instrumentation only. The new b8d9db6 signed candidate has the same 159 build-input files and matching unsigned AAB, but that signed file has not been installed or device-tested. Preserve the prior 5efd0a4 candidate and QA APK as history.",
+    "relatedSignedCandidateRecorded": true,
+    "relatedSignedCandidateSourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "relatedSignedCandidateWasDeviceTested": false
+  },
+  "candidateHistory": [
+    {
+      "appName": "결정해지니",
+      "applicationId": "com.jmpark0611.genie",
+      "versionCode": 1,
+      "versionName": "1.0.0",
+      "sourceCommit": "5efd0a4fe7f04b38087ecc3de07c1730ce4b0944",
+      "status": "signed-ugc-candidate-confirmed-not-store-ready",
+      "file": "Genie-Android-1.0.0-1-ugc-candidate.aab",
+      "sizeBytes": 4161285,
+      "sha256": "347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3",
+      "nativeBuildRunId": 45184417729,
+      "ugcFollowUpIncludedInSource": true,
+      "signedArtifactConfirmed": true,
+      "candidateChangedByThisPacket": false,
+      "refreshIfRuntimeOrPublicPolicyLinkChanges": true,
+      "exactSignedCandidateDeviceValidated": false,
+      "physicalDeviceValidated": false,
+      "previousArtifactMustNotBeTreatedAsThisCandidate": true,
+      "nativeBuildJobId": 137726190042,
+      "nativeBuildConclusion": "success",
+      "nativeBuildRunUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45184417729",
+      "preparation": {
+        "sourceFiles": 159,
+        "webAssets": 184,
+        "nativeFiles": 69,
+        "preparedAtUtc": "2026-11-23T13:29:42.225Z"
+      },
+      "verificationFile": "Genie-Android-1.0.0-1-ugc-verification.json",
+      "ugcFollowUpIncludedInSignedArtifact": true,
+      "signedJarVerified": true,
+      "nonSignaturePayloadUnchanged": true,
+      "sameUploadCertificateAsPreviousCandidate": true,
+      "qaApkConversionStatus": "completed-qa-resigned-payload-verified-not-device-validation",
+      "operationalBackendValidated": false,
+      "qaApkFile": "Genie-Android-candidate-QA.apk",
+      "qaApkSha256": "8fafa2908355ac1fed1c024ff2908c85e8cd721c9a28667ecf170807874f5cf8",
+      "qaApkSizeBytes": 4305320,
+      "candidateManifestReparsedDuringQaConversion": true,
+      "apkManifestIdentityVerified": true,
+      "qaApkUsesUploadSigner": false,
+      "originalLocalSigningReceiptBinaryManifestReparsed": false
+    }
+  ],
+  "productionBackendReadOnlyStatus": {
+    "projectId": "njrtcxohbkfgrgwhlvua",
+    "observedAtUtc": "2026-11-23T23:34:04.455989Z",
+    "observedAtKst": "2026-11-24T08:34:04.455989+09:00",
+    "method": [
+      "list_migrations",
+      "read-only catalog SELECT"
+    ],
+    "migrationCount": 7,
+    "reportingMigrationApplied": false,
+    "questionSafetyMigrationApplied": false,
+    "privateSchemasAbsent": [
+      "genie_reporting_private",
+      "genie_question_safety_private"
+    ],
+    "expectedPublicRpcCount": 6,
+    "expectedPublicRpcsFound": 0,
+    "expectedPrivateFunctionCount": 7,
+    "expectedPrivateFunctionsFound": 0,
+    "expectedPrivateTableCount": 7,
+    "expectedPrivateTablesFound": 0,
+    "productionUserRowsRead": false,
+    "productionWritesPerformed": false,
+    "previousMigrationApplyStatus": "aborted-by-user-no-retry-performed",
+    "cors": {
+      "recheckedThisTurn": false,
+      "lastObservedAtUtc": "2026-11-23T13:23:23.788Z",
+      "webOrigin": "https://genie-web-rosy.vercel.app",
+      "webHttpStatus": 204,
+      "androidOrigin": "https://localhost",
+      "androidHttpStatus": 403,
+      "androidError": "ORIGIN_DENIED",
+      "currentAllowedOriginsValueRead": false,
+      "currentState": "requires-recheck",
+      "reasonNotRechecked": "Supabase Edge URL is outside this execution environment network allowlist."
+    }
   }
 }

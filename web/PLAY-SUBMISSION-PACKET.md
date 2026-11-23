@@ -1,6 +1,12 @@
 # 결정해지니 — Play Console 제출 항목과 심사 접근 패킷
 
-갱신 기준: 2026-11-23 22:36 KST (13:36 UTC). **입력용 준비 자료이며 Play Console 등록·저장·제출을 수행한 기록이 아닙니다.**
+갱신 기준: 2026-11-24 KST. **입력용 준비 자료이며 Play Console 등록·저장·제출을 수행한 기록이 아닙니다.**
+
+최신 격리 Android 기기 검증은 `eaf89c29c2bd06e3123e7c822a453d1a23b2153c`의
+같은 실행에서 계측을 수행한 3회 모두 네 시나리오를 통과했습니다. 이 소스와 빌드
+입력 159개가 같은 `b8d9db6…`에서 새 AAB를 export·서명했습니다. 기존 `5efd0a4…`
+후보와 QA APK는 이력으로 보존합니다. 가상기기 성공을 새 서명 AAB의 설치 검증이나
+실물 기기·운영 서버 검증으로 바꾸어 기록하지 않습니다.
 
 앱 설명과 개인정보 초안은 `PLAY-STORE-PREPARATION.md`를 그대로 기준으로 사용합니다.
 이 파일은 내용을 다시 포장하지 않고 Console 항목별 답변, 영문 심사 지침, 확인된
@@ -8,45 +14,99 @@
 같은 판단을 구조화한 내부 준비 자료이며 Google 공식 CSV/API 가져오기 형식이 아닙니다.
 `null`은 미확정이며 `아니요`로 바꾸어 입력하면 안 됩니다.
 
-## 1. 이 패킷에 연결된 후보
+## 1. 최신 서명 후보와 보존한 이력
 
 | 항목 | 값 |
 | --- | --- |
 | 앱 | 결정해지니 · `com.jmpark0611.genie` |
 | 버전 | versionName `1.0.0` · versionCode `1` |
-| 새 UGC 후보 소스 | `5efd0a4fe7f04b38087ecc3de07c1730ce4b0944` |
+| 새 후보의 실제 빌드 소스 | `b8d9db66c249684842971410f2c7b80dd5bec395` |
 | 새 후보 진행 상태 | 실제 CI export 성공, 로컬 서명·서명 확인·원본 payload 불변 확인 완료 |
-| 새 후보 파일 | `Genie-Android-1.0.0-1-ugc-candidate.aab` · 4,161,285 bytes |
-| 새 후보 SHA-256 | `347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3` |
-| 새 후보 검증 기록 | `Genie-Android-1.0.0-1-ugc-verification.json` |
-| 실제 export 근거 | [run 45184417729](https://github.com/jmpark0611-art/bestchoice/actions/runs/45184417729) · job `137726190042` · success |
-| 확정 준비본 | 소스 159개 · 웹 자산 184개 · native 69개. 준비 시각 2026-11-23 22:29:42 KST (`2026-11-23T13:29:42.225Z`) |
+| 새 후보 파일 | `Genie-Android-1.0.0-1-20261124-candidate.aab` · 4,161,320 bytes |
+| 새 후보 SHA-256 | `5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78` |
+| 서명 전 AAB SHA-256 | `df2819562154f4dc833a69ae5b7d3e47c8e31a6e7ab94f0a41e5aee7245f46d3` |
+| 새 후보 검증 기록 | `Genie-Android-1.0.0-1-20261124-verification.json` |
+| 실제 export 근거 | [run 45289031213](https://github.com/jmpark0611-art/bestchoice/actions/runs/45289031213) · attempt 1 · job `138092733186` · success |
+| 확정 준비본 | 소스 159개 · 웹 자산 184개 · native 69개. 준비 시각 2026-11-24 08:28:23 KST (`2026-11-23T23:28:23.245Z`) |
 | 운영 주체 | 에스제이컴퍼니 · 대표 박지민 |
 | 문의 | `jmpark0611@gmail.com` |
 | 공유 웹 | `https://genie-web-rosy.vercel.app` |
 | 현재 제출 가능 여부 | 미완료. Android 운영 Origin 거부 해소, 신고·차단 계약의 운영 적용, 공개 정책·삭제 안내, 새 서명 후보/공유 웹 확인 등이 필요 |
 
-**이전 후보의 이력:** 소스 `959836f6a19bc4729d49b20237092384a2417728`,
+**바로 이전 UGC 후보의 이력:** 소스 `5efd0a4fe7f04b38087ecc3de07c1730ce4b0944`,
+`Genie-Android-1.0.0-1-ugc-candidate.aab`, 4,161,285 bytes,
+SHA-256 `347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3`입니다.
+기존 QA APK와 Manifest 재파싱·APK 서명 검증 기록을 포함한 후보 객체 전체를 JSON의
+`candidateHistory`에 보존합니다. 이 QA APK를 새 `b8d9db6…` 후보의 APK로 표시하지 않습니다.
+
+**더 이전 후보의 이력:** 소스 `959836f6a19bc4729d49b20237092384a2417728`,
 `Genie-Android-1.0.0-1-candidate.aab`, 4,158,468 bytes,
 SHA-256 `c737b458e8e606bd616ee5f5b8698ac6e2ca886d04c474e3a47a1a2fffddb56c`입니다.
-JSON의 `previousCandidate`에 보존하며 새 UGC 후보의 파일·검증 결과로 사용하지 않습니다.
+JSON의 기존 `previousCandidate`를 그대로 보존하며 최신 후보의 파일·검증 결과로 사용하지 않습니다.
 
 공유 전 정책 동의, 투표 전 질문 신고, 작성자 차단·해제 UI를 새 서명 후보에
 포함했습니다. 아래 심사 안내는 이 보완을 포함하는 후보용 초안입니다. 새 서버
 계약은 일회용 격리 환경의 실제 HTTP 검증을 통과했으며 운영에는 적용하지 않았습니다.
 서버 QA나 기존 preview 가상기기 검증을 새 서명 AAB의 기기 검증으로 간주하지 않습니다.
-새 후보는 기존과 같은 upload 인증서로 서명했습니다. QA용 APK 변환과 원본 내용·
-AAB/APK Manifest·APK 서명 확인을 완료했습니다. 실제 기기 실행은 하지 않았습니다.
-정확한 새 후보의 기기·운영 접근 확인 전에는
-제출 준비 완료로 표시하지 않습니다.
+새 후보는 기존과 같은 upload 인증서로 서명했습니다. 컴파일/export 영수증은 최종
+AAB의 binary Manifest 앱 ID·버전 검증 성공을 기록합니다. 로컬 서명 도구는 서명과
+원본 payload·Manifest 바이트 보존을 확인했고, 이 단계에서 Manifest를 다시 파싱하지
+않았으므로 `binaryManifestReparsed:false`를 그대로 유지합니다.
+
+**새 후보의 QA APK 생성, APK Manifest 재파싱·서명 확인, 실제 설치·실물 기기 실행,
+운영 기능 실행 검증과 Play 제출은 아직 수행하지 않았습니다.** 이전 후보의 QA APK 변환
+성공과 구분하며, 정확한 새 후보의 기기·운영 접근 확인 전에는 제출 준비 완료로
+표시하지 않습니다.
+
+### 최신 격리 Android 가상기기 검증 — 별도 근거
+
+소스는 `eaf89c29c2bd06e3123e7c822a453d1a23b2153c`, 실행은
+[45278517165](https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165)입니다.
+모든 attempt는 같은 소스를 사용했습니다.
+
+| attempt | 결과 | 실제 확인 범위 |
+| --- | --- | --- |
+| [1](https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165/attempts/1) | 성공 | 시작·About 진입 및 시스템 뒤로가기·320px 화면·초안을 작성한 프로세스의 강제종료 후 복원, 네 시나리오 통과 |
+| [2](https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165/attempts/2) | 빌드 단계 실패 | Maven HTTP 429로 계측 시작 전 중단. 화면 동작 실패나 초안 복원 실패로 계산하지 않음 |
+| [3](https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165/attempts/3) | 성공 | 같은 네 시나리오 통과 |
+| [4](https://github.com/jmpark0611-art/bestchoice/actions/runs/45278517165/attempts/4) | 성공 | 같은 네 시나리오 통과 |
+
+통과한 케이스 ID는 `launch`, `native-back`, `narrow-screen`,
+`draft-restore-after-force-stop`입니다. 이는 `dev.local.genie.preview` 격리 fixture의
+실제 에뮬레이터 계측 결과이며, 계측 실행 3회에서 네 케이스가 모두 통과했다는 뜻입니다.
+서명된 출시 후보 설치, 실물 휴대전화, 운영 백엔드·공유 투표·신고, 스토어 스크린샷은
+이 근거에 포함되지 않습니다.
+
+기기 검증 소스 `eaf89c…`와 새 export 소스 `b8d9db6…`의 sourceSnapshot 159개는
+바이트 단위로 일치하며, 비교한 스냅샷 SHA-256은
+`949f135553920a3d8aaff7b0318893f11eebbcae48cfb99d6b3343f3828645b7`입니다.
+[두 커밋의 차이](https://github.com/jmpark0611-art/bestchoice/compare/eaf89c29c2bd06e3123e7c822a453d1a23b2153c...b8d9db66c249684842971410f2c7b80dd5bec395)는
+export workflow의 주석뿐입니다. 새 unsigned AAB 해시는 `eaf89c…`의 no-upload 빌드와도
+일치합니다. 이 일치는 같은 빌드 입력·산출물의 연결 근거이며, 서명된 새 파일의
+설치·실행을 대신한 결과는 아닙니다.
+
+### 최신 운영 준비 상태 — 읽기 전용 재확인
+
+2026-11-24 08:34:04 KST에 운영 migration 이력과 시스템 카탈로그를 확인했습니다.
+기존 migration 7개만 있으며 신고·질문 안전성 private schema 2개, 신규 public RPC
+6개, 내부 함수 7개, private table 7개는 모두 없습니다. 실제 사용자 자료를 읽거나
+운영 설정·데이터를 변경하지 않았습니다. 이전 migration 적용은 사용자 취소로 끝났고
+이번에는 재시도하지 않았습니다.
+
+Android `https://localhost`의 HTTP 403 `ORIGIN_DENIED`는 2026-11-23 22:23:23 KST의
+마지막 관측입니다. 이번에 새 OPTIONS 응답이나 현재 origin 설정값을 확인한 것은
+아닙니다. 최신 읽기 결과와 이후 진행 순서는 `ANDROID-RELEASE-READINESS-2026-11-24.md/.json`에
+기록합니다. 이 카탈로그 확인은 실제 후보의 AI·공유·투표·신고 실행 검증을 대신하지 않습니다.
 
 ## 2. Console에 옮길 항목
 
 Console의 현재 화면에서는 앱 콘텐츠 항목이 `App access` 또는 `Sign-in details`로
-표시될 수 있습니다. 이번 Play Console 읽기 접근은 자동 승인 검토에서 거절되어
-실제 폼을 확인하지 못했습니다. 로그인·등록·저장·제출에 성공했다고 표시하지 않으며,
-보이지 않은 체크박스 ID도 기록하지 않습니다. 접근이 가능한 후 실제 문항의 의미에
-맞춰 아래 답변을 옮깁니다.[G1]
+표시될 수 있습니다. **2026-11-24 KST의 현재 확인 결과는 Google 로그인 필요**입니다.
+로그인 화면까지 확인했지만 인증된 Play Console의 앱·입력 폼에는 접근하지 못했습니다.
+2026-11-23의 자동 승인 검토 거절은 이전 접근 이력으로 보존하며, 현재 차단 사유를
+그 거절로 대신 설명하지 않습니다. 로그인·등록·저장·제출에 성공했다고 표시하지
+않으며, 보이지 않은 체크박스 ID도 기록하지 않습니다. 인증된 접근이 확보된 후 실제
+문항의 의미에 맞춰 아래 답변을 옮깁니다.[G1]
 
 | Console 항목 | 입력/판단 | 상태와 근거 |
 | --- | --- | --- |
@@ -62,7 +122,7 @@ Console의 현재 화면에서는 앱 콘텐츠 항목이 `App access` 또는 `S
 | 광고 포함 | 아니요 | 현재 앱·Manifest·의존성에서 광고 SDK, 배너, 후원 노출·자체 광고 흐름 없음 |
 | 인앱 상품/구독 | 없음 | 결제·구독 화면, Google Play Billing·결제 SDK/API 및 결제 권한 없음. 스토어의 다운로드 가격을 설정했다는 뜻은 아님 |
 | 앱 접근 안내 | 아래 5개 영문 지침 | 이메일·비밀번호·OTP·기존 계정을 제공하는 구조가 아님. 자동 익명 세션과 작성자/투표자별 표시 조건 설명 |
-| 대상 연령 | 사용자 결정 1건 남음 | 실제 의도한 대상 연령. 임의로 18세 이상이나 전 연령을 선택하지 않음 |
+| 대상 연령 | 성인만, `18세 이상` | 청소년을 대상에 포함하지 않는다는 기존 사용자 지시 반영. 다시 선택을 요청하지 않으며, 콘텐츠 등급 산출과 구분 |
 | 콘텐츠 등급 | 실제 설문 답변 후 산출 | 연령등급을 직접 지정하거나 `전체이용가`로 가정하지 않음. 공유 질문·투표·AI 생성 기능을 아래 사실대로 신고 |
 | 데이터 보안 | 3절의 항목별 초안 | `수집 없음` 선택 불가. 공급자 공유 분류·로그·삭제 답변의 남은 확인을 해결한 뒤 제출 |
 | 스토어 이미지 | 기존 512×512 아이콘, 1024×500 feature graphic | 이미지 파일 준비 완료. 폰 스크린샷은 실제 제출 화면으로 추가 확보 필요 |
@@ -232,7 +292,8 @@ Home drafts restore via 초안 이어쓰기. 안내 보기 / 초안 저장 설�
 | 실제 운영 OPTIONS: Android `https://localhost`는 403 / `ORIGIN_DENIED`, 허용 Origin 헤더 없음 | Android의 결정 API 접근이 현재 Origin 단계에서 거절됨 | 승인된 설정 변경으로 기존 허용 원점을 유지하며 `https://localhost` 추가 후 확인 |
 | 같은 시각의 기존 웹 Origin은 204 / 정확한 허용 Origin 헤더 | 해당 웹 Origin의 사전 요청 허용만 확인 | POST·익명 세션·AI·공유 투표 성공으로 확대 해석하지 않음 |
 | 새 질문 안전 계약: 49개 guard 및 일회용 서버의 실제 HTTP 검증 통과 | 투표 전/후 질문 신고, 중복 요청, 작성자 차단·해제와 권한 경계의 실행 근거 확보 | 운영 적용·신고 검토 절차는 별도 승인 후 진행 |
-| Play Console 읽기 접근의 자동 승인 거절 | 실제 Console 항목·계정 요구 사항을 확인하지 못함 | 접근 가능한 승인 경로에서 실제 폼을 확인. 로그인·앱 등록·제출 성공으로 기록하지 않음 |
+| 2026-11-23 Play Console 접근 이력: 자동 승인 거절 | 당시 실제 Console 항목·계정 요구 사항을 확인하지 못함 | 과거 이력으로 보존. 현재 접근 상태는 다음 행을 기준으로 함 |
+| 2026-11-24 Play Console 접근: Google 로그인 필요 | 로그인 화면은 확인했으나 인증된 앱·입력 폼은 미확인 | 로그인 완료 후 실제 등록·버전·서명 연결과 폼 확인. 앱 등록·저장·제출은 아직 수행한 것으로 표시하지 않음 |
 
 CORS 근거는 `qa/native-cors-read-2026-11-23.json/.md`,
 [run 45183387009](https://github.com/jmpark0611-art/bestchoice/actions/runs/45183387009),
@@ -277,15 +338,18 @@ AI 비공개 유지, 동시 동일 요청의 단일 접수·한도, 작성자 �
 로컬 UI가 있다는 사실만으로 이전 AAB나 운영 서버가 갱신되지는 않습니다. UGC
 관리와 AI 생성 결과 신고는 관련되지만 같은 기능으로 자동 충족되는 것은 아닙니다.[G5][G6]
 
-## 7. 사용자에게 남길 결정 한 가지
+## 7. 확정된 대상 연령과 남은 콘텐츠 등급
 
-**누구를 위한 앱으로 출시할지, 실제 목표 연령대를 정해야 합니다.**
+**의도한 대상은 성인만이며, 대상 연령 입력은 `18세 이상`으로 준비합니다.**
 
-사용자가 선택한 대상 연령은 아직 없습니다. 성인만을 위한 앱인지, 청소년도
-의도한 대상인지에 따라 표시와 필요한 보호 조치를 맞춰야 합니다. 심사를 쉽게
-하려고 연령을 임의로 올리거나, 더 넓게 노출하려고 모든 연령을 고르지 않습니다.[G7]
-JSON의 `targetAgeGroups`는 결정 전까지 `null`로 둡니다. 계약·보관·운영 상태는
-사용자에게 추측을 요구하는 선택지가 아니라 실제 근거로 확인해 해결할 항목입니다.
+사용자가 청소년을 대상에 포함하지 않겠다고 이미 지시한 내용을 반영했습니다.
+기존의 대상 연령 미확정 표시는 이전 상태이므로 같은 선택을 다시 요청하지 않습니다.
+JSON의 `targetAgeGroups`는 `["18+"]`이며 실제 Console의 해당 연령 항목에 대응합니다.[G7]
+
+이는 대상 이용자의 선택이며 콘텐츠 등급 판정이 아닙니다. 실제 콘텐츠 등급 설문은
+아직 답변하지 않았으므로 `contentRatingFacts.ageRating`은 계속 `null`로 유지합니다.
+개인정보 URL·공급자 공유 분류·삭제 범위·가격·출시 국가의 미확정 값도 그대로 유지하며,
+연령 결정이나 가상기기 성공을 근거로 이 값을 추정하여 채우지 않습니다.
 
 ## 8. 근거와 갱신 규칙
 
@@ -307,15 +371,18 @@ Google 공식 문서는 2026-11-23에 확인했습니다. 소스 코드에 대�
 `src/components/{DecisionReport,DecisionReflection}.tsx`, `package.json`, `package-lock.json`,
 `android/app/src/main/AndroidManifest.xml`입니다. 이전 후보 식별은
 `ANDROID-RELEASE-PROFILE.json`과 전달 확인 기록에 보존하며, 새 후보는 위 확정 소스의
-실제 export 결과와 `Genie-Android-1.0.0-1-ugc-verification.json`의 서명 확인 결과에
+실제 export 결과와 `Genie-Android-1.0.0-1-20261124-verification.json`의 서명 확인 결과에
 따라 파일과 해시를 기록합니다.
 
-이 패킷은 새 두 파일의 준비 자료입니다. 이후 승인된 질문 신고·차단 UI 보완에는
+이 패킷은 두 파일의 준비 자료입니다. 이전에 승인된 질문 신고·차단 UI 보완에는
 관련 50개 집중 검사와 질문 권한 안내 1개 추가 검사를 실행했습니다. 기존 전체
-앱 검사 83개를 반복하지 않았습니다. 이 문서는 별도로 완료된 서버 QA·CORS 확인과
-새 후보의 빌드·서명 결과를 기록하며, 문서 갱신만을 위해 검증·서명을 반복하지
-않았습니다. Console 입력·제출과 운영 설정·데이터 변경은 수행하지 않았습니다.
+앱 검사 83개를 반복하지 않았습니다. 이번 문서 갱신은 별도로 완료된 최신 격리
+가상기기 계측 결과, 기존 대상 연령 결정, 현재 Console 로그인 필요 상태를 반영합니다.
+기존 서버 QA·CORS 관측과 `5efd0a4…` 후보의 빌드·서명 근거는 원래 범위로 보존하며,
+별도로 완료한 `b8d9db6…` 후보의 export·로컬 서명 결과를 최신 후보에 연결합니다.
+문서 갱신 자체가 새 기기·운영 검증이나 서명 실행은 아닙니다. Console 입력·제출과
+운영 설정·데이터 변경은 이 문서 갱신으로 수행하지 않았습니다.
 
-### 최신 후보의 설치 검증용 파일
+### 보존된 5efd0a4 후보의 설치 검증용 파일
 
-새 signed AAB `347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3`에서 QA 서명 APK `8fafa2908355ac1fed1c024ff2908c85e8cd721c9a28667ecf170807874f5cf8`를 생성했습니다. 앱 자산 185개, DEX 1개, baseline profile 2개의 원본 payload 일치와 AAB/APK Manifest·APK v2/v3 서명을 확인했습니다. QA 임시 키는 삭제됐습니다. 업로드키 또는 Play 서명 APK가 아니며 실제 설치·실행·공유·클립보드·스크린샷·운영 검증은 수행하지 않았습니다. 원본 local-signing receipt의 `binaryManifestReparsed:false`는 그대로 보존하고, 이 별도 변환의 재파싱 결과와 구분합니다.
+기존 signed AAB `347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3`에서 QA 서명 APK `8fafa2908355ac1fed1c024ff2908c85e8cd721c9a28667ecf170807874f5cf8`를 생성했습니다. 앱 자산 185개, DEX 1개, baseline profile 2개의 원본 payload 일치와 AAB/APK Manifest·APK v2/v3 서명을 확인했습니다. QA 임시 키는 삭제됐습니다. 업로드키 또는 Play 서명 APK가 아니며 실제 설치·실행·공유·클립보드·스크린샷·운영 검증은 수행하지 않았습니다. 원본 local-signing receipt의 `binaryManifestReparsed:false`는 그대로 보존하고, 이 별도 변환의 재파싱 결과와 구분합니다. 이 문단의 완료 항목은 `5efd0a4…` 이력에만 해당하며 최신 `b8d9db6…` 후보에는 적용하지 않습니다.
