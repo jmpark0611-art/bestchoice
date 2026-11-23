@@ -33,12 +33,24 @@ Docker 내부망에서는 `-p`만으로 호스트 포트 연결을 기대하지 
 
 이 작업이 성공해도 운영 Supabase 검증, 모델 응답 품질 검증, Android 실기기 검증 또는 출시 완료가 아닙니다. 완전 강제 종료로 정리 단계가 실행되지 못하는 경우에는 GitHub의 일회용 runner 폐기에 의존하며 성공으로 기록하지 않습니다.
 
+## 미배포 신고 제안의 별도 검증
+
+기본 두 세션 흐름은 서버 QA commit `2448544bb6601d4ac5154cd9bfa39722a009f248`의 [실행 45163032169](https://github.com/jmpark0611-art/bestchoice/actions/runs/45163032169)에서 실제 통과했습니다. 그 receipt는 보존하고, 이후 실행의 신고 검증은 새 `reportingProposal` 필드로 구분합니다. 이 QA 소스의 결과를 앞서 서명한 Android AAB의 빌드 증거와 혼동하지 않습니다.
+
+`vs-report-result.proposal.sql`은 기존 `supabase/proposals/vs-report-result.sql`의 원문을 바이트 그대로 복사한 파일입니다. 두 파일의 SHA-256은 `c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c`입니다. 운영 마이그레이션이나 함수는 수정하지 않으며, 기존 제안의 새 객체 생성 방식과 세션 opt-in guard도 그대로 유지합니다.
+
+실행기는 기본 흐름 성공 뒤에만 현재 nonce·project·DB container·단일 내부망 소유권을 다시 확인합니다. 정확한 DB 컨테이너의 `psql`에 stdin으로 세션 opt-in과 제안 원문을 전달하고 PostgREST 스키마를 갱신합니다. 원격 DB 주소나 SQL 본문·사용자 ID를 argv/log에 넣지 않습니다. 별도 롤백 트랜잭션에서 authenticated 역할의 직접 SELECT/INSERT 거부와 RLS·GRANT를 확인합니다. HTTP에서 비공개 스키마를 선택할 수 없다는 사실과 실제 DB 역할 권한은 구분합니다.
+
+추가 합성 익명 세션 3개로 미투표자·다른 작성자의 신고 거부, 작성자와 투표한 친구의 접수증, 동의 누락과 요청 UUID의 내용 변경 거부를 검사합니다. 같은 요청 UUID와 내용을 실제 HTTP로 두 번 병렬 전송한 뒤 접수증 전체 일치, 신고 1건, 사용자·전체 한도 각각 1회 증가를 해당 실행의 DB 집계로 확인합니다. 이는 병렬 전송한 두 요청의 검증이며 모든 DB 스케줄이나 경쟁 상황을 강제로 재현했다는 뜻은 아닙니다.
+
+원본 결정을 삭제한 뒤 신고는 0건이고 한도는 유지되어야 합니다. HTTP 전후와 집계 조회마다 소유권을 확인하며, 집계는 이 실행에서 생성한 poll/user/request에 한정합니다. 전체 한도는 이 실행에서 새로 생성한 비공개 스키마의 당일 카운터만 확인합니다. 최종 receipt는 이러한 검사와 기존 전용 볼륨·네트워크·listener 정리가 모두 끝난 뒤에만 출력합니다. 이 검증은 제안을 운영에 활성화하지 않습니다.
+
 ## 실행과 검증 범위
 
 로컬 집중 검사(외부 연결 없음, proxy lifecycle 검사는 소유한 loopback echo 서버만 사용):
 
 ```sh
-node --test web/scripts/local-stack-check.test.mjs web/qa/local-stack-fixture/fixture.test.mjs
+node --test web/scripts/local-stack-check.test.mjs web/scripts/verify-local-reporting.test.mjs web/qa/local-stack-fixture/fixture.test.mjs
 ```
 
 실제 Docker 실행은 `.github/workflows/genie-local-integration.yml`이 담당합니다. 실행 결과가 나오기 전에는 실제 Supabase 통합 통과로 표시하지 않습니다.

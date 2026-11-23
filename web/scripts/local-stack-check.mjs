@@ -13,6 +13,8 @@ import { createServer as createTcpServer, createConnection, isIP } from 'node:ne
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { verifyLocalIntegration } from './verify-local-integration.mjs';
+import { verifyLocalReporting, reportingAuditSql, REPORT_ROLE_CHECK_SQL, REPORT_CHECK_CODES,
+  REPORT_HTTP_CHECKS } from './verify-local-reporting.mjs';
 
 export const PINS = Object.freeze({
   cliVersion: '3.2.0',
@@ -21,6 +23,8 @@ export const PINS = Object.freeze({
   schemaPath: 'supabase/migrations/20261115000000_vs_polls_and_votes.sql',
   schemaSha256: 'a11c228c811cf8f04030a6507755863a4a3c6a771f86caa5268db59c77a136f1',
   schemaGitBlob: 'c2a91f8f3dfc69598907faf1109fae41be0c638a',
+  reportingProposalPath: 'web/qa/local-stack-fixture/vs-report-result.proposal.sql',
+  reportingProposalSha256: 'c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c',
   probeImage: 'node:24.22.3-bookworm-slim',
   networkCidr: '172.30.240.0/24', gateway: '172.30.240.1',
   probeCidr: '172.30.241.0/24', probeGateway: '172.30.241.1',
@@ -419,7 +423,10 @@ export function readPinnedInputs(repoRoot) {
     hashes[file] = digest(readFileSync(source));
     ensure(hashes[file] === manifest.files?.[file], 'PINNED_FIXTURE_HASH_MISMATCH');
   }
-  return { schema, fixtureRoot, hashes, manifest };
+  const reportingProposal = path.join(repoRoot, PINS.reportingProposalPath);
+  ensure(regular(reportingProposal) && digest(readFileSync(reportingProposal)) === PINS.reportingProposalSha256,
+    'PINNED_REPORT_PROPOSAL_REQUIRED');
+  return { schema, fixtureRoot, hashes, manifest, reportingProposal };
 }
 
 function executable(name, env) {
@@ -435,10 +442,12 @@ function executable(name, env) {
   fail('REQUIRED_LOCAL_TOOL_MISSING');
 }
 
-function execute({ command, args, cwd, env, timeout = 60_000, signal }) {
+function execute({ command, args, cwd, env, timeout = 60_000, signal, input }) {
   return new Promise(resolve => {
     let stdout = '', stderr = '', settled = false, terminated = false, hard;
-    const child = spawn(command, args, { cwd, env, shell: false, detached: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(command, args, { cwd, env, shell: false, detached: true,
+      stdio: [input === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'] });
+    if (input !== undefined) { child.stdin.on('error', () => {}); child.stdin.end(input); }
     const stop = () => {
       terminated = true;
       try { process.kill(-child.pid, 'SIGTERM'); } catch {}
@@ -842,6 +851,74 @@ export class DockerStackRuntime {
     const after = readPinnedInputs(this.repoRoot);
     ensure(JSON.stringify(after.hashes) === JSON.stringify(this.inputs.hashes), 'FIXTURE_SOURCE_CHANGED_DURING_CHECK');
   }
+  async reportingDatabase() {
+    ensure(this.integrationVerified === true && this.edgeVerified === true, 'BASELINE_REQUIRED_BEFORE_REPORT_PROPOSAL');
+    const [net] = await this.inspect('network', [this.state.networkName]);
+    const current = validateNetwork(net, this.state.networkName);
+    ensure(current.id === this.network.id && net.Labels?.[RUN_LABEL] === this.state.nonce, 'REPORT_DATABASE_NETWORK_IDENTITY_FAILED');
+    const containers = await this.stackContainers(true);
+    return containers.db;
+  }
+  async reportingSql(stage, input) {
+    ensure(['LOCAL_REPORT_PROPOSAL_APPLY_FAILED', 'LOCAL_REPORT_ROLE_CHECK_FAILED', 'LOCAL_REPORT_AUDIT_FAILED'].includes(stage) &&
+      typeof input === 'string' && input.length < 32_000, 'LOCAL_REPORT_SQL_REFUSED');
+    const db = await this.reportingDatabase();
+    // This is the exact owned container, not a host/remote DB connection. SQL and
+    // UUID parameters go through stdin, never process argv or diagnostic output.
+    return this.command(stage, this.tools.docker,
+      ['exec', '--user', 'postgres', '-i', db.Id, 'psql', '-X', '-q', '-A', '-t', '-w', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres', '-d', 'postgres'],
+      { input, timeout: 30_000 });
+  }
+  async installReportingProposal() {
+    await this.reportingDatabase();
+    const proposal = readFileSync(this.inputs.reportingProposal);
+    ensure(digest(proposal) === PINS.reportingProposalSha256, 'PINNED_REPORT_PROPOSAL_REQUIRED');
+    await this.reportingSql('LOCAL_REPORT_PROPOSAL_APPLY_FAILED',
+      "set genie.allow_local_reporting_proposal = 'on';\n" + proposal.toString('utf8') + "\nnotify pgrst, 'reload schema';\n");
+    const roles = await this.reportingSql('LOCAL_REPORT_ROLE_CHECK_FAILED', REPORT_ROLE_CHECK_SQL);
+    ensure(roles.stdout.trim() === 'REPORT_ROLE_CHECKS_PASSED', 'LOCAL_REPORT_ROLE_CHECK_FAILED');
+    this.reportingApplied = true;
+  }
+  async verifyReporting() {
+    ensure(this.reportingApplied === true, 'LOCAL_REPORT_PROPOSAL_NOT_APPLIED');
+    const requests = [];
+    try {
+      this.reportingProof = await verifyLocalReporting({ GENIE_SUPABASE_URL: ORIGIN,
+        GENIE_CONFIRM: 'isolated-genie-synthetic-only', GENIE_SUPABASE_PUBLIC_KEY: this.keys.anon }, '--run', {
+        verifyOwnership: async () => { await this.reportingDatabase(); },
+        inspectState: async scope => {
+          const sql = reportingAuditSql(scope);
+          ensure(!this.reportingScope || JSON.stringify(scope) === JSON.stringify(this.reportingScope), 'LOCAL_REPORT_SCOPE_CHANGED');
+          this.reportingScope ??= Object.freeze({ ...scope });
+          const result = await this.reportingSql('LOCAL_REPORT_AUDIT_FAILED', sql);
+          try { return JSON.parse(result.stdout.trim()); } catch { fail('REPORT_QA_AUDIT_INVALID'); }
+        },
+        send: (url, options) => {
+          ensure(!this.signal?.aborted, 'LOCAL_CHECK_INTERRUPTED');
+          return this.send(url, { ...options,
+            signal: this.signal ? AbortSignal.any([options.signal, this.signal]) : options.signal });
+        },
+        observe: item => {
+          if (!REPORT_HTTP_CHECKS.includes(item.check)) return;
+          // Fields originate from the fixed request builder, never server bodies.
+          requests.push({ number: item.number, check: item.check, method: item.method, route: item.route,
+            status: Number.isInteger(item.status) && item.status >= 100 && item.status <= 599 ? item.status : null,
+            ...(item.transportFailed === true ? { transportFailed: true } : {}) });
+          if (requests.length > 12) requests.shift();
+        },
+      });
+      await this.reportingDatabase();
+      readPinnedInputs(this.repoRoot);
+      this.reportingVerified = true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      const assertion = [...REPORT_CHECK_CODES, 'LOCAL_REPORT_SCOPE_CHANGED', 'LOCAL_REPORT_AUDIT_FAILED',
+        'REPORT_DATABASE_NETWORK_IDENTITY_FAILED', 'LOCAL_CHECK_INTERRUPTED'].includes(message)
+        ? message : 'REPORT_QA_RUNTIME_FAILED';
+      this.diagnostics.push({ stage: 'LOCAL_REPORTING_CHECK_FAILED', assertion, requests });
+      fail('LOCAL_REPORTING_CHECK_FAILED');
+    }
+  }
   receipt() {
     return { status: 'local-supabase-integration-passed-not-a-release',
       sourceCommit: /^[0-9a-f]{40}$/.test(this.env.GITHUB_SHA ?? '') ? this.env.GITHUB_SHA : null,
@@ -850,6 +927,9 @@ export class DockerStackRuntime {
       fixtureHashes: this.inputs.hashes, serviceImages: this.imageProof, networkProof: this.probeProof,
       loopbackProxies: this.verifiedProxyProof, loopbackProxiesClosed: true,
       realLocalAuthPostgrestAndEdge: true, twoSessionFlowVerified: this.integrationVerified === true,
+      reportingProposal: { ...this.reportingProof, verified: this.reportingVerified === true,
+        sourceSha256: PINS.reportingProposalSha256, directPostgresRoleDenialsVerified: this.reportingApplied === true,
+        roleCheckTransactionRolledBack: true, appliedOnlyToDisposableDatabase: true },
       modelCalled: false, hostedProjectContacted: false, productionFilesChanged: false,
       nativeDeviceVerified: false, storeSubmitted: false, disposableResourcesDeleted: true };
   }
@@ -912,7 +992,7 @@ export class DockerStackRuntime {
     if (okay) {
       try { rmSync(this.state.workspace, { recursive: true, force: true }); rmSync(statePath(this.env), { force: true }); } catch { okay = false; }
     }
-    this.keys = undefined; this.edgeEnv = undefined;
+    this.keys = undefined; this.edgeEnv = undefined; this.reportingScope = undefined;
     return okay;
   }
 }
@@ -924,7 +1004,8 @@ export async function runLocalStackCheck({ repoRoot = defaultRepo, env = process
   const actions = runtime ?? new DockerStackRuntime({ repoRoot, env, signal });
   let error, complete = false, cleaned = false;
   try {
-    for (const stage of ['preflight', 'prepare', 'isolate', 'startCore', 'verifyCore', 'installFixture', 'startEdge', 'verifyEdge', 'verifyIntegration']) {
+    for (const stage of ['preflight', 'prepare', 'isolate', 'startCore', 'verifyCore', 'installFixture', 'startEdge', 'verifyEdge',
+      'verifyIntegration', 'installReportingProposal', 'verifyReporting']) {
       progress(stage); await actions[stage]();
     }
     complete = true;

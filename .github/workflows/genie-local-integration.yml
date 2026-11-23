@@ -9,6 +9,7 @@ on:
     paths:
       - 'web/scripts/local-stack-check*.mjs'
       - 'web/scripts/verify-local-integration*.mjs'
+      - 'web/scripts/verify-local-reporting*.mjs'
       - 'web/qa/local-stack-fixture/**'
       - '.github/workflows/genie-local-integration.yml'
   workflow_dispatch:
@@ -41,7 +42,7 @@ jobs:
         with:
           node-version: '24.22.3'
       - name: Check only new isolation guards and the preserved deterministic fixture
-        run: node --test web/scripts/local-stack-check.test.mjs web/qa/local-stack-fixture/fixture.test.mjs
+        run: node --test web/scripts/local-stack-check.test.mjs web/scripts/verify-local-reporting.test.mjs web/qa/local-stack-fixture/fixture.test.mjs
       - name: Verify the actual local Auth, PostgREST and Edge flow
         run: node web/scripts/local-stack-check.mjs --run-isolated
       - name: Confirm disposable stack cleanup even after interruption
