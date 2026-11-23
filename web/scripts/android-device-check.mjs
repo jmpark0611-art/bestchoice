@@ -394,7 +394,7 @@ export async function prepareDeviceCheck({ workDir, webRoot = defaultWebRoot, sd
   const androidDir = path.join(fixture, 'android');
   await checked(run, { stage: 'debug-apk-build', command: '/bin/sh', args: [path.join(androidDir, 'gradlew'),
     '--no-daemon', '--no-configuration-cache', '-Pandroid.builder.sdkDownload=false', '--console=plain',
-    'assembleDebug', 'assembleDebugAndroidTest'], cwd: androidDir, env: buildEnv, timeout: 900_000 });
+    ':app:assembleDebug', ':app:assembleDebugAndroidTest'], cwd: androidDir, env: buildEnv, timeout: 900_000 });
   const apk = path.join(androidDir, 'app/build/outputs/apk/debug/app-debug.apk');
   const testApk = path.join(androidDir, 'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk');
   if (![apk, testApk].every(file => regular(file) && lstatSync(file).size > 0)) reject('NEW_DEBUG_APKS_MISSING');
