@@ -1,17 +1,44 @@
 # 결정해지니 Android 출시 준비
 
-이 문서는 기존 기능 소스에 추가한 **로컬 Android 출시 경로**를 설명합니다.
-합성 설정과 일회용 키를 사용한 실제 Android 컴파일·서명·자산 대조는
-2026-11-23에 통과했습니다. 정식 출시용 AAB, 실제 서버 및 실기기 확인,
-Google Play 제출은 남아 있습니다. 상세 결과는 `ANDROID-NATIVE-CHECK.md`에 있습니다.
-현재 준비 완료 항목과 환경 차단점은
-`ANDROID-RELEASE-PROGRESS-2026-11-23.md`에 정리했습니다.
+이 문서는 Android 출시 경로와 검증 이력을 설명합니다. **2026-11-23 현재 전용
+아이콘을 포함한 실제 설정의 AAB를 생성하고, 결정해지니 전용 업로드 키로 로컬
+서명·검증하여 보관했습니다.** Google Play 제출을 마쳤다는 의미는 아닙니다.
 
-후속 준비에서 실제 연결 대상과 앱 등록 전 후보 입력을
+## 현재 준비 상태 — 2026-11-23 20:35 KST (11:35 UTC) 갱신
+
+| 항목 | 현재 결과 |
+| --- | --- |
+| 실제 앱 ID·버전 | `com.jmpark0611.genie`, versionCode `1`, versionName `1.0.0` |
+| 후보의 고정 소스 | 147개 파일, `959836f6a19bc4729d49b20237092384a2417728` |
+| unsigned 빌드·자산·최종 Manifest 검증 | [실행 45162298044](https://github.com/jmpark0611-art/bestchoice/actions/runs/45162298044), attempt 1, job `137650483659` 통과 |
+| 로컬 서명 후보 | `Genie-Android-1.0.0-1-candidate.aab`, 4,158,468 bytes |
+| 서명 후보 SHA-256 | `c737b458e8e606bd616ee5f5b8698ac6e2ca886d04c474e3a47a1a2fffddb56c` |
+| 전달 확인 기록 | `Genie-Android-1.0.0-1-verification.json` — 서명 검증, 원본 payload 보존, `brandingIncluded: true`, `storeSubmitted: false` |
+| 브랜드·스토어 이미지 | 전용 Android launcher·시작 배경·웹 SVG가 후보에 포함됨. 별도 `genie-play-icon.png` 512×512 RGBA와 `genie-play-feature.png` 1024×500 RGB 렌더 확인·보관 완료 |
+| 실제 격리 Supabase 기본 흐름 | [실행 45163032169](https://github.com/jmpark0611-art/bestchoice/actions/runs/45163032169), QA 전용 후속 커밋 `2448544bb6601d4ac5154cd9bfa39722a009f248` 통과 |
+| 실제 격리 신고 RPC | [실행 45166205966](https://github.com/jmpark0611-art/bestchoice/actions/runs/45166205966), QA 전용 후속 커밋 `fff40a925c09183cecee01ff2855f5213a04c91a`의 실제 HTTP·접근 권한·동시 동일 요청·삭제 검증과 guard 41/41 통과 |
+| Android 가상기기 | [실행 45164565371](https://github.com/jmpark0611-art/bestchoice/actions/runs/45164565371), QA 드라이버 후속 커밋 `d59e5d946f4ad45f8cc0dd72115bffd4ea4dbdde`에서 네 가지 preview fixture 시나리오 통과 |
+| 미완료 | 서명 후보·실물 기기 검증, 실제 운영 서버·신고 운영·공유 웹 호환, 개인정보 공개와 스토어 준비·제출은 별도 |
+
+AAB와 확인 JSON, 두 스토어 PNG는 `deliverables/genie-android-release/` 전달 폴더에
+정리했습니다. 고정 소스의 unsigned AAB는 GitHub artifact의 ZIP 해시와 출처를
+독립 확인한 뒤 로컬로 가져왔으며, 비공개 서명키는 CI에 올리지 않았습니다.
+서명 후 비서명 ZIP 항목과 Manifest가 원본과 같다는 것을 확인했습니다. 이 단계는
+binary Manifest를 다시 파싱한 검사가 아니라 앞서 확인한 Manifest 바이트의 보존
+검사이며, 확인 JSON도 `binaryManifestReparsed: false`로 구분합니다.
+
+기본 Supabase 통과 기록은 실제 로컬 Auth·PostgREST·Edge Runtime과 합성 데이터로
+확인한 별도 QA 결과입니다. AAB에 포함된 소스 커밋을 QA 후속 커밋으로 바꾸어
+표시하지 않으며, 운영 OpenAI 호출이나 운영 서버 검증으로 계산하지 않습니다.
+최신 세부 상태는 `ANDROID-RELEASE-PROGRESS-2026-11-23.md`, 스토어·개인정보 초안은
+`PLAY-STORE-PREPARATION.md`를 참고합니다. 아래의 최초 합성 검증과 환경 차단 기록은
+과거 이력으로 보존합니다.
+
+실제 연결 대상과 앱 등록 전 후보 입력을
 `ANDROID-RELEASE-PROFILE.json`에 기록했습니다. 앱 ID는 `com.jmpark0611.genie`,
 첫 버전은 `1.0.0`(versionCode 1)입니다. 이 ID의 Play 등록·사용 가능 여부를
 확인했다는 의미는 아니며, 최초 스토어 업로드 전에는 변경할 수 있는 준비값입니다.
-해당 서버의 활성 공개 키와 새로 생성·검증한 업로드 서명키는 소스 밖에서 보관합니다.
+해당 서버의 활성 공개 키와 생성·검증한 업로드 서명키는 소스 밖에서 관리합니다.
 
 ## 실행 명령
 
@@ -27,6 +54,28 @@ Google Play 제출은 남아 있습니다. 상세 결과는 `ANDROID-NATIVE-CHEC
 `prepare`는 JDK, Android SDK 또는 서명키가 없어도 공개 설정과 기존 웹 의존성이
 준비되어 있으면 실행할 수 있습니다. `check`와 `bundle`은 네이티브 준비 조건까지
 요구합니다. `bundle`은 이전 `prepare` 결과나 기존 AAB를 재사용하지 않습니다.
+
+### 현재 후보를 만든 별도 경로
+
+기존 offline `android:bundle`과 함께, 승인된 공개 저장소의 표준 Linux 실행기에서
+unsigned AAB를 만든 뒤 로컬 서명하는 경로를 사용했습니다.
+
+1. `scripts/android-public-config.mjs`가 승인된 기존 공개 웹에서 공개 설정을 읽고
+   알려진 지문과 대조했습니다. 서버·모델 API를 호출하거나 앱을 실행하지 않았습니다.
+2. `scripts/android-unsigned-export.mjs`가 명시적 다운로드 허용 아래 새 사본을
+   준비하고 unsigned 빌드, 최종 Manifest, 앱·라이브러리 자산, 소스 일치를 확인했습니다.
+   서명 환경 변수는 받지 않으며, helper 자체에는 업로드 기능이 없습니다.
+3. 별도 승인된 export workflow가 AAB·identity 기록·준비 기록·export 기록의 정확한
+   네 파일을 하루 보관 artifact로 전달했습니다. 현재 전달 artifact는 `14810724317`,
+   ZIP SHA-256은 `ef7cbbeaa6daa3b8d965661d225e77e817b572c3963484da1ed1224e9fc3aad6`입니다.
+4. `scripts/sign-android-export.mjs`가 독립 조회한 실행 메타데이터·ZIP 해시, 정확한
+   로컬 소스 사본, 공개 설정 지문·최종 identity·자산을 확인한 뒤에만 비공개 로컬
+   입력으로 서명했습니다. 인증서 지문, 서명, 원본 payload 보존을 확인하고 별도
+   서명 영수증을 남겼습니다.
+
+따라서 초기 작업 공간의 SDK·Gradle 캐시 부재는 **현재 후보 파일이 없다는 차단점은
+아닙니다.** 이것이 그 작업 공간에서 offline native 빌드를 실행했다는 뜻은 아니며,
+해당 명령의 기존 도구 조건은 아래와 같이 유지됩니다.
 
 ## 명시해야 하는 공개 설정 여섯 가지
 
@@ -51,7 +100,7 @@ Google Play 제출은 남아 있습니다. 상세 결과는 `ANDROID-NATIVE-CHEC
 자동 읽기를 끈 상태에서 세 공개 값을 명시적으로 번들에 반영합니다. 웹 빌드와
 Capacitor 자식 프로세스에는 서명 정보나 무관한 서비스 비밀값을 전달하지 않습니다.
 
-## AAB 생성에만 필요한 비공개 서명 입력
+## Offline AAB 생성 경로의 비공개 서명 입력
 
 | 환경 변수 | 의미 |
 | --- | --- |
@@ -68,11 +117,17 @@ Capacitor 자식 프로세스에는 서명 정보나 무관한 서비스 비밀�
 
 2026-11-23에는 결정해지니 전용 RSA 3072비트 업로드 키를 생성하고, 별도의 작은
 JAR에 실제 서명한 뒤 `jarsigner` 검증을 마쳤습니다. 키 저장소·접근 정보·공개 인증서·
-생성 기록을 비공개로 보관했습니다. 기존 앱의 키를 사용하거나 변경하지 않았고,
-새 키의 Play 등록과 이 키로 서명한 출시용 AAB 생성은 아직 하지 않았습니다.
+생성 기록을 비공개로 보관했습니다. 당시에는 새 키를 출시 AAB에 쓰지 않았지만,
+후속 작업에서 위의 실제 후보 AAB에 로컬 서명하고 검증했습니다. 기존 앱의 키를
+사용하거나 변경하지 않았으며, 새 키의 Play 등록은 아직 확인하지 않았습니다.
 공개 인증서 SHA-256은 `ANDROID-RELEASE-PROFILE.json`에서 확인할 수 있습니다.
 
-## 기존에 준비되어 있어야 하는 도구
+unsigned import·로컬 서명 경로에서는 명시한 비공개 접근 JSON과 키 저장소를
+사용합니다. 이 문서에 비공개 경로나 값을 기재하지 않으며, 파일·출처·내용 검증을
+마치기 전에 서명 입력을 읽지 않습니다. 두 경로 모두 서명 성공과 Play 등록 상태는
+구분합니다.
+
+## Offline 빌드에 준비되어 있어야 하는 도구
 
 현재 소스는 Android SDK 36(최소 SDK 24), AGP 8.13.0, Gradle 8.14.3의 `all`
 배포본, Java 21 컴파일 설정을 사용합니다. AGP 8.13.0의 기본 Build Tools는
@@ -120,7 +175,7 @@ SHA-256을 저장합니다. 이 파일은 앱 웹 자산에 포함하지 않습�
 기존 기록을 재사용할 수 없습니다. 이 기록은 우발적인 소스 혼합이나 오래된 산출물
 재사용을 막기 위한 것이며, 개발 환경에 대한 보안 인증은 아닙니다.
 
-실제 네이티브 빌드와 서명 검증까지 성공했을 때만 새 작업 폴더의
+offline `android:bundle`은 실제 네이티브 빌드와 서명 검증까지 성공했을 때만 새 작업 폴더의
 `android/app/build/outputs/bundle/release/app-release.aab`와
 `ANDROID-BUNDLE.json`을 완료 결과로 안내합니다. 이후에도 상태는
 `created-awaiting-device-and-store-review`입니다.
@@ -140,9 +195,9 @@ Java 코드의 namespace는 그대로 두고 release 출력의 application ID와
 검증 단계가 중단하도록 연결했습니다. 이 Gradle 경로는 표준 Ubuntu 24.04 실행기의
 Java 21·SDK 36 환경에서 합성 설정으로 실제 컴파일·임시 키 서명까지 통과했습니다.
 
-## 이번 로컬 준비 이후 남는 출시 단계
+## 과거 검증 이력과 현재 남은 출시 단계
 
-### 2026-11-23 추가: 도구 차단점 해소 작업
+### 2026-11-23 최초 검증: 도구 차단점 해소 작업
 
 `android:jdk`는 기존 Java에 컴파일·서명 모듈이 있는지 먼저 검사합니다. 필요한
 모듈이 있을 때만 새 절대 경로를 `--output`으로 지정하여 로컬 실행 도구를 만들 수
@@ -154,8 +209,8 @@ Gradle Plugin 호환성을 증명하지 않습니다. 자세한 검증 결과는
 실제 Android 컴파일을 위한 별도 검증 경로는 `android:native-check`입니다. 이 명령은
 명시한 `--allow-dependency-downloads`가 없으면 중단합니다. Linux의 기존 Java 21,
 SDK platform 36, Build Tools 35.0.0을 요구하고, 합성 설정·일회용 키로 release
-variant를 컴파일합니다. 네이티브 의존성 다운로드는 이 별도 검증에서만 허용되며
-정식 `android:bundle`은 계속 offline입니다.
+variant를 컴파일합니다. 후속 unsigned export도 별도의 명시적 허용 경로를 사용하며,
+정식 `android:bundle` 명령은 계속 offline입니다.
 
 검증이 성공하면 새 AAB의 서명과 포함된 자산을 확인한 뒤 임시 키와 AAB를 삭제하고
 `native-check-passed-not-a-release` 기록만 남깁니다. 실제 서버나 앱을 실행하지
@@ -185,32 +240,67 @@ variant를 컴파일합니다. 네이티브 의존성 다운로드는 이 별도
 이는 새 Android 후보의 공유 흐름을 검증한 결과가 아닙니다. 계정 설정 변경이나
 웹 배포는 하지 않았습니다.
 
-현재 준비 폴더 `.genie-release/run-*`를 다른 컴퓨터에 복사해서 재사용하지 않습니다.
+준비 폴더 `.genie-release/run-*`를 다른 컴퓨터의 native 빌드에 그대로 재사용하지 않습니다.
 기록의 sourceRoot와 의존성 링크가 원본 절대 경로를 가리키므로, 대상 컴퓨터에서는
 정확한 전체 소스와 lockfile로 새 `android:prepare` 또는 `android:bundle`을 실행합니다.
+검증된 네 파일 export를 로컬에서 가져오는 전용 서명 경로는 다운로드한 sourceRoot를
+따르지 않고 호출자가 명시한 정확한 로컬 소스 사본과 대조하도록 별도로 구현했습니다.
 
-후속 작업에서는 실제 설정 여섯 가지와 출시 서명 입력을 연결하여 사전 점검했습니다.
-현재 정확한 차단 항목은 `ANDROID_SDK_MISSING`과 `GRADLE_CACHE_MISSING`입니다.
-따라서 출시용 AAB는 아직 생성하지 않았습니다. 실제 연결 정보를 넣어 로컬 웹 빌드와
-파일 복사를 하더라도 앱을 실행하지 않으므로 실제 서버 접속 검증으로 계산하지 않습니다.
+### 과거 사전 점검의 차단과 후속 해소
 
-다음 실행에는 위 후보 입력을 사용하는 준비된 비공개 네이티브 빌드 환경이 필요합니다.
-서버 통합 확인은 이미 접근이 허용된 별도 격리 환경에서 합성
-데이터와 분리된 두 세션으로 결정→공유→투표→작성자 집계/삭제를 확인해야 합니다.
+초기 작업에서는 실제 설정 여섯 가지와 출시 서명 입력을 연결했지만,
+`ANDROID_SDK_MISSING`과 `GRADLE_CACHE_MISSING` 때문에 당시 작업 공간에서 AAB를
+만들지 못했습니다. 이후 승인된 native 실행기와 unsigned export·로컬 서명 경로로
+실제 후보를 확보했습니다. 이 과거 오류를 현재 AAB 미생성 상태로 재사용하지 않습니다.
+실제 연결 정보를 넣은 빌드가 성공해도 앱 실행이나 실제 운영 서버 접속 검증으로
+계산하지 않습니다.
+
+### 실제 격리 서버: 기본 흐름과 신고 통합 통과
+
+이미 승인된 별도 격리 환경에서 합성 데이터·분리된 두 세션으로 기본
+결정→공유→투표→작성자 집계/삭제 흐름을 확인한 실행 `45163032169`가 통과했습니다.
+이 결과는 QA 전용 후속 커밋 `2448544bb6601d4ac5154cd9bfa39722a009f248`의 별도
+기록이며, 실제 모델 요청을 사용하지 않습니다. 이후 실행 `45166205966`, job
+`137663686487`은 QA 전용 소스 `fff40a925c09183cecee01ff2855f5213a04c91a`에서
+신고 제안 RPC의 실제 로컬 HTTP 통합과 guard 검사 41/41을 통과했습니다.
+합성 세션 3개로 접근 권한·정상 접수증·동시 동일 요청의 한 번 접수와 한 번 한도
+차감·동의 및 내용 검사·원본 삭제 시 신고 행 정리를 확인했습니다. 비공개 schema의
+HTTP 거부와 직접 PostgreSQL 역할 권한 거부, 검사 트랜잭션 rollback도 확인했습니다.
+제안 SQL SHA-256은
+`c81db728edbc2b7584eff86d5aedc79485ba09476d35e06bfb40226d2f82024c`입니다.
+추가 변경은 QA 파일 7개이며 서명 AAB를 다시 빌드하거나 변경한 것이 아닙니다.
+임시 자원·proxy 정리를 마쳤고, 실제 모델이나 hosted Supabase를 호출하지 않았습니다.
+운영 신고 RPC와 운영자의 신고 검토 절차는 활성화하지 않았습니다.
 운영에 연결된 Preview를 테스트 서버로 간주하지 않습니다. 기존 운영 마이그레이션과
 `vs-decide`를 이 작업에서 변경하지 않습니다.
 
-기존 승인된 로컬 통합 대상은 정확히 `http://127.0.0.1:55321`이며 현재 listener가
-없습니다. `scripts/verify-local-integration.mjs`는 이전 보관 도구를 복원하여 현재 API
-계약에 맞게 보강한 실행 준비물입니다. `--run`과
+승인된 로컬 통합 대상은 정확히 `http://127.0.0.1:55321`입니다. 최초 사전 점검에는
+listener가 없었지만 후속 실행은 실행별로 소유한 임시 스택·loopback proxy를 만들고
+정리하는 경로를 사용했습니다. `scripts/verify-local-integration.mjs`는 이전 보관
+도구를 복원하여 현재 API 계약에 맞게 보강했습니다. `--run`과
 `GENIE_CONFIRM=isolated-genie-synthetic-only`, 로컬 스택에서 발급한 공개 키가 필요합니다.
-키의 로컬 출처·listener 소유권·외부 통신 차단은 별도 환경 근거가 필요합니다.
+키의 로컬 출처·listener 소유권·외부 통신 차단은 실행별 환경 근거로 확인합니다.
 리디렉션은 거부하며 정해진 경로에만 요청하고, 출력에 토큰을 기록하지 않습니다.
 합성 응답으로 도구를 확인한 결과를 실제 Supabase 검증으로 취급하지 않습니다.
 
-서명된 AAB가 생기면 Android 실기기의 시작·뒤로가기·공유 링크·초안 복원·투표·신고
-흐름을 확인하고, 개인정보/스토어 안내와 실제 동작의 일치를 확인합니다.
-그 다음 Google Play 제출을 별도 범위에서 진행하며, iOS는 Android 이후 이어갑니다.
+### 현재 남은 출시 확인
+
+API 36 가상기기의 `dev.local.genie.preview`에서 시작, 실제 OS 터치 뒤 시스템
+뒤로가기, 320px 화면, 강제종료 후 명시적 초안 복원의 네 시나리오가 통과했습니다.
+실행 `45164565371`의 `allFourCasesPassed`, `forceStopConfirmed`, 임시 AVD·debug
+키 정리는 모두 확인됐고 guard 검사는 14/14 통과했습니다. 환경은 emulator
+`37.3.10.0`, WebView `133.0.6943.137`이며 백엔드 접속과 artifact 보관은 없었습니다.
+이 실행의 `d59e5d9…`는 검증 드라이버만 후속 변경한 QA 소스이므로 서명 후보의
+`959836f6…`를 대체하는 커밋으로 표시하지 않습니다.
+
+서명 후보 자체와 실물 기기 확인, 공유 링크·투표·신고를 포함한 전체 출시 흐름의
+기기 검증은 남습니다. 전용 launcher와 스토어용 아이콘·feature graphic은 준비됐고,
+실제 폰 스크린샷과 개인정보 공개 문서·Data safety·심사 입력도 별도로 마무리해야 합니다.
+
+격리 서버 통과와 별개로 실제 운영 신고 기능, 공개 정책 URL, 기존 공유 웹과 이
+후보의 호환성 확인도 필요합니다. 검토한 운영 변경과 Google Play 등록·제출은 별도
+승인 범위로 진행하며, iOS는 Android 이후 이어갑니다. 구체적인 준비물과 범위는
+`PLAY-STORE-PREPARATION.md`에 정리했습니다.
 
 ## 근거
 
