@@ -86,7 +86,15 @@ test('requires an already accepted exact license, never creates or updates its f
   mkdirSync(path.join(sdk, 'licenses'));
   const file = path.join(sdk, 'licenses/android-sdk-license');
   writeFileSync(file, 'b'.repeat(40) + '\n');
-  assert.throws(() => requireAcceptedLicense(pin, sdk), { code: 'SDK_LICENSE_ACCEPTANCE_REQUIRED' });
+  assert.throws(() => requireAcceptedLicense(pin, sdk), error => {
+    assert.equal(error.code, 'SDK_LICENSE_ACCEPTANCE_REQUIRED');
+    assert.deepEqual(error.licenseDiagnostic, {
+      package: 'system-images;android-36;google_apis;x86_64', licenseId: 'android-sdk-license',
+      expectedSha1: pin.licenseSha1, licenseFilePresent: true, licenseFileReadable: true,
+      acceptedHashes: ['b'.repeat(40)],
+    });
+    return true;
+  });
   assert.equal(readFileSync(file, 'utf8'), 'b'.repeat(40) + '\n');
   writeFileSync(file, 'b'.repeat(40) + '\n' + pin.licenseSha1 + '\n');
   assert.doesNotThrow(() => requireAcceptedLicense(pin, sdk));

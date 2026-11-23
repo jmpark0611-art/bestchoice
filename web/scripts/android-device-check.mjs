@@ -175,7 +175,24 @@ export function parseSdkMetadata(xml, kind) {
 export function requireAcceptedLicense(pin, sdkRoot) {
   if (!/^[a-z0-9-]{1,100}$/.test(pin.licenseId) || !/^[0-9a-f]{40}$/.test(pin.licenseSha1)) reject('INVALID_LICENSE_REFERENCE');
   const file = path.join(sdkRoot, 'licenses', pin.licenseId);
-  if (!regular(file) || !readFileSync(file, 'utf8').split(/\r?\n/).includes(pin.licenseSha1)) reject('SDK_LICENSE_ACCEPTANCE_REQUIRED');
+  const licenseFilePresent = regular(file);
+  let readable = licenseFilePresent, acceptedHashes = [];
+  if (licenseFilePresent) {
+    try {
+      acceptedHashes = readFileSync(file, 'utf8').split(/\r?\n/).filter(line => /^[0-9a-f]{40}$/.test(line));
+    } catch { readable = false; }
+  }
+  if (!acceptedHashes.includes(pin.licenseSha1)) {
+    const error = new Error('SDK_LICENSE_ACCEPTANCE_REQUIRED');
+    error.code = 'SDK_LICENSE_ACCEPTANCE_REQUIRED';
+    // Public license fingerprints only. Do not print arbitrary file contents.
+    error.licenseDiagnostic = {
+      package: ['emulator', 'system-images;android-36;google_apis;x86_64'].includes(pin.package) ? pin.package : 'synthetic-test',
+      licenseId: pin.licenseId, expectedSha1: pin.licenseSha1, licenseFilePresent,
+      licenseFileReadable: readable, acceptedHashes: [...new Set(acceptedHashes)].slice(0, 20),
+    };
+    throw error;
+  }
 }
 
 async function fetchMetadata(url) {
@@ -314,10 +331,23 @@ export async function prepareDeviceCheck({ workDir, webRoot = defaultWebRoot, sd
       normalizedRevision(emulator.revision) !== normalizedRevision(EMULATOR_PIN.revision)) reject('OFFICIAL_EMULATOR_PIN_CHANGED');
   Object.assign(emulator, { sha256: EMULATOR_PIN.sha256, archiveSource: EMULATOR_PIN.source, metadataSource: METADATA.emulator });
   Object.assign(image, { metadataSource: METADATA.image });
-  for (const pin of [emulator, image]) requireAcceptedLicense(pin, sdkRoot);
   const pins = { schemaVersion: 1, resolvedAt: new Date().toISOString(), imagePinScope: 'resolved-once-from-official-metadata-for-this-run', emulator, image };
   save(path.join(workDir, 'download-pins.json'), pins);
   console.log('Official per-run download pins: ' + JSON.stringify(pins));
+  try {
+    for (const pin of [emulator, image]) requireAcceptedLicense(pin, sdkRoot);
+  } catch (error) {
+    if (error.code === 'SDK_LICENSE_ACCEPTANCE_REQUIRED') {
+      save(path.join(workDir, 'result.json'), {
+        schemaVersion: 1, status: 'blocked-before-binary-download-license-not-accepted',
+        sourceCommit: /^[0-9a-f]{40}$/.test(env.GITHUB_SHA ?? '') ? env.GITHUB_SHA : null,
+        failureCode: error.code, licenseDiagnostic: error.licenseDiagnostic, pins,
+        fixtureOnly: true, allFourCasesPassed: false, cases: [],
+        binariesDownloaded: false, physicalDeviceTested: false, signedReleaseNotTested: true,
+      });
+    }
+    throw error;
+  }
   for (const [kind, pin] of Object.entries({ emulator, image })) {
     const archive = path.join(workDir, 'downloads', kind + '.zip');
     pin.actualArchive = await downloadArchive(pin, archive);
@@ -589,6 +619,9 @@ if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === imp
     else if (options.command === 'runtime') await runDeviceCheck(options.workDir);
     else reject('EXPECTED_PREPARE_OR_ISOLATE_COMMAND');
   } catch (error) {
+    if (error.code === 'SDK_LICENSE_ACCEPTANCE_REQUIRED' && error.licenseDiagnostic) {
+      console.error('SDK_LICENSE_DIAGNOSTIC ' + JSON.stringify(error.licenseDiagnostic));
+    }
     console.error(/^[A-Z][A-Z0-9_]+$/.test(error.code ?? '') ? error.code : 'ANDROID_DEVICE_CHECK_FAILED');
     process.exitCode = 1;
   }
