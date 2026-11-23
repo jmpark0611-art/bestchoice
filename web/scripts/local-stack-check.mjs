@@ -54,6 +54,74 @@ const DIAGNOSTIC_STAGES = new Set(['CLI_DOWNLOAD_FAILED', 'CLI_EXTRACTION_FAILED
   'LOCAL_CORE_START_FAILED', 'LOCAL_EDGE_START_FAILED', 'SCOPED_FIREWALL_SUPPORT_REQUIRED', 'SCOPED_FIREWALL_INSTALL_FAILED',
   'PINNED_IMAGE_PULL_FAILED', 'PINNED_IMAGE_INSPECTION_FAILED']);
 
+const INTEGRATION_ASSERTIONS = new Map([
+  ['Distinct anonymous users required', 'ANONYMOUS_SESSIONS_NOT_DISTINCT'],
+  ['Expected synthetic decision UUID', 'DECISION_ID_INVALID'],
+  ['Owner response is incompatible with the current app contract', 'OWNER_RESPONSE_CONTRACT_FAILED'],
+  ['Shared response is incompatible with the current app contract', 'SHARED_RESPONSE_CONTRACT_FAILED'],
+  ['Visible result fields or vote counts are invalid', 'VISIBLE_RESULT_INVALID'],
+  ['Unexpected private fields before vote', 'PREVOTE_PRIVACY_FAILED'],
+  ['Vote response must contain the recorded choice', 'VOTE_RECORD_MISSING'],
+  ['Voter response must keep non-owner permissions and private identifiers hidden', 'VOTER_PRIVACY_FAILED'],
+  ['Shared or owner result changed unexpectedly', 'RESULT_PERSISTENCE_FAILED'],
+  ['Reloaded guest choice did not persist', 'GUEST_VOTE_PERSISTENCE_FAILED'],
+  ['Owner result mismatch', 'SYNTHETIC_INPUT_MISMATCH'],
+  ['Direct table reads not isolated', 'TABLE_READ_ISOLATION_FAILED'],
+  ['Direct voter write allowed', 'TABLE_WRITE_DENIAL_FAILED'],
+  ['Foreign owner RPC allowed', 'OWNER_RPC_DENIAL_FAILED'],
+  ['Foreign share RPC allowed', 'SHARE_RPC_DENIAL_FAILED'],
+  ['Share was invalid or not idempotent', 'SHARE_IDEMPOTENCY_FAILED'],
+  ['Owner vote was allowed', 'OWNER_VOTE_DENIAL_FAILED'],
+  ['Vote not idempotent or tally differs', 'VOTE_IDEMPOTENCY_OR_TALLY_FAILED'],
+  ['Owner choice request failed', 'OWNER_CHOICE_WRITE_FAILED'],
+  ['Owner choice or share did not persist', 'OWNER_CHOICE_PERSISTENCE_FAILED'],
+  ['Foreign delete RPC should be a no-op', 'GUEST_DELETE_NOOP_FAILED'],
+  ['Voter removed owner record', 'OWNER_RECORD_REMOVED_BY_GUEST'],
+  ['Foreign delete changed owner choice or share', 'GUEST_DELETE_CHANGED_OWNER_STATE'],
+  ['Owner delete unsuccessful', 'OWNER_DELETE_FAILED'],
+  ['Deleted record or invitation remained accessible', 'DELETION_VISIBILITY_FAILED'],
+  ['LOCAL_INTEGRATION_TRANSPORT_FAILED', 'TRANSPORT_FAILED'],
+  ['LOCAL_CHECK_INTERRUPTED', 'INTERRUPTED'],
+]);
+const INTEGRATION_HTTP_LABELS = new Map([
+  ['Anonymous Auth', 'AUTH_HTTP_FAILED'], ['Deterministic local Edge', 'EDGE_HTTP_FAILED'],
+  ['my_poll', 'OWNER_READ_HTTP_FAILED'], ['share', 'SHARE_HTTP_FAILED'],
+  ['shared_poll', 'SHARED_READ_HTTP_FAILED'], ['vote', 'VOTE_HTTP_FAILED'],
+  ['PostgREST owner visibility', 'TABLE_READ_HTTP_FAILED'],
+]);
+const INTEGRATION_REQUESTS = new Set([
+  'POST /auth/v1/signup', 'POST /functions/v1/vs-decide',
+  ...['my_poll', 'share', 'shared_poll', 'vote', 'set_did', 'delete_poll'].map(name => 'POST /rest/v1/rpc/vs_' + name),
+  'GET /rest/v1/vs_polls', 'PATCH /rest/v1/vs_polls',
+]);
+
+/** A route template only: no query, body, headers, tokens or user/poll identifiers. */
+export function integrationRequestDiagnostic(url, options) {
+  let parsed;
+  try { parsed = new URL(url); } catch { fail('LOCAL_INTEGRATION_REQUEST_UNEXPECTED'); }
+  const method = options?.method;
+  ensure(parsed.origin === ORIGIN && !parsed.username && !parsed.password && !parsed.hash &&
+    INTEGRATION_REQUESTS.has(method + ' ' + parsed.pathname), 'LOCAL_INTEGRATION_REQUEST_UNEXPECTED');
+  return { method, route: parsed.pathname, status: null };
+}
+
+/** Exact messages owned by verify-local-integration only; never emit arbitrary error text. */
+export function integrationFailureDiagnostic(error, requests = [], requestCount = requests.length) {
+  const message = error instanceof Error ? error.message : '';
+  const http = /^(Anonymous Auth|Deterministic local Edge|my_poll|share|shared_poll|vote|PostgREST owner visibility) HTTP ([1-5][0-9]{2})$/.exec(message);
+  const assertion = http ? INTEGRATION_HTTP_LABELS.get(http[1])
+    : INTEGRATION_ASSERTIONS.get(message) ?? 'UNKNOWN_VERIFIER_FAILURE';
+  const history = requests.slice(-12).filter(item => INTEGRATION_REQUESTS.has(item.method + ' ' + item.route)).map(item => ({
+    number: Number.isSafeInteger(item.number) && item.number > 0 ? item.number : null,
+    method: item.method, route: item.route,
+    status: Number.isInteger(item.status) && item.status >= 100 && item.status <= 599 ? item.status : null,
+    ...(item.transportFailed === true ? { transportFailed: true } : {}),
+  }));
+  return { stage: 'LOCAL_INTEGRATION_FAILED', assertion,
+    ...(http ? { httpStatus: Number(http[2]) } : {}),
+    requestCount: Number.isSafeInteger(requestCount) && requestCount >= 0 ? requestCount : null, requests: history };
+}
+
 /** Bounded known startup errors; never status/inspect bodies or arbitrary stdout. */
 export function sanitizedFailureDiagnostic(stage, result, privateValues = []) {
   if (!DIAGNOSTIC_STAGES.has(stage)) return null;
@@ -751,12 +819,25 @@ export class DockerStackRuntime {
   }
   async verifyIntegration() {
     ensure(this.edgeVerified, 'NETWORK_GUARD_REQUIRED_BEFORE_TEST_USERS');
-    await verifyLocalIntegration({ GENIE_SUPABASE_URL: ORIGIN, GENIE_CONFIRM: 'isolated-genie-synthetic-only',
-      GENIE_SUPABASE_PUBLIC_KEY: this.keys.anon }, '--run', {
-      send: (url, options) => {
-        ensure(!this.signal?.aborted, 'LOCAL_CHECK_INTERRUPTED');
-        return fetch(url, { ...options, signal: this.signal ? AbortSignal.any([options.signal, this.signal]) : options.signal });
-      }, log: () => {}, warn: () => {} });
+    const requests = []; let requestCount = 0;
+    try {
+      await verifyLocalIntegration({ GENIE_SUPABASE_URL: ORIGIN, GENIE_CONFIRM: 'isolated-genie-synthetic-only',
+        GENIE_SUPABASE_PUBLIC_KEY: this.keys.anon }, '--run', {
+        send: async (url, options) => {
+          ensure(!this.signal?.aborted, 'LOCAL_CHECK_INTERRUPTED');
+          const entry = { number: ++requestCount, ...integrationRequestDiagnostic(url, options) };
+          requests.push(entry); if (requests.length > 12) requests.shift();
+          try {
+            const response = await this.send(url, { ...options,
+              signal: this.signal ? AbortSignal.any([options.signal, this.signal]) : options.signal });
+            entry.status = response.status;
+            return response;
+          } catch { entry.transportFailed = true; fail('LOCAL_INTEGRATION_TRANSPORT_FAILED'); }
+        }, log: () => {}, warn: () => {} });
+    } catch (error) {
+      this.diagnostics.push(integrationFailureDiagnostic(error, requests, requestCount));
+      fail('LOCAL_INTEGRATION_FAILED');
+    }
     this.integrationVerified = true;
     const after = readPinnedInputs(this.repoRoot);
     ensure(JSON.stringify(after.hashes) === JSON.stringify(this.inputs.hashes), 'FIXTURE_SOURCE_CHANGED_DURING_CHECK');

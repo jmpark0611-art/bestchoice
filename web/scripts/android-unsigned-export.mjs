@@ -27,8 +27,66 @@ const stop = code => { throw new ExportFailure(code); };
 const execute = job => {
   const result = spawnSync(job.command, job.args, { cwd: job.cwd, env: job.env, shell: false,
     encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 16 * 1024 * 1024 });
-  return { status: result.status ?? 1, stdout: result.stdout ?? '' };
+  return { status: result.status ?? 1, stdout: result.stdout ?? '', stderr: result.stderr ?? '',
+    signal: result.signal ?? null, errorCode: result.error?.code ?? null };
 };
+
+/**
+ * Project only bounded build metadata, never arbitrary Gradle error text.
+ * Redacting a raw log excerpt alone is insufficient: it can include an encoded
+ * client key, an environment dump, or a source line containing a credential.
+ */
+export function unsignedBuildFailureDiagnostic(result = {}) {
+  const scanLimit = 128 * 1024;
+  const streams = [result.stdout, result.stderr].map(value => typeof value === 'string' ? value : '');
+  const text = streams.map(value => value.slice(-scanLimit)
+    .replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '')).join('\n');
+  const reasons = [
+    ['DEPENDENCY_RESOLUTION_FAILED', /Could not (?:resolve|download|find)\b|Could not get resource|Could not GET/i],
+    ['GRADLE_DISTRIBUTION_DOWNLOAD_FAILED', /Could not install Gradle distribution|Downloading .*gradle-8\.14\.3-all\.zip[\s\S]*Exception/i],
+    ['SDK_LICENSE_NOT_ACCEPTED', /licenses? (?:have |has )?not been accepted|License for package .*not accepted|LicenseNotAcceptedException/i],
+    ['ANDROID_SDK_COMPONENT_MISSING', /SDK location not found|Failed to find (?:Platform SDK|Build Tools|target)|SDK package.*(?:missing|not installed)/i],
+    ['ANDROID_RESOURCE_COMPILATION_FAILED', /Android resource linking failed|Resource compilation failed|AAPT2?.*(?:error|failed)/i],
+    ['JAVA_COMPILATION_FAILED', /Compilation failed|error: (?:cannot find symbol|package .* does not exist|incompatible types)/i],
+    ['JAVA_TOOLCHAIN_MISMATCH', /Unsupported class file major version|invalid source release|requires Java|Cannot find a Java installation/i],
+    ['NETWORK_TIMEOUT', /SocketTimeoutException|ConnectTimeoutException|Read timed out|connect timed out|Connection timed out/i],
+    ['NETWORK_CONNECTION_FAILED', /UnknownHostException|ConnectException|Connection reset|Connection refused|Network is unreachable/i],
+    ['TLS_VERIFICATION_FAILED', /SSLHandshakeException|PKIX path building failed|unable to find valid certification path/i],
+    ['GRADLE_DAEMON_DISAPPEARED', /Gradle build daemon disappeared unexpectedly|DaemonDisappearedException/i],
+    ['OUT_OF_MEMORY', /OutOfMemoryError|Java heap space|GC overhead limit exceeded|Cannot allocate memory/i],
+    ['DISK_SPACE_EXHAUSTED', /No space left on device|ENOSPC/],
+    ['RELEASE_PREPARATION_GUARD_FAILED', /Android release (?:preparation|source, configuration or assets|verifier)/],
+    ['BINARY_MANIFEST_IDENTITY_FAILED', /Android bundle identity verification failed/],
+    ['UNSIGNED_MODE_GUARD_FAILED', /Unsigned Android export must not receive|unsigned export option accepts only/],
+  ].filter(([, pattern]) => pattern.test(text)).map(([code]) => code);
+  const safeTask = value => typeof value === 'string' &&
+    /^:(?:(?:app|capacitor-android|capacitor-cordova-android-plugins):)?[A-Za-z][A-Za-z0-9]{0,79}$/.test(value);
+  const failures = [...text.matchAll(/(?:Execution failed for task '([^'\r\n]{1,180})'|> Task (:[^\s]{1,180}) FAILED)/g)]
+    .map(match => match[1] ?? match[2]).filter(safeTask);
+  const tasks = [...text.matchAll(/^> Task (:[^\s]{1,180})(?:\s|$)/gm)].map(match => match[1]).filter(safeTask);
+  const dependencies = [...text.matchAll(/\b((?:com\.(?:android|google)|androidx|org\.(?:jetbrains|gradle))(?:\.[a-z][a-z0-9_.]{0,63})?:[a-z][a-z0-9._-]{0,79}:[0-9][0-9A-Za-z.+-]{0,39})(?![\w.-])/g)]
+    .map(match => match[1].replace(/\.+$/, '')).filter(value => !/sb_(?:publishable|secret)_|sk[-_]/.test(value));
+  const httpStatuses = [...text.matchAll(/(?:status(?:\s+code)?\s*:?\s*|HTTP\/[12](?:\.[0-9])?\s+)([45][0-9]{2})\b/gi)]
+    .map(match => Number(match[1]));
+  const hosts = ['dl.google.com', 'maven.google.com', 'repo.maven.apache.org', 'repo1.maven.org',
+    'plugins.gradle.org', 'services.gradle.org', 'downloads.gradle.org'].filter(host => text.includes(`https://${host}/`));
+  const knownFiles = new Set(['build.gradle', 'settings.gradle', 'variables.gradle', 'capacitor.build.gradle',
+    'genie-release.gradle', 'genie-bundle-identity.gradle']);
+  const locations = [...text.matchAll(/(?:Build|Settings|Script) file '([^'\r\n]{1,1024})' line: ([1-9][0-9]{0,5})/g)]
+    .map(match => ({ file: match[1].split(/[\\/]/).at(-1), line: Number(match[2]) }))
+    .filter(value => knownFiles.has(value.file)).slice(0, 4);
+  return {
+    stage: 'native-build', exitCode: Number.isInteger(result.status) && result.status >= 0 && result.status <= 255 ? result.status : null,
+    signal: ['SIGTERM', 'SIGKILL', 'SIGABRT', 'SIGSEGV', 'SIGINT'].includes(result.signal) ? result.signal : null,
+    spawnErrorCode: ['ENOBUFS', 'ENOMEM', 'ENOENT', 'EACCES', 'ETIMEDOUT', 'EAGAIN'].includes(result.errorCode) ? result.errorCode : null,
+    reasonCodes: reasons.length ? reasons : ['UNCLASSIFIED_NATIVE_FAILURE'],
+    failedTasks: [...new Set(failures)].slice(0, 4), lastTask: tasks.at(-1) ?? null,
+    dependencyCoordinates: [...new Set(dependencies)].slice(0, 6), repositoryHosts: hosts,
+    httpStatuses: [...new Set(httpStatuses)].slice(0, 4), locations,
+    stdoutCharacters: streams[0].length, stderrCharacters: streams[1].length,
+    scanTruncated: streams.some(value => value.length > scanLimit), rawOutputIncluded: false,
+  };
+}
 
 function freshExportDirectory(exportDir) {
   if (typeof exportDir !== 'string' || !path.isAbsolute(exportDir) || path.normalize(exportDir) !== exportDir) return false;
@@ -118,7 +176,10 @@ export async function runUnsignedExport({ webRoot = defaultRoot, env = process.e
       args: [path.join(androidDir, 'gradlew'), '--no-daemon', '--no-configuration-cache',
         '-Pandroid.builder.sdkDownload=false', '-PgenieUnsignedExport=true', '--console=plain', 'bundleRelease', 'verifyGenieBundleIdentity'],
       cwd: androidDir, env: buildEnv });
-    if (build.status !== 0) stop('ANDROID_UNSIGNED_COMPILATION_FAILED');
+    if (build.status !== 0) {
+      log('GENIE_UNSIGNED_GRADLE_FAILURE ' + JSON.stringify(unsignedBuildFailureDiagnostic(build)));
+      stop('ANDROID_UNSIGNED_COMPILATION_FAILED');
+    }
     const artifact = path.join(workspace, bundleRelative);
     if (!regular(artifact) || lstatSync(artifact).size === 0) stop('NEW_UNSIGNED_AAB_MISSING');
     const unsigned = await capturedRun({ stage: 'verify-unsigned', command: tools.jarsigner,

@@ -4,6 +4,7 @@ name: Genie Android unsigned candidate export
 # No signing secrets, backend interaction, cache, deployment or store submission.
 # Only edits to this workflow trigger a new export; app changes do not upload it.
 # Candidate revision: dedicated Genie launcher, launch background and web icon.
+# Capture bounded native failure metadata while exporting this branded candidate.
 on:
   push:
     branches:

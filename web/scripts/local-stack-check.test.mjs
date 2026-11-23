@@ -9,7 +9,8 @@ import { createServer as createTcpServer, createConnection } from 'node:net';
 import { PINS, validateInvocation, localEnvironment, dockerPolicyArguments, validateNetwork,
   validateContainers, firewallPlan, stackConfig, readPinnedInputs, parseLocalStatus,
   runLocalStackCheck, cleanupInterruptedRun, sanitizedFailureDiagnostic, startupContainerStates,
-  validatedProxyTarget, OwnedLoopbackProxy, DockerStackRuntime } from './local-stack-check.mjs';
+  validatedProxyTarget, OwnedLoopbackProxy, DockerStackRuntime,
+  integrationRequestDiagnostic, integrationFailureDiagnostic } from './local-stack-check.mjs';
 
 const nonce = '123456abcdef';
 const network = 'genie-local-' + nonce;
@@ -311,6 +312,57 @@ test('core API readiness explicitly reads only the owned loopback health route b
   runtime.proxies[0].proof = () => ({ ...proxyProof()[1], target: null });
   runtime.send = async () => assert.fail('an unverified target must not receive a request');
   await assert.rejects(runtime.verifyLoopbackApi(), /APPROVED_LISTENER_UNCONFIRMED/);
+});
+
+test('integration diagnostics allow only fixed verifier assertions and bounded route templates without private content', () => {
+  const request = integrationRequestDiagnostic('http://127.0.0.1:55321/rest/v1/vs_polls?select=id,did&id=eq.private-poll-id',
+    { method: 'GET', body: 'private-body', headers: { Authorization: 'private-token' } });
+  assert.deepEqual(request, { method: 'GET', route: '/rest/v1/vs_polls', status: null });
+  for (const url of ['https://hosted.invalid/rest/v1/vs_polls', 'http://private-user@127.0.0.1:55321/rest/v1/vs_polls',
+    'http://127.0.0.1:55321/auth/v1/admin/users', 'http://127.0.0.1:55321/rest/v1/vs_polls#private']) {
+    assert.throws(() => integrationRequestDiagnostic(url, { method: 'GET' }), /LOCAL_INTEGRATION_REQUEST_UNEXPECTED/);
+  }
+  const requests = Array.from({ length: 20 }, (_, i) => ({ ...request, number: i + 1, status: 200,
+    body: 'private-body', token: 'private-token', userId: 'private-user-id' }));
+  const diagnostic = integrationFailureDiagnostic(new Error('Foreign share RPC allowed'), requests, 20);
+  assert.equal(diagnostic.assertion, 'SHARE_RPC_DENIAL_FAILED');
+  assert.equal(diagnostic.requestCount, 20); assert.equal(diagnostic.requests.length, 12);
+  assert.equal(diagnostic.requests[0].number, 9);
+  assert.equal(JSON.stringify(diagnostic).includes('private'), false);
+  const http = integrationFailureDiagnostic(new Error('Deterministic local Edge HTTP 502'));
+  assert.equal(http.assertion, 'EDGE_HTTP_FAILED'); assert.equal(http.httpStatus, 502);
+  for (const message of ['private-token private-user-id', 'Deterministic local Edge HTTP 502 private-body']) {
+    const unknown = integrationFailureDiagnostic(new Error(message));
+    assert.equal(unknown.assertion, 'UNKNOWN_VERIFIER_FAILURE');
+    assert.equal(JSON.stringify(unknown).includes('private'), false);
+  }
+});
+
+test('integration harness preserves actual failed route and HTTP status without printing response bodies or tokens', async () => {
+  let count = 0;
+  const runtime = new DockerStackRuntime({ repoRoot: workspace, env: approved(), send: async () => {
+    count++;
+    if (count <= 2) return Response.json({ user: { id: 'private-user-' + count, is_anonymous: true },
+      access_token: 'private-token-' + count });
+    return Response.json({ error: 'private-backend-body' }, { status: 502 });
+  } });
+  runtime.edgeVerified = true; runtime.keys = { anon: jwt('anon') };
+  await assert.rejects(runtime.verifyIntegration(), /LOCAL_INTEGRATION_FAILED/);
+  assert.equal(count, 3);
+  assert.deepEqual(runtime.diagnostics, [{ stage: 'LOCAL_INTEGRATION_FAILED', assertion: 'EDGE_HTTP_FAILED', httpStatus: 502,
+    requestCount: 3, requests: [
+      { number: 1, method: 'POST', route: '/auth/v1/signup', status: 200 },
+      { number: 2, method: 'POST', route: '/auth/v1/signup', status: 200 },
+      { number: 3, method: 'POST', route: '/functions/v1/vs-decide', status: 502 },
+    ] }]);
+  assert.equal(JSON.stringify(runtime.diagnostics).includes('private'), false);
+  assert.equal(JSON.stringify(runtime.diagnostics).includes(jwt('anon')), false);
+  runtime.diagnostics = []; runtime.send = async () => { throw new Error('private-transport-error'); };
+  await assert.rejects(runtime.verifyIntegration(), /LOCAL_INTEGRATION_FAILED/);
+  assert.equal(runtime.diagnostics[0].assertion, 'TRANSPORT_FAILED');
+  assert.deepEqual(runtime.diagnostics[0].requests, [{ number: 1, method: 'POST', route: '/auth/v1/signup',
+    status: null, transportFailed: true }]);
+  assert.equal(JSON.stringify(runtime.diagnostics).includes('private'), false);
 });
 
 test('firewall plan touches only this bridge and CIDR and records exact inverse operations', () => {

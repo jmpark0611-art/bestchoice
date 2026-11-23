@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { runUnsignedExport } from './android-unsigned-export.mjs';
+import { runUnsignedExport, unsignedBuildFailureDiagnostic } from './android-unsigned-export.mjs';
 import { resolveAndroidReleaseConfig } from './android-release-config.mjs';
 import { digest, sourceSnapshot, writeReleaseManifest, verifyAndroidRelease } from './android-release-manifest.mjs';
 
@@ -85,7 +85,9 @@ function fixture(t, options = {}) {
       }));
       if (options.sourceDrift) writeFileSync(sourceFile, '// Changed while compiling.\n');
       if (options.bridgeDrift) writeFileSync(nativeBridge, 'CHANGED_BRIDGE\n');
-      return { status: options.nativeFailure ? 1 : 0, stdout: `CHILD_OUTPUT_MUST_NOT_BE_LOGGED ${publicEnv.VITE_SUPABASE_PUBLISHABLE_KEY}` };
+      return { status: options.nativeFailure ? 1 : 0,
+        stdout: options.nativeStdout ?? `CHILD_OUTPUT_MUST_NOT_BE_LOGGED ${publicEnv.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        stderr: options.nativeStderr ?? '' };
     }
     if (job.stage === 'verify-unsigned') return { status: options.unsignedStatus ?? 0, stdout: options.unsignedText ?? 'jar is unsigned.\n' };
     if (job.stage === 'verify-package') {
@@ -158,12 +160,70 @@ nativeTest('an existing selected output remains untouched and missing public/pro
   }
 });
 
-nativeTest('native failure and thrown child output leave no export or leaked child diagnostics', async t => {
+nativeTest('native failure and thrown child output leave no export or raw child diagnostics', async t => {
   for (const [options, code] of [[{ nativeFailure: true }, 'ANDROID_UNSIGNED_COMPILATION_FAILED'],
     [{ throwStage: 'native-build' }, 'UNSIGNED_EXPORT_INCOMPLETE']]) {
     const f = fixture(t, options);
     rejected(f, await invoke(f), code);
   }
+});
+
+test('failure diagnostics retain useful Gradle task and dependency facts without raw key, URL or error text', () => {
+  const diagnostic = unsignedBuildFailureDiagnostic({ status: 1,
+    stdout: '\x1b[31m> Task :app:checkReleaseAarMetadata FAILED\x1b[0m\n',
+    stderr: `Build file '/private/work/genie-release.gradle' line: 117\n` +
+      `Execution failed for task ':app:checkReleaseAarMetadata'.\n` +
+      `Could not resolve com.android.tools.build:gradle:8.13.0.\n` +
+      `Could not GET 'https://dl.google.com/dl/android/maven2/path?key=${publicEnv.VITE_SUPABASE_PUBLISHABLE_KEY}'.\n` +
+      'Received status code 429 from server: PRIVATE_ERROR_TEXT\n' +
+      'OPENAI_API_KEY=sk-proj-PRIVATE_NEVER_LOG\n' });
+  assert.deepEqual(diagnostic.failedTasks, [':app:checkReleaseAarMetadata']);
+  assert.equal(diagnostic.lastTask, ':app:checkReleaseAarMetadata');
+  assert.deepEqual(diagnostic.reasonCodes, ['DEPENDENCY_RESOLUTION_FAILED']);
+  assert.deepEqual(diagnostic.dependencyCoordinates, ['com.android.tools.build:gradle:8.13.0']);
+  assert.deepEqual(diagnostic.repositoryHosts, ['dl.google.com']);
+  assert.deepEqual(diagnostic.httpStatuses, [429]);
+  assert.deepEqual(diagnostic.locations, [{ file: 'genie-release.gradle', line: 117 }]);
+  for (const forbidden of [publicEnv.VITE_SUPABASE_PUBLISHABLE_KEY, 'PRIVATE_', 'https://', '/private/', 'OPENAI_API_KEY']) {
+    assert.equal(JSON.stringify(diagnostic).includes(forbidden), false);
+  }
+  assert.equal(diagnostic.rawOutputIncluded, false);
+});
+
+test('failure diagnostics bound scanned/output data and reject secret-shaped or arbitrary metadata', () => {
+  const diagnostic = unsignedBuildFailureDiagnostic({ status: 1, signal: 'SIGKILL', errorCode: 'ENOBUFS',
+    stdout: 'discarded unknown output\n'.repeat(10_000) +
+      `> Task :app:${publicEnv.VITE_SUPABASE_PUBLISHABLE_KEY} FAILED\n` +
+      'com.android:sb_secret_UNRELATED_TOKEN:1.0\n' +
+      'com.android.' + 'a'.repeat(500) + ':artifact:1.0\n' +
+      Array.from({ length: 40 }, (_, i) => `> Task :app:compileFixture${i} FAILED\nandroidx.core:core:1.${i}.0\n`).join(''),
+    stderr: `Gradle build daemon disappeared unexpectedly.\n${publicEnv.VITE_SUPABASE_PUBLISHABLE_KEY}` });
+  assert.equal(diagnostic.scanTruncated, true);
+  assert.equal(diagnostic.signal, 'SIGKILL');
+  assert.equal(diagnostic.spawnErrorCode, 'ENOBUFS');
+  assert.deepEqual(diagnostic.reasonCodes, ['GRADLE_DAEMON_DISAPPEARED']);
+  assert.equal(diagnostic.failedTasks.length, 4);
+  assert.equal(diagnostic.dependencyCoordinates.length, 6);
+  assert.equal(diagnostic.lastTask, ':app:compileFixture39');
+  assert.ok(JSON.stringify(diagnostic).length < 4096);
+  assert.equal(/sb_publishable_|sb_secret_|UNRELATED_TOKEN|discarded unknown/.test(JSON.stringify(diagnostic)), false);
+  const unknown = unsignedBuildFailureDiagnostic({ status: 'PRIVATE', signal: 'PRIVATE', errorCode: 'PRIVATE', stderr: 'PRIVATE exception' });
+  assert.equal(unknown.exitCode, null); assert.equal(unknown.signal, null); assert.equal(unknown.spawnErrorCode, null);
+  assert.deepEqual(unknown.reasonCodes, ['UNCLASSIFIED_NATIVE_FAILURE']);
+  assert.equal(JSON.stringify(unknown).includes('PRIVATE'), false);
+});
+
+nativeTest('native failure emits only the bounded diagnostic and still cleans every candidate output', async t => {
+  const f = fixture(t, { nativeFailure: true, nativeStdout: '> Task :app:bundleRelease FAILED\n',
+    nativeStderr: `java.net.SocketTimeoutException: Read timed out ${publicEnv.VITE_SUPABASE_PUBLISHABLE_KEY}` });
+  rejected(f, await invoke(f), 'ANDROID_UNSIGNED_COMPILATION_FAILED');
+  const messages = f.state.logs.filter(value => value.startsWith('GENIE_UNSIGNED_GRADLE_FAILURE '));
+  assert.equal(messages.length, 1);
+  const diagnostic = JSON.parse(messages[0].slice('GENIE_UNSIGNED_GRADLE_FAILURE '.length));
+  assert.deepEqual(diagnostic.reasonCodes, ['NETWORK_TIMEOUT']);
+  assert.deepEqual(diagnostic.failedTasks, [':app:bundleRelease']);
+  assert.equal(diagnostic.rawOutputIncluded, false);
+  assert.equal(f.state.calls.some(job => job.stage === 'verify-unsigned'), false);
 });
 
 nativeTest('a signed or ambiguous jarsigner result is never exported as unsigned', async t => {

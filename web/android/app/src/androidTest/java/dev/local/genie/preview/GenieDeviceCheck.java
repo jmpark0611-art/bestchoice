@@ -14,6 +14,8 @@ import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.view.InputDevice;
+import android.view.MotionEvent;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebView;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -140,6 +142,51 @@ public class GenieDeviceCheck {
         instrumentation.waitForIdleSync();
     }
 
+    private void tapWebElement(String selector) throws Exception {
+        String target = "document.querySelector(" + JSONObject.quote(selector) + ")";
+        assertEquals("The touch target is missing", "true", evaluate("(() => {const e=" + target
+            + ";if(!e)return false;e.scrollIntoView({behavior:'instant',block:'center',inline:'center'});return true;})()"));
+        awaitTrue("(() => {const e=" + target + ";if(!e)return false;const r=e.getBoundingClientRect();"
+            + "return r.width>0 && r.height>0 && r.left>=0 && r.right<=innerWidth"
+            + " && r.top>=0 && r.bottom<=innerHeight;})()", "The touch target is not fully visible");
+        JSONObject css = new JSONObject(evaluate("(() => {const e=" + target + ",r=e.getBoundingClientRect();"
+            + "const x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);"
+            + "return {x,y,width:innerWidth,height:innerHeight,hit:hit===e||e.contains(hit)};})()"));
+        assertTrue("Another element covers the touch target", css.getBoolean("hit"));
+        double cssX = css.getDouble("x"), cssY = css.getDouble("y");
+        double cssWidth = css.getDouble("width"), cssHeight = css.getDouble("height");
+        AtomicReference<float[]> point = new AtomicReference<>();
+        instrumentation.runOnMainSync(() -> {
+            WebView webView = activity.getBridge().getWebView();
+            if (!activity.hasWindowFocus() || webView.getWidth() <= 0 || webView.getHeight() <= 0) return;
+            int[] origin = new int[2];
+            webView.getLocationOnScreen(origin);
+            float scaleX = (float) (webView.getWidth() / cssWidth);
+            float scaleY = (float) (webView.getHeight() / cssHeight);
+            point.set(new float[] {(float) (origin[0] + cssX * scaleX),
+                (float) (origin[1] + cssY * scaleY), scaleX, scaleY});
+        });
+        float[] nativePoint = point.get();
+        assertNotNull("The app WebView is not ready for system touch", nativePoint);
+        assertTrue("CSS/native coordinate scales disagree", nativePoint[2] > 0
+            && Math.abs(nativePoint[2] - nativePoint[3]) < 0.02f);
+        long downAt = SystemClock.uptimeMillis();
+        MotionEvent down = MotionEvent.obtain(downAt, downAt, MotionEvent.ACTION_DOWN, nativePoint[0], nativePoint[1], 0);
+        MotionEvent up = null;
+        try {
+            down.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+            instrumentation.sendPointerSync(down);
+            SystemClock.sleep(50);
+            up = MotionEvent.obtain(downAt, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, nativePoint[0], nativePoint[1], 0);
+            up.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+            instrumentation.sendPointerSync(up);
+        } finally {
+            down.recycle();
+            if (up != null) up.recycle();
+        }
+        instrumentation.waitForIdleSync();
+    }
+
     private String valuesMatch() {
         return "(() => { const a=document.getElementById('in-a'),b=document.getElementById('in-b'),"
             + "n=document.getElementById('in-note'); return !!a && !!b && !!n && a.value===" + JSONObject.quote(A)
@@ -158,9 +205,12 @@ public class GenieDeviceCheck {
         report("launch", new JSONObject().put("origin", "https://localhost").put("apiLevel", Build.VERSION.SDK_INT)
             .put("webViewPackage", webView.packageName).put("webViewVersion", webView.versionName));
 
-        assertEquals("About navigation link is missing", "true", evaluate("(() => {"
-            + "const a=document.querySelector('a[href=\"/about\"]'); if(!a)return false; a.click(); return true; })()"));
+        // A real OS touch supplies user activation. A synthetic JS click makes
+        // Chromium skip the resulting history entry in native Back navigation.
+        tapWebElement("a[href=\"/about\"]");
         awaitTrue("location.pathname==='/about' && !!document.querySelector('h2')", "About did not open");
+        assertEquals("The About link did not receive real user activation", "true",
+            evaluate("navigator.userActivation.hasBeenActive"));
         UiAutomation automation = instrumentation.getUiAutomation();
         assertNotNull("Android system UI automation is unavailable", automation);
         JSONObject beforeBack = awaitNativeBackReady();
