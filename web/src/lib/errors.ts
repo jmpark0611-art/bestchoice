@@ -16,8 +16,11 @@ const MESSAGES: Record<string, string> = {
   TIMEOUT: '응답이 늦어지고 있어요. 이미 저장됐을 수 있으니 최근 결정을 먼저 확인해주세요.',
   NETWORK: '연결이 불안정해요. 잠시 후 다시 시도해주세요.',
   AI_FAILED: '지니가 답을 못 냈어요. 다시 시도해주세요.',
+  AUTHOR_BLOCKED: '이 작성자의 질문을 차단했어요. 차단을 해제하면 다시 볼 수 있어요.',
+  BLOCK_LIMIT: '차단할 수 있는 작성자 수에 도달했어요. 이용 안내에서 작성자 차단을 정리해 주세요.',
+  SHARING_UNAVAILABLE: '지금은 공유 질문의 보호 기능을 사용할 수 없어요. 잠시 후 다시 시도해 주세요.',
 };
-const KNOWN_RPC = ['INVALID_INPUT', 'NOT_FOUND', 'OWNER_CANNOT_VOTE', 'VOTE_CLOSED', 'AUTH_REQUIRED', 'SHARE_FAILED'];
+const KNOWN_RPC = ['AUTHOR_BLOCKED', 'BLOCK_LIMIT', 'INVALID_INPUT', 'NOT_FOUND', 'OWNER_CANNOT_VOTE', 'VOTE_CLOSED', 'AUTH_REQUIRED', 'SHARE_FAILED'];
 
 export const errorMessage = (code: string) => MESSAGES[code] ?? (code.startsWith('AI_') || code === 'MODEL_FORMAT' ? MESSAGES.AI_FAILED : MESSAGES.NETWORK);
 export const codeOf = (e: unknown) => (e instanceof AppError ? e.code : 'NETWORK');

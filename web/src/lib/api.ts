@@ -96,11 +96,12 @@ export async function listMyPolls(limit = 3): Promise<PollSummary[]> {
 }
 
 /** Bound authentication and RPC together; never send a mutation after expired auth. */
-async function boundedRpc(name: string, args: Record<string, unknown>) {
+async function boundedRpc(name: string, args: Record<string, unknown>, safetyRequired = false) {
   return withDeadline(async signal => {
     await session();
     if (signal.aborted) throw new AppError('TIMEOUT');
     const { data, error } = await getSupabase().rpc(name, args).abortSignal(signal);
+    if (safetyRequired && (error?.code === 'PGRST202' || error?.code === '42883')) throw new AppError('SHARING_UNAVAILABLE');
     if (error) rpcError(error);
     return data;
   }, 15_000);
@@ -126,12 +127,31 @@ function validateSharedPoll(data: unknown): Poll {
   return p;
 }
 export async function getSharedPoll(code: string): Promise<Poll> {
-  return validateSharedPoll(await boundedRpc('vs_shared_poll', { p_code: code }));
+  return validateSharedPoll(await boundedRpc('vs_shared_poll_guarded', { p_code: code }, true));
 }
 export async function vote(code: string, choice: Side): Promise<Poll> {
-  const result = validateSharedPoll(await boundedRpc('vs_vote', { p_code: code, p_choice: choice }));
+  const result = validateSharedPoll(await boundedRpc('vs_vote_guarded', { p_code: code, p_choice: choice }, true));
   if (!result.myVote) throw new AppError('RESULT_INVALID');
   return result;
+}
+
+export async function setQuestionAuthorBlocked(code: string, blocked: boolean): Promise<void> {
+  if (!/^[A-Za-z0-9_-]{1,128}$/.test(code) || typeof blocked !== 'boolean') throw new AppError('INVALID_INPUT');
+  const result = await boundedRpc('vs_set_question_author_block', { p_share_code: code, p_blocked: blocked }, true);
+  if (!result || result.status !== (blocked ? 'blocked' : 'unblocked')) throw new AppError('RESULT_INVALID');
+}
+
+/** Clearing preferences while signed out must not create a new anonymous user. */
+export async function clearQuestionAuthorBlocks(): Promise<void> {
+  return withDeadline(async signal => {
+    const token = await getExistingSessionToken();
+    if (signal.aborted) throw new AppError('TIMEOUT');
+    if (token === null) return;
+    const { data, error } = await getSupabase().rpc('vs_clear_question_author_blocks').abortSignal(signal);
+    if (error?.code === 'PGRST202' || error?.code === '42883') throw new AppError('SHARING_UNAVAILABLE');
+    if (error) rpcError(error);
+    if (!data || data.status !== 'cleared') throw new AppError('RESULT_INVALID');
+  }, 15_000);
 }
 export async function setDid(id: string, did: Did): Promise<void> {
   await boundedRpc('vs_set_did', { p_id: id, p_did: did });

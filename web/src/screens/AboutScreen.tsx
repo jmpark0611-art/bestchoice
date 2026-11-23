@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Brand, Screen } from '../components/ui';
 import { clearDecisionReflections, reflectionErrorMessage } from '../lib/decisionReflections';
 import { resetDefaultCriterion } from '../lib/decisionPreferences';
+import { clearQuestionAuthorBlocks } from '../lib/api';
+import { codeOf, errorMessage } from '../lib/errors';
 import {
   clearDecisionDrafts, clearReflectionDrafts, draftErrorMessage,
   getDraftAutosaveEnabled, setDraftAutosaveEnabled,
@@ -13,6 +15,19 @@ export function AboutScreen() {
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [draftSetting, setDraftSetting] = useState(() => getDraftAutosaveEnabled());
+  const [clearingBlocks, setClearingBlocks] = useState(false);
+  const blockClearPending = useRef(false);
+  const active = useRef(true);
+  useEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
+  const clearBlocks = async () => {
+    if (blockClearPending.current || !window.confirm('현재 익명 세션에서 차단한 작성자를 모두 해제할까요? 해당 작성자의 공유 질문을 다시 볼 수 있어요.')) return;
+    blockClearPending.current = true;setClearingBlocks(true);setNotice(null);setError(null);
+    try {
+      await clearQuestionAuthorBlocks();
+      if (active.current) setNotice('작성자 차단을 모두 해제했어요.');
+    } catch (cause) { if (active.current) setError(errorMessage(codeOf(cause))); }
+    finally { blockClearPending.current = false;if (active.current) setClearingBlocks(false); }
+  };
   const clearReflections = () => {
     if (!window.confirm('이 기기에 저장한 만족도와 회고, 작성 중인 회고 초안을 모두 지울까요? 되돌릴 수 없어요.')) return;
     const result = clearDecisionReflections();
@@ -57,8 +72,17 @@ export function AboutScreen() {
         <li>결론은 판단을 돕는 참고용이에요. 의료·법률·투자처럼 중요한 결정은 전문가와 확인하세요.</li>
         <li>기록은 만든 날부터 2개월 뒤 자동으로 삭제돼요.</li>
         <li>AI 결과에 문제가 있으면 결과 화면의 ‘AI 답변 신고’에서 이유와 보낼 내용을 확인한 뒤 신고할 수 있어요. 신고에는 해당 결정의 식별자와 신고 사유·설명이 전달돼요. 운영자는 문제를 확인하기 위해 해당 결정의 선택지·상황·AI 결과를 볼 수 있어요. 서버가 접수 번호를 돌려준 경우에만 접수 완료로 안내해요.</li>
+        <li>공유 질문의 선택지·상황은 투표 전에도 ‘질문 신고’로 알려줄 수 있어요. ‘이 작성자 차단’은 현재 익명 세션에서 해당 작성자의 공유 질문을 숨겨요. 차단은 서버에 저장되며 다른 기기나 새 세션에는 이어지지 않을 수 있어요.</li>
         <li>운영: 에스제이컴퍼니 · 대표 박지민 · 문의 jmpark0611@gmail.com</li>
       </ul>
+      <Link to="/content-policy">공유 콘텐츠 이용정책</Link>
+      <section className="sharebox" aria-label="공유 질문 차단 관리">
+        <h3>차단한 작성자</h3>
+        <p className="small">차단한 질문의 링크에서 한 명씩 해제하거나 여기에서 모두 해제할 수 있어요. 질문·투표·신고 기록은 지워지지 않아요.</p>
+        <button type="button" className="btn ghost" disabled={clearingBlocks} onClick={() => void clearBlocks()}>
+          {clearingBlocks ? '차단 해제 중…' : '작성자 차단 모두 해제'}
+        </button>
+      </section>
       <section className="sharebox" aria-label="이 기기의 기록 관리">
         <h3>이 기기에 저장하는 내용</h3>
         <p className="small">기본 기준은 직접 저장할 때만 기억해요. 다음 결정에서 미리 선택되며 언제든 바꿀 수 있어요.</p>

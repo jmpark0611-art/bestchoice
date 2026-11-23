@@ -29,6 +29,60 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe('DecisionReport explicit consent and receipt', () => {
+  it('previews only the visible question before voting and sends after explicit consent', async () => {
+    const user = userEvent.setup();
+    const question = { a: '걸어가기', b: '버스', note: '개인정보가 포함된 질문인지 확인해요' };
+    render(<DecisionReport target={{ kind: 'question', shareCode: 'before-vote' }} question={question} />);
+    await user.click(screen.getByRole('button', { name: '질문 신고' }));
+    await user.click(screen.getByRole('radio', { name: '개인정보가 포함됐어요' }));
+    await user.click(screen.getByRole('button', { name: '보낼 내용 확인' }));
+    expect(screen.getByText('A:').closest('p')).toHaveTextContent(question.a);
+    expect(screen.getByText('B:').closest('p')).toHaveTextContent(question.b);
+    expect(screen.getByText('기준과 상황:').closest('p')).toHaveTextContent(question.note);
+    expect(screen.queryByText(/대상 AI 선택:/)).not.toBeInTheDocument();
+    expect(submit).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: '신고 보내기' })).toBeDisabled();
+    await user.click(screen.getByRole('checkbox', { name: '위 내용을 확인했고 신고 전송에 동의해요.' }));
+    await user.click(screen.getByRole('button', { name: '신고 보내기' }));
+    expect(submit).toHaveBeenCalledExactlyOnceWith({
+      target: { kind: 'question', shareCode: 'before-vote' }, category: 'privacy', details: '',
+      consented: true, requestId: expect.stringMatching(/^[0-9a-f-]{36}$/i),
+    });
+    expect(await screen.findByRole('status')).toHaveTextContent('신고가 서버에 접수됐어요.');
+  });
+
+  it('keeps an AI receipt and hidden result out of a question report for the same share code', async () => {
+    let finish!: (result: ReportReceipt) => void;
+    submit.mockReturnValue(new Promise<ReportReceipt>(resolve => { finish = resolve; }));
+    const user = userEvent.setup();
+    const view = render(<DecisionReport target={{ kind: 'voter', shareCode: 'same-code' }} choiceLabel="AI 비공개 선택" reason="AI 비공개 이유" />);
+    await previewReport(user);
+    await user.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('button', { name: '신고 보내기' }));
+    view.rerender(<DecisionReport target={{ kind: 'question', shareCode: 'same-code' }} question={{ a: '선택 A', b: '선택 B', note: null }} />);
+    await act(async () => { finish(receipt); });
+    await user.click(screen.getByRole('button', { name: '질문 신고' }));
+    expect(screen.queryByText(receiptId)).not.toBeInTheDocument();
+    expect(screen.queryByText('AI 비공개 선택')).not.toBeInTheDocument();
+    expect(screen.queryByText('AI 비공개 이유')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('어떤 문제였나요? (선택)')).toHaveValue('');
+    expect(screen.getByRole('radio', { name: '사실과 맞지 않아요' })).not.toBeChecked();
+  });
+
+  it('uses question-specific permission guidance without asking a reporter to vote first', async () => {
+    submit.mockRejectedValue(new AppError('REPORT_NOT_ALLOWED'));
+    const user = userEvent.setup();
+    render(<DecisionReport target={{ kind: 'question', shareCode: 'before-vote' }} question={{ a: 'A', b: 'B', note: null }} />);
+    await user.click(screen.getByRole('button', { name: '질문 신고' }));
+    await user.click(screen.getByRole('radio', { name: '다른 문제가 있어요' }));
+    await user.click(screen.getByRole('button', { name: '보낼 내용 확인' }));
+    await user.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('button', { name: '신고 보내기' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('이 질문을 신고할 권한을 확인하지 못했어요.');
+    expect(screen.getByRole('alert')).not.toHaveTextContent('투표');
+    expect(screen.queryByText('신고가 서버에 접수됐어요.')).not.toBeInTheDocument();
+  });
+
   it('previews the exact reason and details without a request, then sends only after consent', async () => {
     const user = userEvent.setup();
     render(<DecisionReport {...props} />);

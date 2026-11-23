@@ -5,20 +5,27 @@ import {
 } from '../lib/decisionReports';
 
 type Props = {
-  target: ReportTarget;
-  choiceLabel: string;
-  reason: string;
   disabled?: boolean;
   /** Parent keeps refresh/navigation from discarding a report whose receipt is still unknown. */
   onRequestPendingChange?: (pending: boolean) => void;
-};
+} & ({
+  target: Exclude<ReportTarget, { kind: 'question' }>;
+  choiceLabel: string;
+  reason: string;
+} | {
+  target: Extract<ReportTarget, { kind: 'question' }>;
+  question: { a: string; b: string; note: string | null };
+});
 
-/** Parent shows this only after an AI result is visible; the RPC independently checks access. */
+/** AI reports require a visible result; question reports contain only the visible question. */
 export function DecisionReport(props: Props) {
   return <ReportEditor key={reportTargetKey(props.target)} {...props} />;
 }
 
-function ReportEditor({ target, choiceLabel, reason, disabled = false, onRequestPendingChange }: Props) {
+function ReportEditor(props: Props) {
+  const { target, disabled = false, onRequestPendingChange } = props;
+  const isQuestion = target.kind === 'question';
+  const question = 'question' in props ? props.question : null;
   const id = useId();
   const active = useRef(true);
   const sending = useRef(false);
@@ -70,7 +77,7 @@ function ReportEditor({ target, choiceLabel, reason, disabled = false, onRequest
       const result = await submitDecisionReport(pendingRequest.current);
       if (active.current) setReceipt(result);
     } catch (cause) {
-      if (active.current) setError(reportErrorMessage(cause));
+      if (active.current) setError(reportErrorMessage(cause, target));
     } finally {
       sending.current = false;
       if (active.current) setPending(false);
@@ -81,8 +88,8 @@ function ReportEditor({ target, choiceLabel, reason, disabled = false, onRequest
 
   return (
     <section className="sharebox decision-report" aria-labelledby={`${id}-heading`}>
-      <h3 id={`${id}-heading`}>AI 답변에 문제가 있나요?</h3>
-      {!opened && <button type="button" className="btn text" disabled={disabled} onClick={() => setOpened(true)}>AI 답변 신고</button>}
+      <h3 id={`${id}-heading`}>{isQuestion ? '이 질문에 문제가 있나요?' : 'AI 답변에 문제가 있나요?'}</h3>
+      {!opened && <button type="button" className="btn text" disabled={disabled} onClick={() => setOpened(true)}>{isQuestion ? '질문 신고' : 'AI 답변 신고'}</button>}
       {opened && receipt && <div role="status">
         <p>신고가 서버에 접수됐어요.</p>
         <p className="small">접수 번호: <code>{receipt.receiptId}</code></p>
@@ -111,9 +118,16 @@ function ReportEditor({ target, choiceLabel, reason, disabled = false, onRequest
         <h4>보낼 내용 확인</h4>
         <p><strong>신고 사유:</strong> {categoryLabel}</p>
         <p><strong>추가 설명:</strong> {details.trim() || '없음'}</p>
-        <p className="small">대상 AI 선택: {choiceLabel}</p>
-        <blockquote>{reason}</blockquote>
-        <p className="small">신고 사유·추가 설명과 이 결정의 식별 정보를 보내요. 운영자는 이미 서버에 있는 이 결정의 선택지·상황·AI 답변을 확인할 수 있어요.</p>
+        {isQuestion && question ? <div>
+          <p className="context-text"><strong>A:</strong> {question.a}</p>
+          <p className="context-text"><strong>B:</strong> {question.b}</p>
+          {question.note && <p className="context-text"><strong>기준과 상황:</strong> {question.note}</p>}
+          <p className="small">신고 사유·추가 설명과 이 질문의 공유 식별 정보를 보내요. 운영자는 서버에 있는 질문의 선택지·상황을 확인할 수 있어요.</p>
+        </div> : !isQuestion && 'reason' in props ? <>
+          <p className="small">대상 AI 선택: {props.choiceLabel}</p>
+          <blockquote>{props.reason}</blockquote>
+          <p className="small">신고 사유·추가 설명과 이 결정의 식별 정보를 보내요. 운영자는 이미 서버에 있는 이 결정의 선택지·상황·AI 답변을 확인할 수 있어요.</p>
+        </> : null}
         <p className="small">이 기기의 회고·만족도·다른 결정 기록은 보내지 않아요.</p>
         {!attempted && <label className="report-consent">
           <input type="checkbox" checked={consented} disabled={disabled || pending} onChange={event => setConsented(event.target.checked)} />

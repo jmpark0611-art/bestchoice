@@ -33,6 +33,11 @@ function open(path: string) {
   );
 }
 
+async function acceptSharePolicy(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('checkbox', { name: '공유 콘텐츠 이용정책을 확인했고 동의해요.' }));
+  await user.click(screen.getByRole('button', { name: '동의하고 공유하기' }));
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
@@ -155,6 +160,8 @@ describe('PollScreen', () => {
     const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
     open('/p/p1');
     await user.click(await screen.findByRole('button', { name: '친구한테 물어보기' }));
+    expect(api.sharePoll).not.toHaveBeenCalled();
+    await acceptSharePolicy(user);
     expect(api.sharePoll).toHaveBeenCalledWith('p1');
     expect(await screen.findByText(`${window.location.origin}/v/abc123`)).toBeInTheDocument();
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/v/abc123'));
@@ -202,6 +209,7 @@ it('share cancellation preserves result and reads updated vote totals without cr
  Object.defineProperty(navigator,'share',{value:share,configurable:true});
  const user=userEvent.setup();const view=open('/p/p1');await screen.findByText('짬뽕!');
  await user.click(screen.getByText('투표 링크 다시 보내기'));
+ await acceptSharePolicy(user);
  await screen.findByText('공유를 취소했어요. 결과는 그대로예요.');
  await waitFor(()=>expect(api.getMyPoll).toHaveBeenCalledTimes(2));expect(api.sharePoll).not.toHaveBeenCalled();
  view.unmount();document.dispatchEvent(new Event('visibilitychange'));expect(api.getMyPoll).toHaveBeenCalledTimes(2);
@@ -229,7 +237,7 @@ it('a read started before actual choice cannot roll back the saved selection',as
 });
 
 
-it('native share waits, guards exit and refresh, and only then reads updated votes', async () => {
+it('native share waits, guards beforeunload and refresh, and only then reads updated votes', async () => {
   let finish!: () => void;
   const share = vi.fn(() => new Promise<void>(r => { finish = r; }));
   const prior = Object.getOwnPropertyDescriptor(navigator, 'share');
@@ -240,6 +248,7 @@ it('native share waits, guards exit and refresh, and only then reads updated vot
     const user = userEvent.setup();
     open('/p/p1');
     await user.click(await screen.findByRole('button',{name:'투표 링크 다시 보내기'}));
+    await acceptSharePolicy(user);
     expect(share).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button',{name:'새로 고침'})).toBeDisabled();
     const exit = new Event('beforeunload',{cancelable:true});
@@ -282,6 +291,9 @@ it('share request is single-flight and refresh stays disabled while server write
   open('/p/p1');
   const shareButton = await screen.findByRole('button', { name: '친구한테 물어보기' });
   await user.dblClick(shareButton);
+  expect(api.sharePoll).not.toHaveBeenCalled();
+  await user.click(screen.getByRole('checkbox', { name: '공유 콘텐츠 이용정책을 확인했고 동의해요.' }));
+  await user.dblClick(screen.getByRole('button', { name: '동의하고 공유하기' }));
   expect(api.sharePoll).toHaveBeenCalledTimes(1);
   expect(shareButton).toBeDisabled();
   await act(async () => finish('pending-code'));

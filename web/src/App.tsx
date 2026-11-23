@@ -4,6 +4,7 @@ import { AboutScreen } from './screens/AboutScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { PollScreen } from './screens/PollScreen';
 import { VoteScreen } from './screens/VoteScreen';
+import { ContentPolicyScreen } from './screens/ContentPolicyScreen';
 
 export function App() {
   return (
@@ -14,6 +15,7 @@ export function App() {
       <Route path="/p/:id" element={<PollScreen />} />
       <Route path="/v/:code" element={<VoteScreen />} />
       <Route path="/about" element={<AboutScreen />} />
+      <Route path="/content-policy" element={<ContentPolicyScreen />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

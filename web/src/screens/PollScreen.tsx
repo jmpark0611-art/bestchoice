@@ -7,6 +7,7 @@ import { DecisionReport } from '../components/DecisionReport';
 import { buildReconsideration, makeReconsiderState } from '../lib/decisionReconsider';
 import { getMyPoll, setDid, sharePoll, type Did, type Poll } from '../lib/api';
 import { codeOf, errorMessage } from '../lib/errors';
+import { hasAcceptedContentPolicy, rememberContentPolicyAcceptance, SHARED_CONTENT_RULES } from '../lib/contentPolicy';
 
 import { publicShareOrigin, voteUrl } from '../lib/shareUrl';
 export { voteUrl } from '../lib/shareUrl';
@@ -26,6 +27,10 @@ export function PollScreen() {
   const reportPending = useRef(false);
   const [recordBusy,setRecordBusy] = useState(false);
   const [shareBusy,setShareBusy] = useState(false);
+  const [sharePolicyOpen, setSharePolicyOpen] = useState(false);
+  const [sharePolicyChecked, setSharePolicyChecked] = useState(false);
+  const [sharePolicyStorageWarning, setSharePolicyStorageWarning] = useState(false);
+  const policyAcceptedForPage = useRef(false);
   const [notice, setNotice] = useState<string | null>(null);
   const shareLinkRef = useRef<HTMLElement | null>(null);
   const reflectionChanged = useCallback((dirty: boolean) => {
@@ -74,6 +79,7 @@ export function PollScreen() {
     setPoll(null);
     sharing.current=false;recording.current=false;refreshing.current=false;
     setShareBusy(false);setRecordBusy(false);setNotice(null);dataVersion.current++;
+    setSharePolicyOpen(false);setSharePolicyChecked(false);setSharePolicyStorageWarning(false);policyAcceptedForPage.current=false;
     try {
       const result = await getMyPoll(id);
       if (version === loadVersion.current) setPoll(result);
@@ -127,6 +133,10 @@ export function PollScreen() {
 
   const ask = async () => {
     if(sharing.current || recording.current) return;
+    if(reportPending.current){setNotice(PENDING_REPORT_NOTICE);return;}
+    if(!policyAcceptedForPage.current && !hasAcceptedContentPolicy()){
+      setSharePolicyOpen(true);setSharePolicyChecked(false);return;
+    }
     if(!publicShareOrigin()){setNotice('공유할 웹 주소가 아직 설정되지 않았어요.');return;}
     sharing.current=true;setShareBusy(true);setNotice(null);
     const version=loadVersion.current;
@@ -196,6 +206,26 @@ export function PollScreen() {
       <button type="button" className="btn" disabled={shareBusy || recordBusy} onClick={ask}>
         {poll.shareCode ? '투표 링크 다시 보내기' : '친구한테 물어보기'}
       </button>
+      {sharePolicyOpen && <section className="sharebox" aria-label="공유 전 콘텐츠 정책 동의">
+        <h3>공유 전에 확인해 주세요</h3>
+        <ul className="help">{SHARED_CONTENT_RULES.map(rule => <li key={rule}>{rule}</li>)}</ul>
+        <p className="small">정책을 어긴 질문은 신고 검토 후 공유가 중단되거나 삭제될 수 있어요.</p>
+        <Link to="/content-policy" onClick={leave}>공유 콘텐츠 이용정책 전체 보기</Link>
+        <label className="report-consent">
+          <input type="checkbox" checked={sharePolicyChecked} disabled={shareBusy || recordBusy}
+            onChange={event => setSharePolicyChecked(event.target.checked)} />
+          공유 콘텐츠 이용정책을 확인했고 동의해요.
+        </label>
+        <button type="button" className="btn" disabled={!sharePolicyChecked || shareBusy || recordBusy}
+          onClick={() => {
+            if (!sharePolicyChecked || sharing.current || recording.current) return;
+            policyAcceptedForPage.current = true;
+            setSharePolicyStorageWarning(!rememberContentPolicyAcceptance());
+            setSharePolicyOpen(false);void ask();
+          }}>동의하고 공유하기</button>
+        <button type="button" className="btn text" onClick={() => { setSharePolicyOpen(false); setSharePolicyChecked(false); }}>공유 취소</button>
+      </section>}
+      {sharePolicyStorageWarning && <p className="small" role="status">동의는 이번 공유에 적용했어요. 기기에 저장하지 못해 다음에는 다시 확인할 수 있어요.</p>}
       {notice && (
         <p className="small" role="status">
           {notice}

@@ -10,7 +10,8 @@ export const REPORT_CATEGORIES = [
   { value: 'other', label: '다른 문제가 있어요' },
 ] as const;
 export type ReportCategory = (typeof REPORT_CATEGORIES)[number]['value'];
-export type ReportTarget = { kind: 'owner'; pollId: string } | { kind: 'voter'; shareCode: string };
+export type ReportTarget = { kind: 'owner'; pollId: string } | { kind: 'voter'; shareCode: string } |
+  { kind: 'question'; shareCode: string };
 export type ReportSubmission = {
   target: ReportTarget;
   category: ReportCategory;
@@ -30,7 +31,7 @@ export function createReportRequestId(): string {
 }
 
 export function reportTargetKey(target: ReportTarget): string {
-  return target.kind === 'owner' ? `owner:${target.pollId}` : `voter:${target.shareCode}`;
+  return target.kind === 'owner' ? `owner:${target.pollId}` : `${target.kind}:${target.shareCode}`;
 }
 
 function validSubmission(input: ReportSubmission): boolean {
@@ -39,7 +40,7 @@ function validSubmission(input: ReportSubmission): boolean {
     REPORT_CATEGORIES.some(category => category.value === input.category) &&
     typeof input.details === 'string' && input.details.trim().length <= REPORT_DETAILS_MAX &&
     (target.kind === 'owner' ? UUID.test(target.pollId)
-      : target.kind === 'voter' && /^[A-Za-z0-9_-]{1,128}$/.test(target.shareCode));
+      : (target.kind === 'voter' || target.kind === 'question') && /^[A-Za-z0-9_-]{1,128}$/.test(target.shareCode));
 }
 
 function reportRpcError(error: { code?: string; message?: string }): AppError {
@@ -56,14 +57,16 @@ export async function submitDecisionReport(input: ReportSubmission): Promise<Rep
       await ensureSession();
       // Authentication can finish after a timeout; never send a late report.
       if (signal.aborted) throw new AppError('TIMEOUT');
-      const { data, error } = await getSupabase().rpc('vs_report_result', {
-        p_request_id: input.requestId,
-        p_category: input.category,
-        p_details: input.details.trim(),
-        p_consent: true,
-        p_poll_id: input.target.kind === 'owner' ? input.target.pollId : null,
-        p_share_code: input.target.kind === 'voter' ? input.target.shareCode : null,
-      }).abortSignal(signal);
+      const payload = {
+        p_request_id: input.requestId, p_category: input.category,
+        p_details: input.details.trim(), p_consent: true,
+      };
+      const { data, error } = await (input.target.kind === 'question'
+        ? getSupabase().rpc('vs_report_question', { ...payload, p_share_code: input.target.shareCode })
+        : getSupabase().rpc('vs_report_result', {
+          ...payload, p_poll_id: input.target.kind === 'owner' ? input.target.pollId : null,
+          p_share_code: input.target.kind === 'voter' ? input.target.shareCode : null,
+        })).abortSignal(signal);
       if (signal.aborted) throw new AppError('TIMEOUT');
       if (error) throw reportRpcError(error);
       if (!data || typeof data !== 'object' || data.status !== 'received' ||
@@ -80,13 +83,15 @@ export async function submitDecisionReport(input: ReportSubmission): Promise<Rep
   }, 15_000);
 }
 
-export function reportErrorMessage(error: unknown): string {
+export function reportErrorMessage(error: unknown, target?: ReportTarget): string {
   const code = error instanceof AppError ? error.code : 'REPORT_NETWORK';
   switch (code) {
     case 'REPORT_UNAVAILABLE': return '지금은 신고 접수 기능을 사용할 수 없어요. 접수 확인을 받지 못했으니 나중에 다시 시도해 주세요.';
     case 'REPORT_INVALID': return '신고 사유와 200자 이내의 설명, 전송 동의를 확인해 주세요.';
     case 'REPORT_NOT_ALLOWED':
-    case 'AUTH_REQUIRED': return '이 결과를 신고할 권한을 확인하지 못했어요. 작성자이거나 투표를 마친 결과인지 확인해 주세요.';
+    case 'AUTH_REQUIRED': return target?.kind === 'question'
+      ? '이 질문을 신고할 권한을 확인하지 못했어요. 질문 링크와 연결 상태를 확인해 주세요.'
+      : '이 결과를 신고할 권한을 확인하지 못했어요. 작성자이거나 투표를 마친 결과인지 확인해 주세요.';
     case 'REPORT_LIMIT': return '오늘 보낼 수 있는 신고 수에 도달했어요. 내일 다시 시도해 주세요.';
     case 'REPORT_BUSY': return '지금 신고 요청이 많아요. 잠시 후 같은 신고를 다시 보내 주세요.';
     case 'REPORT_REQUEST_CONFLICT': return '이 신고 번호의 내용이 달라 접수 여부를 확인하지 못했어요. 같은 내용을 유지해 주세요.';

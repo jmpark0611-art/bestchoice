@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppError } from './errors';
-import { createReportRequestId, submitDecisionReport, type ReportSubmission } from './decisionReports';
+import { createReportRequestId, reportTargetKey, submitDecisionReport, type ReportSubmission } from './decisionReports';
 
 const backend = vi.hoisted(() => ({ ensureSession: vi.fn(), rpc: vi.fn(), abortSignal: vi.fn() }));
 vi.mock('./supabase', () => ({ ensureSession: backend.ensureSession, getSupabase: () => ({ rpc: backend.rpc }) }));
@@ -37,12 +37,31 @@ describe('explicit report API', () => {
     });
   });
 
+  it('reports a question before voting through only the five question RPC arguments', async () => {
+    const question = { ...input, target: { kind: 'question' as const, shareCode: 'friend-code' }, details: '  질문에 개인정보가 있어요  ' };
+    await expect(submitDecisionReport(question)).resolves.toEqual(receipt);
+    expect(backend.rpc).toHaveBeenCalledExactlyOnceWith('vs_report_question', {
+      p_request_id: requestId, p_category: 'incorrect', p_details: '질문에 개인정보가 있어요',
+      p_consent: true, p_share_code: 'friend-code',
+    });
+    expect(reportTargetKey(question.target)).not.toBe(reportTargetKey({ kind: 'voter', shareCode: 'friend-code' }));
+  });
+
+  it('does not fall back to an AI-result RPC when question reporting is unavailable', async () => {
+    backend.abortSignal.mockResolvedValue({ data: null, error: { code: 'PGRST202' } });
+    await expect(submitDecisionReport({ ...input, target: { kind: 'question', shareCode: 'friend-code' } }))
+      .rejects.toMatchObject({ code: 'REPORT_UNAVAILABLE' });
+    expect(backend.rpc).toHaveBeenCalledTimes(1);
+    expect(backend.rpc.mock.calls[0][0]).toBe('vs_report_question');
+  });
+
   it.each([
     { ...input, consented: false },
     { ...input, requestId: 'invalid' },
     { ...input, details: '가'.repeat(201) },
     { ...input, target: { kind: 'owner', pollId: 'not-a-uuid' } },
     { ...input, target: { kind: 'voter', shareCode: '../another' } },
+    { ...input, target: { kind: 'question', shareCode: '../another' } },
   ] as ReportSubmission[])('rejects invalid input before authentication or any network write', async invalid => {
     await expect(submitDecisionReport(invalid)).rejects.toMatchObject({ code: 'REPORT_INVALID' });
     expect(backend.ensureSession).not.toHaveBeenCalled();
