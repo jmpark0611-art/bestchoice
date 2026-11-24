@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-24T22:33:36Z",
+  "recordedOnKst": "2026-11-25",
+  "provider": "OpenAI",
+  "purpose": "Read actual operating organization/project data controls for release privacy facts",
+  "requestOutcome": "aborted-by-user",
+  "structuredBrowserAuthResultReceived": false,
+  "credentialSubmissionOutcome": "unknown; no successful result was returned",
+  "actualOrganizationOrProjectVerified": false,
+  "dataControlValuesRead": false,
+  "accountSettingsModifiedByAgent": false,
+  "followupObservation": "Browser runtime bindings were replaced; prior tab 4 was absent and browser tab inventory was empty.",
+  "authenticationSucceededClaimed": false,
+  "automaticAuthenticationRetryPerformed": false,
+  "automaticHandoffRequestedAfterCancellation": false,
+  "nextStep": "Keep OpenAI account facts unresolved. Resume sign-in only after the user asks to retry; then use the documented secure authentication flow.",
+  "codeCheckpoint": "3f1dbd4bce8cf0dc2b2596170680f447c826c38e",
+  "implementationPatchSha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08",
+  "validationRepeatedBecauseOfCancellation": false
+}

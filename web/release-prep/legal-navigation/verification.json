@@ -29,12 +29,13 @@
   "existingSignedAabSha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
   "nativeCORS": "previously completed; not changed or rerun here",
   "productionMigrations": "still 7 history entries; new 2 schemas and 6 public function names absent; no new apply attempt",
-  "openAIAccountControls": "sign-in required; actual organization/project controls unknown",
+  "openAIAccountControls": "unknown; secure sign-in choice request aborted; no automatic retry",
   "remainingVerification": [
     "320px and dark-mode rendered layout",
     "real Android WebView back and external-mail behavior",
     "final policy facts and actual public pages",
     "new exact signed candidate after final runtime integration"
   ],
-  "firstTestAttempt": "Data Router test harness collided between Node Request and jsdom AbortSignal. Only harness changed to declarative MemoryRouter; corrected six tests passed. Original failure retained in scratch."
+  "firstTestAttempt": "Data Router test harness collided between Node Request and jsdom AbortSignal. Only harness changed to declarative MemoryRouter; corrected six tests passed. Original failure retained in scratch.",
+  "authenticationFollowup": "authentication-followup.json"
 }
