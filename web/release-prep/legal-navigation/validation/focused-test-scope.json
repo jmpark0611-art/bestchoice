@@ -1,0 +1,35 @@
+{
+  "baselineCommit": "ab960b8889b91ec27b47f1d336b5dcaf6b381b55",
+  "startedAtUtc": "2026-11-24T21:52:49.259433+00:00",
+  "finishedAtUtc": "2026-11-24T21:52:51.462822+00:00",
+  "nodeVersion": "v24.22.3",
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/screens/LegalInfoScreen.integration.test.tsx",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile=/workspace/scratch/59b55f9d68c3/validation/genie-legal-integration-20261125/ui-validation/legal-info-vitest.json"
+  ],
+  "workingDirectory": "/workspace/scratch/59b55f9d68c3/validation/genie-legal-integration-20261125/working/web",
+  "exitCode": 0,
+  "testSourceSha256": "5de8d751a6e4d955ba6c718ec714f60c6c9ac542ed30590f198a6e449ff29aef",
+  "log": "/workspace/scratch/59b55f9d68c3/validation/genie-legal-integration-20261125/ui-validation/legal-info-vitest.log",
+  "vitestJson": "/workspace/scratch/59b55f9d68c3/validation/genie-legal-integration-20261125/ui-validation/legal-info-vitest.json",
+  "scope": "Only new LegalInfoScreen.integration.test.tsx; declarative router and simulated denied mail navigation, no physical device or real mail-client verification",
+  "installedDependencies": false,
+  "fullTestSuiteRun": false,
+  "previousAttempt": {
+    "directory": "/workspace/scratch/59b55f9d68c3/validation/genie-legal-integration-20261125/ui-validation/attempt1-data-router",
+    "reason": "Data Router used Node Request with jsdom AbortSignal; changed test harness to declarative MemoryRouter matching app routing, with route and back assertions retained"
+  },
+  "success": true,
+  "numTotalTestSuites": 1,
+  "numTotalTests": 6,
+  "numPassedTests": 6,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "reasonForFinalFocusedRun": "Final About reporting/blocking copy aligned with review status; bind focused result to final six-file patch",
+  "finalAboutSha256": "f53db409500b426509122d4dfb9566c9d5435d4414345b84627982d62a30d02d"
+}

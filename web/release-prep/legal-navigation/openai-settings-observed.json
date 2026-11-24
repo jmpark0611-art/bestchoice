@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "observedOnUtc": "2026-11-24",
+  "observedOnKst": "2026-11-25",
+  "provider": "OpenAI",
+  "intendedSetting": "Actual organization/project data sharing and retention controls",
+  "requestedUrl": "https://platform.openai.com/settings/organization/data-controls",
+  "observedUrl": "https://platform.openai.com/login?next=%2Fsettings%2Forganization%2Fdata-controls",
+  "result": "sign-in-required",
+  "actualOrganization": null,
+  "actualProject": null,
+  "actualRuntimeProjectMatched": false,
+  "inputOutputSharing": null,
+  "organizationRetentionControl": null,
+  "projectRetentionOverride": null,
+  "credentialsRead": false,
+  "credentialsEntered": false,
+  "settingsChanged": false,
+  "officialDefaultsSubstitutedForAccountValues": false,
+  "nextStep": "Use documented secure browserAuth sign-in method selection; verify actual operating organization/project before reading Data controls."
+}

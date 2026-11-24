@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "projectId": "njrtcxohbkfgrgwhlvua",
+  "observedOnUtc": "2026-11-24",
+  "observedOnKst": "2026-11-25",
+  "source": "Authenticated Supabase dashboard; read-only UI observations during current continuation.",
+  "settingsChanged": false,
+  "productionUserRowsRead": false,
+  "organization": {
+    "id": "vnwdfyjkjfojsjbrwvyd",
+    "plan": "free",
+    "source": "Supabase get_organization read"
+  },
+  "sessions": {
+    "url": "https://supabase.com/dashboard/project/njrtcxohbkfgrgwhlvua/auth/sessions",
+    "singleSessionEnforced": false,
+    "timeBoxHours": 0,
+    "timeBoxDisplayed": "never",
+    "inactivityTimeoutHours": 0,
+    "inactivityDisplayed": "never",
+    "sessionControlsRequireProInObservedUi": true,
+    "accessTokenExpirySeconds": 3600,
+    "refreshReplayDetection": true,
+    "refreshReuseIntervalSeconds": 10,
+    "saveButtonsDisabled": true,
+    "scope": "These values concern session validity, not automatic deletion of auth.users or all associated data."
+  },
+  "auditLogs": {
+    "url": "https://supabase.com/dashboard/project/njrtcxohbkfgrgwhlvua/auth/audit-logs",
+    "writeAuditLogsToDatabase": false,
+    "externalAuthLogsRemainAvailableAccordingToUi": true,
+    "existingHistoricalDatabaseRowsQueried": false,
+    "saveButtonDisabled": true,
+    "scope": "OFF is not proof of no Auth event logging or deletion of earlier audit rows."
+  },
+  "backups": {
+    "scheduledUrl": "https://supabase.com/dashboard/project/njrtcxohbkfgrgwhlvua/database/backups/scheduled",
+    "scheduledUi": "Free Plan does not include project backups.",
+    "pointInTimeUrl": "https://supabase.com/dashboard/project/njrtcxohbkfgrgwhlvua/database/backups/pitr",
+    "pointInTimeUi": "Point in Time Recovery is a Pro Plan add-on",
+    "scheduledBackupRetentionVerified": null,
+    "pointInTimeRecoveryEnabled": false,
+    "scope": "Account-visible project backup feature state only; provider infrastructure backup retention and any separately held exports are not established."
+  },
+  "logDrains": {
+    "url": "https://supabase.com/dashboard/project/njrtcxohbkfgrgwhlvua/settings/log-drains",
+    "ui": "Upgrade to a Pro, Team or Enterprise Plan to send your logs to your preferred platform",
+    "configuredEndpointDisplayed": false,
+    "availableOnCurrentPlan": false,
+    "scope": "No configured Log Drain was displayed. Does not establish the absence of application-side exports or other services' logging."
+  }
+}

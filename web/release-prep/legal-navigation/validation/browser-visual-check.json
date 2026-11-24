@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked-before-render",
+  "attemptedUrl": "http://127.0.0.1:4178/about",
+  "appBuild": "synthetic configuration at current local working source",
+  "firstResult": "net::ERR_CONNECTION_REFUSED",
+  "tabId": "5",
+  "followupObservation": "Browser URL policy denied access to the error page; no authority to observe its contents",
+  "narrowViewportRendered": false,
+  "darkModeRendered": false,
+  "realMailAppLaunched": false,
+  "androidSystemBackVerified": false,
+  "fallbackBrowserAutomationAttempted": false,
+  "nextStep": "Render final candidate in an approved browser/device environment reachable by the same local preview; do not infer layout correctness from jsdom tests."
+}

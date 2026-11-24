@@ -1,0 +1,11 @@
+
+ RUN  v3.2.7 /workspace/scratch/59b55f9d68c3/validation/genie-legal-integration-20261125/working/web
+
+ ✓ src/screens/LegalInfoScreen.integration.test.tsx (6 tests) 546ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  06:52:49
+   Duration  1.72s (transform 303ms, setup 59ms, collect 450ms, tests 546ms, environment 351ms, prepare 96ms)
+
+JSON report written to /workspace/scratch/59b55f9d68c3/validation/genie-legal-integration-20261125/ui-validation/legal-info-vitest.json

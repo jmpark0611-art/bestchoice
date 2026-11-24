@@ -1,0 +1,2 @@
+Final type check was the tsc -b phase of npm run build. Full command output is type-and-web-build.log.
+Exit code: 0

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "kind": "bounded-read-only-migration-diagnosis",
+  "preparedAtUtc": "2026-11-24T21:26:41.273Z",
+  "project": {
+    "id": "njrtcxohbkfgrgwhlvua",
+    "status": "ACTIVE_HEALTHY",
+    "region": "ap-northeast-2",
+    "name": "bestchoice"
+  },
+  "organization": {
+    "id": "vnwdfyjkjfojsjbrwvyd",
+    "plan": "free"
+  },
+  "currentCatalogAndActivity": {
+    "checked_at_utc": "2026-11-24 21:24:40.906863+00",
+    "schemas": [
+      {
+        "name": "genie_question_safety_private",
+        "exists": false
+      },
+      {
+        "name": "genie_reporting_private",
+        "exists": false
+      }
+    ],
+    "public_functions": [
+      {
+        "name": "vs_clear_question_author_blocks",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_report_question",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_report_result",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_set_question_author_block",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_shared_poll_guarded",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_vote_guarded",
+        "overload_count": 0
+      }
+    ],
+    "track_activities": "on",
+    "query_text_capture_limit": "1kB",
+    "has_read_all_stats_role": true,
+    "matching_activity_count": 0,
+    "matching_active_count": 0,
+    "migration_like_activity": []
+  },
+  "migrationHistory": {
+    "source": "root-reported fresh list_migrations",
+    "observedAtUtc": "2026-11-24T21:22:41Z",
+    "count": 7,
+    "requeriedByThisDiagnosis": false
+  },
+  "recoveredEvidence": [
+    {
+      "path": "/workspace/scratch/59b55f9d68c3/validation/genie-release-finalization-20261125/database/preflight.json",
+      "exists": true,
+      "bytes": 63801,
+      "sha256": "eb1986720a7ea00bc8bbfd7b13b8f2892a1d92b4de3cedd5f55c87f92b37ad9b",
+      "matchesPriorRecordedSha256": true,
+      "originalPreparedAtUtc": "2026-11-24T16:06:02.708Z",
+      "originalObservedAtUtc": "2026-11-24 16:04:57.215617+00",
+      "originalGate": "PASS"
+    },
+    {
+      "path": "/workspace/scratch/59b55f9d68c3/validation/genie-release-finalization-20261125/database/queries.sql",
+      "exists": true,
+      "bytes": 10876,
+      "sha256": "539594e2f3ce6fd3e7054495e91ecfbe2f227706ab65af14ca82153793df4c13",
+      "matchesPriorRecordedSha256": true
+    }
+  ],
+  "historicalLogCheck": {
+    "tool": "supabase_query_logs",
+    "source": "postgres_logs",
+    "isoTimestampStart": "2026-11-24T16:06:00Z",
+    "isoTimestampEnd": "2026-11-24T16:40:00Z",
+    "queryCount": 2,
+    "metadataDiscovery": [
+      {
+        "attribute_keys": [
+          "env",
+          "host",
+          "identifier",
+          "parsed.backend_type",
+          "parsed.error_severity",
+          "parsed.process_id",
+          "parsed.query_id",
+          "parsed.session_id",
+          "parsed.session_line_num",
+          "parsed.session_start_time",
+          "parsed.sql_state_code",
+          "parsed.timestamp",
+          "parsed.transaction_id",
+          "path",
+          "project",
+          "region",
+          "source_type"
+        ],
+        "matching_log_count": 2
+      }
+    ],
+    "classifiedEvents": [
+      {
+        "backend_type": "checkpointer",
+        "event_count": 2,
+        "first_event_at": "2026-11-24T16:06:46.675000",
+        "last_event_at": "2026-11-24T16:06:49.181000",
+        "mentions_connection_termination": 0,
+        "mentions_reviewed_migration": 0,
+        "mentions_statement_cancel": 0,
+        "mentions_timeout": 0,
+        "postgres_severity": "LOG",
+        "severity_text": "LOG",
+        "sqlstate": "00000"
+      }
+    ],
+    "messageTextReturned": false,
+    "personalDataReturned": false,
+    "credentialsReturned": false,
+    "conclusion": "Only two LOG/checkpointer events with SQLSTATE 00000 were returned. Both lack the tested migration, timeout, cancellation, and connection-termination indicators. The prior apply failure cause is not established.",
+    "limitations": [
+      "Only the specified 34-minute window and postgres_logs source were inspected.",
+      "Internal Supabase service connection events are not recorded in hosted Postgres logs, per the official field reference.",
+      "No error found in this bounded log query is not proof that an upstream request never failed, never reached the database, or was cancelled."
+    ]
+  },
+  "outcome": {
+    "causeProven": false,
+    "retryConditionsImproved": false,
+    "decisionKorean": "재개조건 개선 없음",
+    "explanation": "Executor/file recovery and successful reads are observed. They do not prove that apply_migration completion is restored. No mutation was attempted by this diagnosis.",
+    "noEvidenceOfAutomaticApprovalRejection": true,
+    "planFailureCausalLinkEstablished": false
+  },
+  "scope": {
+    "ddl": false,
+    "dml": false,
+    "applyMigration": false,
+    "productionDataWrites": false,
+    "settingsChanges": false,
+    "accountChanges": false,
+    "billingChanges": false,
+    "applicationRowReads": false,
+    "fullLogsReturned": false,
+    "credentialsRead": false,
+    "advisorsRequeried": false,
+    "fullPreflightRequeried": false
+  },
+  "sourceDocumentation": [
+    {
+      "url": "https://supabase.com/docs/guides/observability/log-field-reference",
+      "sourceRef": "turn592293122view1",
+      "relevantFacts": [
+        "Postgres statement text and error details may be in event_message.",
+        "Internal Supabase service connection events are not recorded in hosted Postgres logs."
+      ]
+    }
+  ]
+}

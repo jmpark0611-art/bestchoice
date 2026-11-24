@@ -1,0 +1,18 @@
+{
+  "commit": "ab960b8889b91ec27b47f1d336b5dcaf6b381b55",
+  "webFiles": 222,
+  "allWebBlobsMatch": true,
+  "dependencies": {
+    "initialSymlinkTarget": "/workspace/scratch/59b55f9d68c3/validation/genie-release-source-5efd0a4fe7f0/web/node_modules",
+    "initialTargetUsable": false,
+    "initialFailure": "vitest entrypoint missing; only partial Capacitor subtree present",
+    "reusedExistingTarget": "/workspace/scratch/59b55f9d68c3/genie-feature-work/web/node_modules",
+    "packageLockSha256": "e0485a82e100f93e4727249944d731b39ddcbbd01926a378b6a5634197f6e4b2",
+    "packageLockBytesMatch": true,
+    "requiredPackageVersionRecordsMatched": 270,
+    "platformApplicableIncludingOptionalVersionRecordsMatched": 273,
+    "fullPackageContentsIntegrityVerified": false,
+    "newInstallation": false
+  },
+  "otherRepositoryFiles": "partial cached scope; remote tree used for checkpoint preservation"
+}

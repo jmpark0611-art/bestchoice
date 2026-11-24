@@ -1,0 +1,131 @@
+{
+  "baselineCommit": "ab960b8889b91ec27b47f1d336b5dcaf6b381b55",
+  "baselineTree": "730266c65e61559768f929160cee7054a9403645",
+  "createdAtUtc": "2026-11-24T21:45:42.686759+00:00",
+  "files": [
+    {
+      "path": "web/src/App.tsx",
+      "baseline": {
+        "bytes": 968,
+        "sha256": "45e51230e43e1b26725e9016d5e6eb24810ca5ef869972f48bad0feb4cb488ee",
+        "gitBlob": "5d8afe39d98a80c51122086db3d5273bb1adc991"
+      },
+      "working": {
+        "bytes": 1196,
+        "sha256": "c74d3c4650f91ba4a9e8d41c8435b68f49be94fe0185b448ee027f1a04af8d7d",
+        "gitBlob": "de284c5c35bd385e87d4253af3ea3f1232d890bc"
+      }
+    },
+    {
+      "path": "web/src/screens/AboutScreen.tsx",
+      "baseline": {
+        "bytes": 8933,
+        "sha256": "e232613bd8be6a5f5a26b49482a245dc93a87d716e2171e2dc22fe64658fdbcb",
+        "gitBlob": "8a919f6cf56e8d9321dc0bfc073f0f4102451225"
+      },
+      "working": {
+        "bytes": 9874,
+        "sha256": "f53db409500b426509122d4dfb9566c9d5435d4414345b84627982d62a30d02d",
+        "gitBlob": "33db041de6427f67ad614ba659d532a157458544"
+      }
+    },
+    {
+      "path": "web/src/screens/LegalInfoScreen.tsx",
+      "baseline": null,
+      "working": {
+        "bytes": 2981,
+        "sha256": "1e4eefd45dd2dbe43601afa3b0e07dcf4a4c74e100becddbef472bf2580b3f6f",
+        "gitBlob": "7268da14cf8672a28e7032d625ec34ba2e8495aa"
+      }
+    },
+    {
+      "path": "web/src/legal/legalContent.ts",
+      "baseline": null,
+      "working": {
+        "bytes": 16063,
+        "sha256": "1352b2aec6ca7ccc34430b3b1035868260550ce83ec391cc883b640e7f523f89",
+        "gitBlob": "8506f83f810858e9325eedf0af95df0a1ff671cb"
+      }
+    },
+    {
+      "path": "web/src/styles.css",
+      "baseline": {
+        "bytes": 12568,
+        "sha256": "7323d043178a0baf32aa60e29815d34e2967b5424915c79c029a68217570c983",
+        "gitBlob": "a3303c04f5c9bde4b6d70c455838da0a37451c47"
+      },
+      "working": {
+        "bytes": 13987,
+        "sha256": "4c024fd1024bd35ad9de5106b525ab6f83f37c5df400c7bef36315f08751f189",
+        "gitBlob": "c51812b08f357f31589188f2345eb58755ff5f33"
+      }
+    },
+    {
+      "path": "web/src/screens/LegalInfoScreen.integration.test.tsx",
+      "baseline": null,
+      "working": {
+        "bytes": 6961,
+        "sha256": "5de8d751a6e4d955ba6c718ec714f60c6c9ac542ed30590f198a6e449ff29aef",
+        "gitBlob": "ec2e7cbe78f9a2a79a9591b7869d69621f663744"
+      }
+    }
+  ],
+  "protectedFiles": [
+    {
+      "path": "web/release-assets/legal/privacy.html",
+      "unchanged": true,
+      "sha256": "809ff4e3bffe196ff9175c28cbc2c295d199b3822aa5d34e8d7ed864c8cb7340"
+    },
+    {
+      "path": "web/release-assets/legal/delete-data.html",
+      "unchanged": true,
+      "sha256": "32c3dfa674e84e85e538db51fd07475805301b8dd2d5921339341f6bf4366fe1"
+    },
+    {
+      "path": "web/release-assets/legal/PRIVACY-RELEASE-REVIEW.md",
+      "unchanged": true,
+      "sha256": "be1fc664d68e1339ad011b40255f3b991731dfb4ec20e50f96fe26bad66b21c1"
+    },
+    {
+      "path": "web/release-assets/legal/privacy-evidence.json",
+      "unchanged": true,
+      "sha256": "c63b7b6f0e3551ae07f7d68cb1fc4bf9ba47b017da3e803521157f72245aab96"
+    },
+    {
+      "path": "web/ANDROID-RELEASE-PROFILE.json",
+      "unchanged": true,
+      "sha256": "75d1de8e461b47b6c3b2fa1e7260fafa90f98c2249aebc1adcc38d372bd21c02"
+    },
+    {
+      "path": "web/package.json",
+      "unchanged": true,
+      "sha256": "cb218d87049e1ac615fc5054e30117c5c000f88e439b5060c0e1f5562cbbbc44"
+    },
+    {
+      "path": "web/package-lock.json",
+      "unchanged": true,
+      "sha256": "e0485a82e100f93e4727249944d731b39ddcbbd01926a378b6a5634197f6e4b2"
+    },
+    {
+      "path": "web/capacitor.config.ts",
+      "unchanged": true,
+      "sha256": "09833cb345d6e80b861350e0aa92bba8d31862167f58c82c5acdd9a426924b54"
+    },
+    {
+      "path": "web/android/app/src/main/java/dev/local/genie/preview/MainActivity.java",
+      "unchanged": true,
+      "sha256": "fa4807082f4f1a3b006aaa9546d361c9a59bfefa9db9a7cfec93bcfd80dfb411"
+    }
+  ],
+  "staticReview": {
+    "aboutHandlersUnchanged": true,
+    "cssAppendOnly": true,
+    "technicalDatabasePhrasesRemovedFromProductText": true,
+    "reactBestPracticesApplied": true,
+    "runtimeContentUnderSrc": true,
+    "aboutReportAndBlockCopyAlignedWithDraftStatus": true
+  },
+  "validation": "validation/focused-test-scope.json",
+  "status": "local-implementation-focused-ui-tests-passed-not-published-policy-not-aab",
+  "updatedAfterCopyReviewAtUtc": "2026-11-24T21:53:40.771648+00:00"
+}

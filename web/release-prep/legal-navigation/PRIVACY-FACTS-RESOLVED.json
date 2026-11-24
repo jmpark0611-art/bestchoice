@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "kind": "genie-privacy-facts-resolved-from-observed-settings",
+  "recordedOnUtc": "2026-11-24",
+  "recordedOnKst": "2026-11-25",
+  "sourceObservation": "privacy-settings-observed.json",
+  "sourceObservationSha256": "b37da6b30ff0b48188c3b4b9e37bf255da6883cd40465a5f20ca21d650e8ddec",
+  "projectId": "njrtcxohbkfgrgwhlvua",
+  "sourceCodeBaseline": "ab960b8889b91ec27b47f1d336b5dcaf6b381b55",
+  "existingPolicy4FilesEdited": false,
+  "settingsChanged": false,
+  "productionUserRowsRead": false,
+  "rawLogsRead": false,
+  "remoteWrites": false,
+  "resolvedObservedConfiguration": {
+    "plan": {
+      "value": "free",
+      "source": "get_organization and authenticated dashboard"
+    },
+    "sessions": {
+      "singleSessionEnforced": false,
+      "timeBoxHours": 0,
+      "timeBoxDisplayed": "never",
+      "inactivityTimeoutHours": 0,
+      "inactivityDisplayed": "never",
+      "sessionControlsRequireProInObservedUi": true,
+      "accessTokenExpirySeconds": 3600,
+      "refreshReplayDetection": true,
+      "refreshReuseIntervalSeconds": 10
+    },
+    "auditLogs": {
+      "writeAuditLogsToDatabase": false,
+      "externalAuthLogsRemainAvailableAccordingToUi": true,
+      "historicalDatabaseRowsQueried": false
+    },
+    "backups": {
+      "scheduledProjectBackupsIncluded": false,
+      "pointInTimeRecoveryEnabled": false,
+      "observedScheduledMessage": "Free Plan does not include project backups.",
+      "observedPitrMessage": "Point in Time Recovery is a Pro Plan add-on",
+      "anyManualExportExists": null,
+      "providerInfrastructureBackupRetention": null
+    },
+    "logDrains": {
+      "availableOnCurrentPlan": false,
+      "configuredEndpointDisplayed": false,
+      "actualHistoricalOrApplicationSideExportAbsenceVerified": false
+    }
+  },
+  "unresolvedActualValues": {
+    "authUserRetentionOrDeletionPolicy": null,
+    "completeDeletionRequestProcedure": null,
+    "actualPlatformLogRetentionBySource": null,
+    "historicalAuthAuditRowsCleanup": null,
+    "providerInfrastructureBackupRetention": null,
+    "manualExportsOrExternalCopies": null,
+    "hostingLogRetention": null,
+    "openaiActualRuntimeProjectMatched": null,
+    "openaiInputOutputSharing": null,
+    "openaiOrganizationRetentionControl": null,
+    "openaiProjectRetentionOverride": null,
+    "openaiEffectiveRetentionControl": null,
+    "openaiResidencyAndAccountSpecificExceptions": null
+  },
+  "gateResolution": {
+    "P1": {
+      "state": "partial",
+      "closed": [
+        "actual session settings"
+      ],
+      "open": [
+        "auth-user data retention/deletion criteria",
+        "ownership-verified complete request scope"
+      ],
+      "sessionValuesAreDataDeletionPeriods": false
+    },
+    "P2": {
+      "state": "partial",
+      "closed": [
+        "current Auth DB audit write toggle",
+        "account-visible scheduled backup and PITR availability",
+        "current Log Drains UI state"
+      ],
+      "open": [
+        "actual source-specific platform retention",
+        "historical DB audit cleanup",
+        "provider internal recovery retention",
+        "manual/external copies",
+        "hosting logs"
+      ],
+      "freePlanDefaultRetentionUsedAsActual": false,
+      "allBackupsAbsentClaimed": false,
+      "noAuthLogsClaimed": false
+    },
+    "P4": {
+      "state": "sign-in-required",
+      "closed": [
+        "Observed settings URL redirect to login page only"
+      ],
+      "actualOperatingOrganizationConfirmed": false,
+      "actualOperatingProjectConfirmed": false,
+      "accountSettingsRead": false,
+      "newAccountValuesInThisUpdate": false,
+      "officialDefaultsSubstitutedForAccountValues": false,
+      "source": "openai-settings-observed.json",
+      "nextStep": "Root completes other autonomous work, then follows browserAuth login-method selection and verifies operating org/project before reading settings."
+    },
+    "P6": {
+      "state": "unchanged-by-this-observation",
+      "productionApplyConfirmed": false
+    },
+    "P7": {
+      "state": "not-resolved-by-settings-observation",
+      "runtimeIntegrationAssessedInThisUpdate": false,
+      "policyPublished": false
+    }
+  },
+  "minimumLaterOperatorFacts": [
+    {
+      "id": "OP1",
+      "topic": "Actual support/privacy role and correspondence retention",
+      "reuseKnownIdentity": true,
+      "askOnlyAfterProcedureDraftPrepared": true
+    },
+    {
+      "id": "OP2",
+      "topic": "Scope and criteria for complete anonymous-identity deletion or inactivity cleanup",
+      "doNotUseJwtExpiryAsRetention": true,
+      "requiresConcreteImpactReview": true
+    },
+    {
+      "id": "OP3",
+      "topic": "Operator-held manual exports, backups, logs or own forwarding systems, if any",
+      "doNotAskBroadAllBackupsAbsence": true
+    },
+    {
+      "id": "OP4",
+      "topic": "Contract route or special retention/residency commitments only if not verifiable from accessible account/contracts",
+      "conditional": true
+    }
+  ],
+  "doNotAskAgain": [
+    "operator/company/representative/support email",
+    "18+ audience",
+    "observed session values",
+    "observed Free plan backup/PITR/Drains availability"
+  ],
+  "verificationLimits": [
+    "UI values were observed by root; this agent reconciled the evidence file",
+    "No production rows or raw logs used",
+    "Historical audit data were not queried",
+    "No default retention duration treated as actual",
+    "OpenAI settings URL led to a sign-in page; actual org/project and account controls were not observed",
+    "Policy HTML files remain unchanged"
+  ],
+  "sourceUrls": [
+    "https://supabase.com/docs/guides/auth/sessions",
+    "https://supabase.com/docs/guides/auth/audit-logs",
+    "https://supabase.com/docs/guides/platform/backups",
+    "https://supabase.com/docs/guides/observability/log-drains",
+    "https://help.openai.com/en/articles/10306912-sharing-feedback-evaluation-and-fine-tuning-data-and-api-inputs-and-outputs-with-openai",
+    "https://developers.openai.com/api/docs/guides/your-data"
+  ],
+  "additionalObservations": [
+    {
+      "source": "openai-settings-observed.json",
+      "sha256": "080ffb95c444f494730fc561b98f6dcd5a381a7162bbb9219515bd9338f74c18",
+      "observedOnUtc": "2026-11-24",
+      "result": "sign-in-required"
+    }
+  ],
+  "openaiAccessObservation": {
+    "requestedUrl": "https://platform.openai.com/settings/organization/data-controls",
+    "observedUrl": "https://platform.openai.com/login?next=%2Fsettings%2Forganization%2Fdata-controls",
+    "result": "sign-in-required",
+    "actualOrganization": null,
+    "actualProject": null,
+    "actualRuntimeProjectMatched": false,
+    "credentialsRead": false,
+    "credentialsEntered": false,
+    "settingsChanged": false,
+    "officialDefaultsSubstitutedForAccountValues": false,
+    "nextStep": "Use documented secure browserAuth sign-in method selection; verify actual operating organization/project before reading Data controls."
+  },
+  "updatesGatesOriginallyDefinedIn": "../../release-assets/legal/PRIVACY-RELEASE-REVIEW.md"
+}

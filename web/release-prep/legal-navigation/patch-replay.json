@@ -1,0 +1,14 @@
+{
+  "baselineCommit": "ab960b8889b91ec27b47f1d336b5dcaf6b381b55",
+  "preparedOnKst": "2026-11-25",
+  "patchSha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08",
+  "patchBytes": 34839,
+  "gitApplyCheckExitCode": 0,
+  "gitApplyExitCode": 0,
+  "resultingSixFilesByteMatch": true,
+  "unrelatedTrackedWebFilesUnchanged": 219,
+  "newFiles": 3,
+  "modifiedFiles": 3,
+  "allTrackedWebFilesInBaseline": 222,
+  "remoteRuntimeApplied": false
+}
