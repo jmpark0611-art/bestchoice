@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-24T16:41:29Z",
+  "userFacingDateKst": "2026-11-25",
+  "sourceCommit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
+  "status": "preparation-completed-in-specified-documents-production-migrations-unapplied",
+  "projectId": "njrtcxohbkfgrgwhlvua",
+  "scope": {
+    "exactTwoProductionMigrationsAlreadyAuthorized": true,
+    "documentationCheckpointBranch": "codex/genie-android-native-check-20261123",
+    "productionApplicationDataWritten": false,
+    "productionApplicationRowsRead": false,
+    "modelCalled": false,
+    "webPublished": false,
+    "storeUploaded": false,
+    "storeSubmitted": false,
+    "defaultBranchMerged": false,
+    "newAppBuildPerformed": false
+  },
+  "migrations": [
+    {
+      "path": "supabase/release-prep/cli-generated/20261123161249_genie_result_reporting.sql",
+      "bytes": 9989,
+      "sha256": "92d40ba68d582bd442ff8d0b3b7d2b70759a2b7b0bf9c3d5fe8f7ad1516a89b6",
+      "gitBlob": "5ad7e207006d046f5c8f86b4afc471acb3e5f2b4",
+      "name": "genie_result_reporting",
+      "requestedDuringThisPreparation": true,
+      "observedApplied": false,
+      "actualServerVersion": null
+    },
+    {
+      "path": "supabase/release-prep/cli-generated/20261123161257_genie_question_safety.sql",
+      "bytes": 16653,
+      "sha256": "fc424dadada0dfd074b39dfb12c835adc58ad9880d0637e6370844f4513c9698",
+      "gitBlob": "e9f4a3bef49e2f344aa63a0cc6d53445bf1ccf0d",
+      "name": "genie_question_safety",
+      "requestedDuringThisPreparation": false,
+      "observedApplied": false,
+      "actualServerVersion": null
+    }
+  ],
+  "preApplyReview": {
+    "checkedAtUtc": "2026-11-24T16:04:57Z",
+    "outcome": "PASS",
+    "conditionsPassed": 13,
+    "oldMigrationCount": 7,
+    "existingFunctionsCompared": 9,
+    "existingVsTablesCompared": 4,
+    "existingFunctionsAndTableContractsUnchanged": true,
+    "newSchemasAndAllPublicNameOverloadsAbsent": true,
+    "requiredRolesColumnsAndAuthUidContractPresent": true,
+    "securityAdvisorNormalizedFindingCount": 40,
+    "securityAdvisorAdded": 0,
+    "securityAdvisorRemoved": 0,
+    "rawArtifactSha256": "eb1986720a7ea00bc8bbfd7b13b8f2892a1d92b4de3cedd5f55c87f92b37ad9b",
+    "queryFileSha256": "539594e2f3ce6fd3e7054495e91ecfbe2f227706ab65af14ca82153793df4c13",
+    "detailedArtifactStatus": "Created and hash-checked before the apply attempt. Original filesystem later unavailable and functions store lost; this file preserves the verified summary, not a byte-identical replacement of the raw preflight artifact.",
+    "provesMigrationWritePathRecovery": false
+  },
+  "dataApiBeforeApply": {
+    "observedDuringUtcMinute": "2026-11-24T16:06Z",
+    "source": "authenticated Supabase dashboard Data API settings",
+    "url": "https://supabase.com/dashboard/project/njrtcxohbkfgrgwhlvua/integrations/data_api/settings",
+    "enabled": true,
+    "exposedSchemas": [
+      "graphql_public",
+      "public"
+    ],
+    "automaticNewTableExposureEnabled": true,
+    "settingsChanged": false,
+    "postApplyEvidence": false
+  },
+  "applyAttempt": {
+    "preparedAtUtc": "2026-11-24T16:06:58Z",
+    "tool": "supabase.apply_migration",
+    "migrationName": "genie_result_reporting",
+    "querySha256": "92d40ba68d582bd442ff8d0b3b7d2b70759a2b7b0bf9c3d5fe8f7ad1516a89b6",
+    "cellId": "31",
+    "completionResponseReceived": false,
+    "resumeResult": "cell belongs to a stale code-mode host generation",
+    "externalOperationCompletion": "unknown",
+    "automaticApprovalRejectionObserved": false,
+    "sqlErrorReceived": false,
+    "userCancellationObservedForThisAttempt": false,
+    "additionalSameRequestRetryPerformed": false,
+    "secondMigrationRequested": false,
+    "pendingManagementRequestCancellationProven": false
+  },
+  "migrationHistoryAfterAttempt": {
+    "observedDuringUtcMinute": "2026-11-24T16:35Z",
+    "method": "supabase.list_migrations",
+    "count": 7,
+    "migrations": [
+      {
+        "version": "20260926043902",
+        "name": "init_bestchoice_schema"
+      },
+      {
+        "version": "20260926043926",
+        "name": "index_composite_fks"
+      },
+      {
+        "version": "20260929051831",
+        "name": "bc_ai_retry_and_user_limit"
+      },
+      {
+        "version": "20260929093527",
+        "name": "bc_retention_and_account_delete"
+      },
+      {
+        "version": "20261016144810",
+        "name": "bc_free_quota_and_ad_bonus"
+      },
+      {
+        "version": "20261016150131",
+        "name": "bc_decision_context"
+      },
+      {
+        "version": "20261117014529",
+        "name": "vs_polls_and_votes"
+      }
+    ]
+  },
+  "catalogAfterAttempt": {
+    "checkedAtUtc": "2026-11-24T16:39:25.443040Z",
+    "checkedAtKst": "2026-11-25T01:39:25.443040+09:00",
+    "method": "exact-name PostgreSQL catalog SELECT by delegated read-only verifier",
+    "schemas": {
+      "genie_reporting_private": false,
+      "genie_question_safety_private": false
+    },
+    "publicFunctionOverloadCounts": {
+      "vs_report_result": 0,
+      "vs_report_question": 0,
+      "vs_set_question_author_block": 0,
+      "vs_clear_question_author_blocks": 0,
+      "vs_shared_poll_guarded": 0,
+      "vs_vote_guarded": 0
+    },
+    "existingFunctionFullComparisonRepeated": false,
+    "applicationRowsRead": false,
+    "applicationRowsWritten": false,
+    "conclusion": "New objects absent at observation. No successful server migration version can be recorded. The lost request is not proved cancelled."
+  },
+  "cors": {
+    "state": "previously-saved-and-verified",
+    "newCheckDuringThisPreparation": false,
+    "evidenceJson": "native-cors-applied-2026-11-25.json",
+    "evidenceMarkdown": "native-cors-applied-2026-11-25.md",
+    "savedAtUtc": "2026-11-24T15:42:26Z",
+    "verifiedAtUtc": "2026-11-24T15:44:19.640Z",
+    "androidStatus": 204,
+    "existingWebStatus": 204,
+    "scope": "Two fixed unauthenticated OPTIONS requests; not authenticated end-to-end evidence."
+  },
+  "privacyIntegrationFinding": {
+    "sourceFile": "web/src/screens/AboutScreen.tsx",
+    "sourceGitBlob": "8a919f6cf56e8d9321dc0bfc073f0f4102451225",
+    "trialUseNoticePresent": true,
+    "finalPolicyOrFinalPolicyLinkPresent": false,
+    "publicDeletionResourceLinkPresent": false,
+    "draftedResources": [
+      "web/release-assets/legal/privacy.html",
+      "web/release-assets/legal/delete-data.html",
+      "web/release-assets/legal/PRIVACY-RELEASE-REVIEW.md",
+      "web/release-assets/legal/privacy-evidence.json"
+    ],
+    "draftResourcesPublished": false,
+    "policyUrl": null,
+    "deletionUrl": null,
+    "effectiveDate": null,
+    "sourceChangeImplemented": false,
+    "candidateRefreshRequiredAfterRuntimeIntegration": true,
+    "accountDeletionApplicability": "Confirm against actual anonymous-session behavior and Console questions; do not infer standard account-creation answers solely from anonymous Auth.",
+    "candidateSourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "candidateAboutScreenGitBlob": "8a919f6cf56e8d9321dc0bfc073f0f4102451225",
+    "candidateAboutScreenMatchesCurrentSource": true
+  },
+  "candidatePreserved": {
+    "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
+    "sha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "newRuntimeChangesIncluded": false,
+    "storeReady": false
+  },
+  "blockedItems": [
+    {
+      "id": "database",
+      "owner": "assistant",
+      "needs": "A migration execution connection that returns completion, reconciliation of any pending request, then exact reviewed migrations with actual history/catalog/advisor verification.",
+      "requiresNewBusinessApproval": false
+    },
+    {
+      "id": "privacy-facts",
+      "owner": "operator-and-assistant",
+      "needs": "Confirm actual provider/account retention, logs/backups, transfer facts, request handling and report review; exact unresolved facts are in PRIVACY-RELEASE-REVIEW.md.",
+      "alreadyConfirmed": "Operator identity, representative, contact email and adult audience remain unchanged."
+    },
+    {
+      "id": "privacy-publication-and-app",
+      "owner": "assistant-after-final-facts-and-publication-authorization",
+      "needs": "Finalize public HTML, publish verified public URLs, add real policy/deletion access within app, create a new candidate and perform focused validation."
+    },
+    {
+      "id": "console-and-device",
+      "owner": "account-owner-and-assistant",
+      "needs": "Access existing Play account, verify package/version/upload-certificate state, capture actual app screenshots, and verify installed candidate on physical Android; no rollout/submission is included."
+    }
+  ],
+  "stopCondition": "No identical migration retry, no invented production success, no app rebuild from the stale local checkout, no public publication or store action while these blocks remain.",
+  "documentRecovery": {
+    "privacy": {
+      "sourceTree": "bec2e4a6e7cccff5afbe30b918ef5c355b4b9dc3",
+      "recoveredByteIdentically": true,
+      "files": [
+        {
+          "path": "web/release-assets/legal/privacy.html",
+          "sha": "88a740d0505a43fa3297a72cba977b7bf182b7fa",
+          "sha256": "809ff4e3bffe196ff9175c28cbc2c295d199b3822aa5d34e8d7ed864c8cb7340",
+          "bytes": 20229
+        },
+        {
+          "path": "web/release-assets/legal/delete-data.html",
+          "sha": "317c6e5df4f08cbf6f2370fcaa136a275bfdc0b1",
+          "sha256": "32c3dfa674e84e85e538db51fd07475805301b8dd2d5921339341f6bf4366fe1",
+          "bytes": 15027
+        },
+        {
+          "path": "web/release-assets/legal/PRIVACY-RELEASE-REVIEW.md",
+          "sha": "8bdfae51bfeb9844b735a3c8808f6c009144590f",
+          "sha256": "be1fc664d68e1339ad011b40255f3b991731dfb4ec20e50f96fe26bad66b21c1",
+          "bytes": 11807
+        },
+        {
+          "path": "web/release-assets/legal/privacy-evidence.json",
+          "sha": "1d6ea0d538de99f7724506fda191fab6fc898a28",
+          "sha256": "c63b7b6f0e3551ae07f7d68cb1fc4bf9ba47b017da3e803521157f72245aab96",
+          "bytes": 9645
+        }
+      ],
+      "additionalLocalManifestsIncluded": false,
+      "note": "The two HTML files, review markdown and evidence JSON were recovered byte-identically. Earlier source-file-manifest.json and static-document-validation.json were not recovered or included as separate files. The four files preserve their original preparation-stage labels."
+    },
+    "play": {
+      "sourceTree": "57fc46452a9a43358cdf0c9bb4895065b60a4960",
+      "recoveredByteIdentically": false,
+      "source": "Exact-base Git blobs and retained authoring transcript.",
+      "rootReconciliation": "Added exact 16:39:25 catalog evidence and corrected the scope for the authorized final preparation-branch checkpoint.",
+      "candidateAndHistoricalEvidencePreserved": true,
+      "copyLengths": {
+        "appName": 5,
+        "shortDescription": 48,
+        "fullDescription": 1075,
+        "releaseNotes": 102
+      }
+    }
+  },
+  "documentationCheckpoint": {
+    "branch": "codex/genie-android-native-check-20261123",
+    "baseCommit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
+    "plannedChangedOrAddedFiles": 12,
+    "runtimeChanges": 0,
+    "migrationBodyChanges": 0,
+    "workflowChanges": 0,
+    "pushPathFiltersReviewed": true,
+    "openPullRequestsForBranchObserved": 0,
+    "defaultBranchMerge": false,
+    "publicDeployment": false
+  }
+}

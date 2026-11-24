@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "recordedAtUtc": "2026-11-24T15:46:39.680Z",
-  "status": "signed-candidate-cors-resolved-awaiting-database-console-and-device",
+  "recordedAtUtc": "2026-11-24T16:41:29Z",
+  "status": "signed-candidate-preserved-awaiting-database-policy-integration-console-and-device",
   "candidate": {
     "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
     "sizeBytes": 4161320,
@@ -178,6 +178,32 @@
     "resumeExecutionRecord": "qa/production-server-resume-2026-11-24.json",
     "databaseObservationScope": "The migration count, catalog and productionWritesPerformed fields describe the dated database-only read above; the separately recorded CORS setting was subsequently changed.",
     "latestMigrationDiagnosis": {
+      "observedAtUtc": "2026-11-24T16:39:25.443040Z",
+      "observedAtKst": "2026-11-25T01:39:25.443040+09:00",
+      "migrationHistoryObservedDuringUtcMinute": "2026-11-24T16:35Z",
+      "migrationCount": 7,
+      "privateSchemasAbsent": [
+        "genie_reporting_private",
+        "genie_question_safety_private"
+      ],
+      "newPublicFunctionOverloadCounts": {
+        "vs_report_result": 0,
+        "vs_report_question": 0,
+        "vs_set_question_author_block": 0,
+        "vs_clear_question_author_blocks": 0,
+        "vs_shared_poll_guarded": 0,
+        "vs_vote_guarded": 0
+      },
+      "currentBlocker": "apply completion response lost with stale execution host; new objects absent in subsequent catalog",
+      "newApplyAttemptThisPreparation": true,
+      "secondMigrationRequested": false,
+      "automaticApprovalRejectionObserved": false,
+      "pendingManagementRequestCancellationProven": false,
+      "mcpWritePathRecoveryVerified": false,
+      "additionalBusinessApprovalRequired": false,
+      "evidence": "qa/release-finalization-2026-11-25.json"
+    },
+    "priorMigrationDiagnosis": {
       "observedAtUtc": "2026-11-24T15:46:39.680Z",
       "observedAtKst": "2026-11-25T00:46:39.680+09:00",
       "projectStatus": "ACTIVE_HEALTHY",
@@ -190,7 +216,8 @@
       "newApplyAttemptThisTurn": false,
       "pendingManagementRequestCancellationProven": false,
       "mcpWritePathRecoveryVerified": false
-    }
+    },
+    "latestMigrationAttemptRecord": "qa/release-finalization-2026-11-25.json"
   },
   "playConsole": {
     "observedOnKst": "2026-11-24",
@@ -207,13 +234,38 @@
   "readyForProductionBackedEndToEndInternalTest": false,
   "signedCandidateAvailableForInternalTrackPreparation": true,
   "nextSequence": [
-    "Authenticate existing Google Play developer account and verify exact package and version code availability.",
-    "Prepare an internal-test draft with this signed AAB after resolving any observed Console requirements.",
-    "Complete the already-authorized report/block database migrations through a working execution connection and verify actual history, functions, grants and RLS. Android and existing-web CORS preflights are now saved and verified.",
-    "Verify auth, AI response, share/vote, reports, blocks and deletion only in an explicitly approved isolated environment using synthetic data and cleanup; do not treat production as a test environment.",
-    "Install the Play-delivered build on a physical Android device and repeat About/back/narrow-screen/draft-restore plus backend flows.",
-    "Complete actual screenshots, public privacy/deletion resources and unresolved Play declarations before review or publication."
+    "Confirm unresolved actual privacy/provider and request-handling facts, finalize the prepared HTML, and obtain verified public policy/deletion URLs through authorized publication.",
+    "Add final policy/deletion access within the app, then create and focus-check a refreshed candidate; the existing AAB does not contain these changes.",
+    "Resume the two already-authorized exact migrations through a working completion path after reconciling pending requests; verify real history, grants, RLS, preserved existing contracts and advisor delta. Android and existing-web CORS preflights are already verified.",
+    "Access the existing Play developer account and verify package, version code and upload certificate before selecting the refreshed candidate; do not infer account-specific testing requirements.",
+    "Verify approved isolated synthetic-data backend flows and install the intended build on a physical Android device; capture actual screenshots and finalize observed Console declarations.",
+    "Proceed to the specifically authorized internal release or review submission only after applicable gates are satisfied; iOS follows Android."
   ],
-  "previousRecordedAtUtc": "2026-11-23T23:35:50.569585Z",
-  "operationalSettingChangeRecord": "qa/native-cors-applied-2026-11-25.json"
+  "previousRecordedAtUtc": "2026-11-24T15:46:39.680Z",
+  "operationalSettingChangeRecord": "qa/native-cors-applied-2026-11-25.json",
+  "privacyRelease": {
+    "sourceFile": "web/src/screens/AboutScreen.tsx",
+    "sourceGitBlob": "8a919f6cf56e8d9321dc0bfc073f0f4102451225",
+    "trialUseNoticePresent": true,
+    "finalPolicyOrFinalPolicyLinkPresent": false,
+    "publicDeletionResourceLinkPresent": false,
+    "draftedResources": [
+      "web/release-assets/legal/privacy.html",
+      "web/release-assets/legal/delete-data.html",
+      "web/release-assets/legal/PRIVACY-RELEASE-REVIEW.md",
+      "web/release-assets/legal/privacy-evidence.json"
+    ],
+    "draftResourcesPublished": false,
+    "policyUrl": null,
+    "deletionUrl": null,
+    "effectiveDate": null,
+    "sourceChangeImplemented": false,
+    "candidateRefreshRequiredAfterRuntimeIntegration": true,
+    "accountDeletionApplicability": "Confirm against actual anonymous-session behavior and Console questions; do not infer standard account-creation answers solely from anonymous Auth.",
+    "candidateSourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "candidateAboutScreenGitBlob": "8a919f6cf56e8d9321dc0bfc073f0f4102451225",
+    "candidateAboutScreenMatchesCurrentSource": true,
+    "evidence": "qa/release-finalization-2026-11-25.md"
+  },
+  "currentCandidateRequiresPolicyRuntimeUpdateBeforeStoreSubmission": true
 }

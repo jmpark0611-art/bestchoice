@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "kind": "genie-privacy-publication-review",
+  "recordedAtUtc": "2026-11-24",
+  "status": "draft-local-only-pending-operational-facts",
+  "readyToPublish": false,
+  "readyToSubmit": false,
+  "repository": {
+    "owner": "jmpark0611-art",
+    "name": "bestchoice",
+    "branch": "codex/genie-android-native-check-20261123",
+    "commit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
+    "tree": "c8da67585b20175c93e4ffb5fa39f98b06ca2d22"
+  },
+  "candidate": {
+    "aabSha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "regeneratedByThisWork": false,
+    "runtimeEditedByThisWork": false
+  },
+  "operator": {
+    "app": "결정해지니",
+    "company": "에스제이컴퍼니",
+    "representative": "박지민",
+    "supportEmail": "jmpark0611@gmail.com",
+    "intendedMinimumAge": 18,
+    "privacyOfficer": null,
+    "privacyOfficerNullReason": "대표자 정보만 확인됨. 개인정보 보호책임자 지정 사실은 별도 확인 필요."
+  },
+  "publication": {
+    "privacyUrl": null,
+    "deletionUrl": null,
+    "effectiveDate": null,
+    "proposedPrivacyPath": "/privacy",
+    "proposedDeletionPath": "/delete-data",
+    "proposedPathsAreLive": false,
+    "htmlFiles": [
+      "web/release-assets/legal/privacy.html",
+      "web/release-assets/legal/delete-data.html"
+    ],
+    "inAppFullPolicyLinkPresentAtBaseline": false,
+    "inAppExternalDeletionLinkPresentAtBaseline": false,
+    "reviewNoticePresent": true,
+    "noindexUntilFinalized": true
+  },
+  "identity": {
+    "userFacingRegistrationUi": false,
+    "automaticSupabaseAnonymousAuth": true,
+    "persistSession": true,
+    "userIdLinksRecords": true,
+    "accountWideDeletionInCurrentApp": false,
+    "decisionDeleteRemovesAuthUser": false,
+    "playAccountDefinitionRequiresQualifiedAssessment": true
+  },
+  "data": {
+    "server": [
+      "anonymous user identifier",
+      "A/B choice text",
+      "criterion composed into note",
+      "optional situation note",
+      "AI choice and reason",
+      "decision timestamp",
+      "actual choice",
+      "share code",
+      "vote side and voter identifier",
+      "daily decision request counts"
+    ],
+    "serverIfReportContractsApplied": [
+      "report category",
+      "optional report details",
+      "reporter identifier",
+      "target decision identifier",
+      "consent version",
+      "request/receipt identifier and timestamp",
+      "report daily counts",
+      "blocker/author linkage"
+    ],
+    "deviceOnlyByApplication": [
+      "decision draft",
+      "reflection drafts",
+      "saved reflection ratings and notes",
+      "default criterion before submission",
+      "draft autosave preference"
+    ],
+    "supportEmail": [
+      "sender address",
+      "user-submitted request content",
+      "correspondence"
+    ],
+    "platformLogFieldsVerified": false
+  },
+  "retention": {
+    "decision": {
+      "rule": "created_at < now() - interval '2 months'",
+      "calendarMonths": 2,
+      "exactAnniversaryDeletion": false,
+      "cronUtc": "10 18 * * *",
+      "cronKst": "03:10 daily",
+      "scheduleEvidence": "web/qa/operational-readiness-2026-11-23.json",
+      "votesCascade": true
+    },
+    "decisionQuota": {
+      "rule": "UTC date older than current UTC date minus 7",
+      "cleanup": "existing daily decision purge"
+    },
+    "drafts": {
+      "ttlHoursSinceLastEdit": 24,
+      "homeLimit": 1,
+      "reflectionDraftLimit": 25,
+      "cleanup": "on next read/write",
+      "continuousBackgroundTimer": false
+    },
+    "reflections": {
+      "ttlDaysSinceLastSave": 60,
+      "limit": 100,
+      "cleanup": "on next read/write",
+      "continuousBackgroundTimer": false
+    },
+    "reportRows": {
+      "appliedStateVerifiedByThisWork": false,
+      "cascadeWithPoll": true,
+      "source": "supabase/release-prep/*.release.sql"
+    },
+    "reportQuota": {
+      "appliedStateVerifiedByThisWork": false,
+      "cutoffDays": 7,
+      "cleanup": "only in a successful later submission",
+      "scheduledPurge": false
+    },
+    "authorBlocks": {
+      "appliedStateVerifiedByThisWork": false,
+      "deleteWithPoll": false,
+      "automaticExpiry": false,
+      "removal": "unblock/clear or relevant auth-user FK cascade"
+    },
+    "anonymousAuthUser": {
+      "retention": null,
+      "purgeByDecisionCleanup": false
+    },
+    "platformLogs": {
+      "retention": null,
+      "fields": null
+    },
+    "backups": {
+      "retention": null
+    },
+    "emailCorrespondence": {
+      "retention": null
+    }
+  },
+  "deletion": {
+    "ownerPath": [
+      "첫 화면",
+      "결정 기록 전체 보기",
+      "대상 기록의 삭제",
+      "확인창"
+    ],
+    "serverScope": [
+      "source decision",
+      "associated votes"
+    ],
+    "localFollowup": [
+      "linked reflections on this device",
+      "linked drafts on this device"
+    ],
+    "localCleanupFailureHasSeparateWarning": true,
+    "deviceControls": [
+      "이 기기의 초안 모두 지우기",
+      "초안 자동 저장",
+      "이 기기의 회고 모두 지우기",
+      "기본 기준 지우기"
+    ],
+    "blockControl": "작성자 차단 모두 해제",
+    "contactRequestPrepared": true,
+    "emailActuallySentByThisWork": false,
+    "operationalRequestHandlingVerified": false,
+    "allProviderDataDeletionPromised": false,
+    "requiresOriginalSessionForSelfService": true,
+    "publicShareLinkAloneProvesOwnership": false,
+    "requestedIdentityDocuments": false,
+    "requestedCredentialsOrTokens": false
+  },
+  "providers": {
+    "supabase": {
+      "knownDatabaseRegion": "ap-northeast-2 (Seoul)",
+      "regionEvidence": "web/qa/operational-readiness-2026-11-23.json",
+      "allProcessingWithinDatabaseRegionClaimed": false,
+      "contractingEntity": null,
+      "allProcessingCountries": null,
+      "actualLogsRetention": null,
+      "actualBackupRetention": null
+    },
+    "openai": {
+      "deployedFunctionEvidence": "web/qa/operational-readiness-2026-11-23.json",
+      "version": 2,
+      "endpoint": "https://api.openai.com/v1/responses",
+      "requestFields": [
+        "a",
+        "b",
+        "note"
+      ],
+      "store": false,
+      "actualModel": null,
+      "actualOptInSetting": null,
+      "actualRetentionControls": null,
+      "contractingEntity": null,
+      "processingCountries": null,
+      "noRetentionEverywhereClaimed": false
+    },
+    "webHosting": {
+      "actualLogFields": null,
+      "retention": null
+    },
+    "supportMail": {
+      "retention": null,
+      "actualProcessingTermsVerified": false
+    }
+  },
+  "requiredFacts": [
+    "P1 auth retention/deletion scope",
+    "P2 platform/hosting logs and backups",
+    "P3 provider entities/transfers/legal basis",
+    "P4 actual OpenAI settings",
+    "P5 request operator/verification/correspondence retention",
+    "P6 report/block production application and operations",
+    "P7 actual public URLs/effective date/in-app policy access"
+  ],
+  "sources": [
+    {
+      "id": "G1",
+      "title": "Google Play User Data",
+      "url": "https://support.google.com/googleplay/android-developer/answer/10144311",
+      "checkedAtUtc": "2026-11-24",
+      "scope": "Public privacy policy, contact, retention/deletion and in-app policy access"
+    },
+    {
+      "id": "G2",
+      "title": "Google Play account deletion FAQ",
+      "url": "https://support.google.com/googleplay/android-developer/answer/13327111?hl=en",
+      "checkedAtUtc": "2026-11-24",
+      "scope": "App account definition and account deletion requirements"
+    },
+    {
+      "id": "O1",
+      "title": "OpenAI API data controls",
+      "url": "https://developers.openai.com/api/docs/guides/your-data",
+      "checkedAtUtc": "2026-11-24",
+      "scope": "Default policy versus actual account settings; store:false is not blanket no-retention"
+    },
+    {
+      "id": "S1",
+      "title": "Supabase anonymous sign-ins",
+      "url": "https://supabase.com/docs/guides/auth/auth-anonymous",
+      "checkedAtUtc": "2026-11-24",
+      "scope": "Anonymous auth records and session loss; no automatic cleanup assumed"
+    },
+    {
+      "id": "S2",
+      "title": "Supabase data residency and transfers FAQ",
+      "url": "https://supabase.com/legal/privacy-resources/data-residency-and-transfers-faq",
+      "publishedVersion": "2026-10-06",
+      "checkedAtUtc": "2026-11-24",
+      "scope": "Selected DB region versus other processing; actual retention requires account-specific facts"
+    },
+    {
+      "id": "K1",
+      "title": "PIPC privacy policy writing guidance 2026.4",
+      "url": "https://pipc.go.kr/np/cop/bbs/selectBoardArticle.do?bbsId=BS217&mCode=D010030030&nttId=12018",
+      "checkedAtUtc": "2026-11-24",
+      "scope": "Current official guidance locator; no claim all legal requirements fulfilled"
+    },
+    {
+      "id": "K2",
+      "title": "PIPC overseas transfer",
+      "url": "https://pipc.go.kr/np/default/page.do?mCode=D060040000",
+      "checkedAtUtc": "2026-11-24",
+      "scope": "Transfer basis and disclosure"
+    },
+    {
+      "id": "K3",
+      "title": "PIPA Article 28-8",
+      "url": "https://www.law.go.kr/LSW/lsLinkCommonInfo.do?lsJoLnkSeq=1033215841",
+      "checkedAtUtc": "2026-11-24",
+      "scope": "Transferred fields, country/timing/method, recipient/contact, purpose/retention, refusal implications"
+    }
+  ],
+  "validation": {
+    "browserRenderPerformed": false,
+    "mailReceiptTestPerformed": false,
+    "publicUrlNetworkTestPerformed": false,
+    "fullAppTestsRepeated": false,
+    "staticStructureCheckPassed": true,
+    "staticValidationReport": "static-document-validation.json",
+    "staticCheckCountPerHtml": 21
+  }
+}
