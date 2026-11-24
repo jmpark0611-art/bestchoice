@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "status": "operational-cors-setting-saved-and-preflight-verified",
+  "recordedAtUtc": "2026-11-24T15:46:39.680Z",
+  "displayTimeZone": "Asia/Seoul",
+  "project": {
+    "id": "njrtcxohbkfgrgwhlvua",
+    "name": "bestchoice"
+  },
+  "setting": {
+    "name": "VS_ALLOWED_ORIGINS",
+    "previousOverridePresent": false,
+    "previousEffectiveSource": "freshly read deployed vs-decide v2 DEFAULT_ORIGINS",
+    "previousEffectiveOrigins": [
+      "http://localhost:5173",
+      "http://localhost:4173",
+      "https://genie-web-rosy.vercel.app",
+      "https://genie-web-jmpark0611-1816s-projects.vercel.app"
+    ],
+    "savedOrigins": [
+      "http://localhost:5173",
+      "http://localhost:4173",
+      "https://genie-web-rosy.vercel.app",
+      "https://genie-web-jmpark0611-1816s-projects.vercel.app",
+      "https://localhost"
+    ],
+    "savedValueEncoding": "UTF-8, comma separated, no trailing newline",
+    "savedValueSha256": "85855062cde9af3e59f07176d43f0111f325cf9f5e37f728f7f9f78db4992840",
+    "dashboardDigestMatchesApprovedValue": true,
+    "addedOrigins": [
+      "https://localhost"
+    ],
+    "removedOrigins": [],
+    "wildcardAdded": false,
+    "saveObservedInDashboard": true,
+    "dashboardUpdatedAtUtc": "2026-11-24T15:42:26Z",
+    "dashboardUpdatedAtKst": "2026-11-25T00:42:26+09:00",
+    "legacyAllowedOriginsKeyChanged": false,
+    "legacyAllowedOriginsDigestAndUpdateMetadataUnchanged": true,
+    "credentialSecretsChanged": false,
+    "originalSecretPlaintextDumped": false,
+    "functionRedeployed": false
+  },
+  "authorization": {
+    "initialSaveAutomaticReviewRejected": true,
+    "subsequentExplicitUserApprovalOfExactFiveOriginsReceived": true,
+    "approvedScope": "Create VS_ALLOWED_ORIGINS with the four deployed fallback origins preserved and add exactly https://localhost.",
+    "finalSaveSucceeded": true
+  },
+  "preflight": {
+    "runId": 45183387009,
+    "runAttempt": 2,
+    "jobId": 138568566856,
+    "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45183387009/job/138568566856",
+    "conclusion": "success",
+    "checkedAtUtc": "2026-11-24T15:44:19.640Z",
+    "checkedAtKst": "2026-11-25T00:44:19.640+09:00",
+    "sourceCommit": "d9ffb9ad80783e7cec01e6ff8b772e021f91e38d",
+    "workflowPath": ".github/workflows/genie-native-cors-read.yml",
+    "workflowGitBlob": "258c07030d03f7b4fa0371b87972db07d4e5f532",
+    "workflowMatchesDocumentationBaseCommit": "4a512edbf196d71fa001b97c8e626cf25416b20b",
+    "endpoint": "https://njrtcxohbkfgrgwhlvua.supabase.co/functions/v1/vs-decide",
+    "method": "OPTIONS",
+    "requestCount": 2,
+    "requestedMethod": "POST",
+    "requestedHeaderNames": [
+      "authorization",
+      "apikey",
+      "content-type"
+    ],
+    "bodySent": false,
+    "authenticationSent": false,
+    "applicationDataWritten": false,
+    "modelCalled": false,
+    "transportFailures": 0,
+    "results": [
+      {
+        "client": "android",
+        "origin": "https://localhost",
+        "httpStatus": 204,
+        "allowedOrigin": "https://localhost",
+        "postAllowed": true,
+        "requiredHeadersAllowed": true,
+        "knownError": null,
+        "preflightAllowed": true
+      },
+      {
+        "client": "existing-web",
+        "origin": "https://genie-web-rosy.vercel.app",
+        "httpStatus": 204,
+        "allowedOrigin": "https://genie-web-rosy.vercel.app",
+        "postAllowed": true,
+        "requiredHeadersAllowed": true,
+        "knownError": null,
+        "preflightAllowed": true
+      }
+    ],
+    "bothOriginsPassed": true
+  },
+  "beforeEvidence": {
+    "referenceJson": "native-cors-read-2026-11-23.json",
+    "referenceMarkdown": "native-cors-read-2026-11-23.md",
+    "runId": 45183387009,
+    "runAttempt": 1,
+    "checkedAtUtc": "2026-11-23T13:23:23.788Z",
+    "androidHttpStatus": 403,
+    "androidKnownError": "ORIGIN_DENIED",
+    "existingWebHttpStatus": 204,
+    "historicalObservationPreserved": true
+  },
+  "remainingDatabaseStatus": {
+    "referenceJson": "production-server-resume-2026-11-24.json",
+    "lastRecordedObservationAtUtc": "2026-11-24T15:46:39.680Z",
+    "lastRecordedObservationAtKst": "2026-11-25T00:46:39.680+09:00",
+    "previousObjectInventoryRecordAtUtc": "2026-11-24T14:06:42.095023Z",
+    "latestDiagnosisSource": "Read-only Supabase migration list and database catalog diagnosis; project ACTIVE_HEALTHY, both new private schemas absent.",
+    "migrationCount": 7,
+    "reportingMigrationApplied": false,
+    "questionSafetyMigrationApplied": false,
+    "resumptionApproved": true,
+    "additionalBusinessApprovalRequired": false,
+    "currentBlocker": "previous apply completion lost; current catalog unapplied",
+    "pendingManagementRequestCancellationProven": false,
+    "mcpWritePathRecoveryVerified": false,
+    "newApplyAttemptDuringThisCorsChange": false
+  },
+  "candidate": {
+    "sourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "signedAabSha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "rebuilt": false,
+    "physicalDeviceValidated": false,
+    "signedCandidateInstalled": false
+  },
+  "scope": {
+    "operationalSettingChanged": true,
+    "productionDdlApplied": false,
+    "productionApplicationRowsWritten": false,
+    "testUsersCreated": false,
+    "actualPostOrAuthFlowTested": false,
+    "productionEndToEndValidated": false,
+    "webDeployed": false,
+    "storeSubmitted": false,
+    "paidResourcesCreated": false,
+    "oldFullAppTestsRepeated": false,
+    "releaseProfileChanged": false
+  },
+  "evidenceSource": "Root observed the Supabase Dashboard before/after save and fresh GitHub job logs; this document records those measurements.",
+  "limitations": [
+    "The two OPTIONS checks verify Android and the existing web preflight only; no authenticated POST, model response or user flow was tested.",
+    "The other three preserved fallback origins were not individually probed in this run.",
+    "CORS success does not install the still-pending report/block RPCs or complete report-handling operations.",
+    "ANDROID-RELEASE-PROFILE.json remains the earlier build-input record to avoid unrelated build workflows; the current CORS evidence is this record and ANDROID-RELEASE-READINESS-2026-11-24.json."
+  ]
+}

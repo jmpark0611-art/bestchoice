@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "recordedAtUtc": "2026-11-23T23:35:50.569585Z",
-  "status": "signed-candidate-authorized-server-resume-blocked-by-execution-connection",
+  "recordedAtUtc": "2026-11-24T15:46:39.680Z",
+  "status": "signed-candidate-cors-resolved-awaiting-database-console-and-device",
   "candidate": {
     "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
     "sizeBytes": 4161320,
@@ -90,17 +90,48 @@
     "productionWritesPerformed": false,
     "previousMigrationApplyStatus": "user-reauthorized-two-attempts-lost-exec-runtime-no-new-objects-observed",
     "cors": {
-      "recheckedThisTurn": false,
-      "lastObservedAtUtc": "2026-11-23T13:23:23.788Z",
+      "referenceJson": "qa/native-cors-applied-2026-11-25.json",
+      "referenceMarkdown": "qa/native-cors-applied-2026-11-25.md",
+      "recheckedThisTurn": true,
+      "lastObservedAtUtc": "2026-11-24T15:44:19.640Z",
+      "lastObservedAtKst": "2026-11-25T00:44:19.640+09:00",
       "webOrigin": "https://genie-web-rosy.vercel.app",
       "webHttpStatus": 204,
       "androidOrigin": "https://localhost",
-      "androidHttpStatus": 403,
-      "androidError": "ORIGIN_DENIED",
+      "androidHttpStatus": 204,
+      "androidError": null,
+      "webPreflightAllowed": true,
+      "androidPreflightAllowed": true,
+      "currentState": "setting-saved-and-both-fixed-preflights-verified",
+      "androidOriginBlockerResolved": true,
+      "settingSavedAtUtc": "2026-11-24T15:42:26Z",
+      "settingDigest": "85855062cde9af3e59f07176d43f0111f325cf9f5e37f728f7f9f78db4992840",
+      "previousOverridePresent": false,
+      "existingFallbackOriginsPreserved": true,
       "currentAllowedOriginsValueRead": false,
-      "currentState": "requires-recheck",
-      "reasonNotRechecked": "No secrets connector capability; browser bootstrap lacks originating connected context; cloud-browser tool unavailable.",
-      "browserConnectionAvailable": false
+      "currentAllowedOriginsValueConfirmedBySavedDigest": true,
+      "valueVerification": "The approved exact UTF-8 five-origin payload hashes to the saved dashboard digest; no plaintext read-back is claimed.",
+      "browserConnectionAvailable": true,
+      "runId": 45183387009,
+      "runAttempt": 2,
+      "jobId": 138568566856,
+      "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45183387009/job/138568566856",
+      "actualPostOrAuthFlowTested": false,
+      "applicationDataWritten": false,
+      "modelCalled": false,
+      "previousObservation": {
+        "recheckedThisTurn": false,
+        "lastObservedAtUtc": "2026-11-23T13:23:23.788Z",
+        "webOrigin": "https://genie-web-rosy.vercel.app",
+        "webHttpStatus": 204,
+        "androidOrigin": "https://localhost",
+        "androidHttpStatus": 403,
+        "androidError": "ORIGIN_DENIED",
+        "currentAllowedOriginsValueRead": false,
+        "currentState": "requires-recheck",
+        "reasonNotRechecked": "No secrets connector capability; browser bootstrap lacks originating connected context; cloud-browser tool unavailable.",
+        "browserConnectionAvailable": false
+      }
     },
     "history": [
       {
@@ -144,7 +175,22 @@
     ],
     "resumptionApproved": true,
     "additionalBusinessApprovalRequired": false,
-    "resumeExecutionRecord": "qa/production-server-resume-2026-11-24.json"
+    "resumeExecutionRecord": "qa/production-server-resume-2026-11-24.json",
+    "databaseObservationScope": "The migration count, catalog and productionWritesPerformed fields describe the dated database-only read above; the separately recorded CORS setting was subsequently changed.",
+    "latestMigrationDiagnosis": {
+      "observedAtUtc": "2026-11-24T15:46:39.680Z",
+      "observedAtKst": "2026-11-25T00:46:39.680+09:00",
+      "projectStatus": "ACTIVE_HEALTHY",
+      "migrationCount": 7,
+      "privateSchemasAbsent": [
+        "genie_reporting_private",
+        "genie_question_safety_private"
+      ],
+      "currentBlocker": "previous apply completion lost; current catalog unapplied",
+      "newApplyAttemptThisTurn": false,
+      "pendingManagementRequestCancellationProven": false,
+      "mcpWritePathRecoveryVerified": false
+    }
   },
   "playConsole": {
     "observedOnKst": "2026-11-24",
@@ -163,9 +209,11 @@
   "nextSequence": [
     "Authenticate existing Google Play developer account and verify exact package and version code availability.",
     "Prepare an internal-test draft with this signed AAB after resolving any observed Console requirements.",
-    "Resume previously cancelled backend preparation only with confirmed user intent; preserve existing CORS origins and add only the verified Android origin.",
-    "Verify production auth, AI response, share/vote, reports, blocks and deletion using explicit synthetic test data and cleanup.",
+    "Complete the already-authorized report/block database migrations through a working execution connection and verify actual history, functions, grants and RLS. Android and existing-web CORS preflights are now saved and verified.",
+    "Verify auth, AI response, share/vote, reports, blocks and deletion only in an explicitly approved isolated environment using synthetic data and cleanup; do not treat production as a test environment.",
     "Install the Play-delivered build on a physical Android device and repeat About/back/narrow-screen/draft-restore plus backend flows.",
     "Complete actual screenshots, public privacy/deletion resources and unresolved Play declarations before review or publication."
-  ]
+  ],
+  "previousRecordedAtUtc": "2026-11-23T23:35:50.569585Z",
+  "operationalSettingChangeRecord": "qa/native-cors-applied-2026-11-25.json"
 }
