@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "recordedAtUtc": "2026-11-23T23:35:50.569585Z",
-  "status": "signed-awaiting-console-login-backend-preparation-and-device-test",
+  "status": "signed-candidate-authorized-server-resume-blocked-by-execution-connection",
   "candidate": {
     "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
     "sizeBytes": 4161320,
@@ -67,8 +67,8 @@
   },
   "backend": {
     "projectId": "njrtcxohbkfgrgwhlvua",
-    "observedAtUtc": "2026-11-23T23:34:04.455989Z",
-    "observedAtKst": "2026-11-24T08:34:04.455989+09:00",
+    "observedAtUtc": "2026-11-24T14:06:42.095023Z",
+    "observedAtKst": "2026-11-24T23:06:42.095023+09:00",
     "method": [
       "list_migrations",
       "read-only catalog SELECT"
@@ -88,7 +88,7 @@
     "expectedPrivateTablesFound": 0,
     "productionUserRowsRead": false,
     "productionWritesPerformed": false,
-    "previousMigrationApplyStatus": "aborted-by-user-no-retry-performed",
+    "previousMigrationApplyStatus": "user-reauthorized-two-attempts-lost-exec-runtime-no-new-objects-observed",
     "cors": {
       "recheckedThisTurn": false,
       "lastObservedAtUtc": "2026-11-23T13:23:23.788Z",
@@ -99,8 +99,52 @@
       "androidError": "ORIGIN_DENIED",
       "currentAllowedOriginsValueRead": false,
       "currentState": "requires-recheck",
-      "reasonNotRechecked": "Supabase Edge URL is outside this execution environment network allowlist."
-    }
+      "reasonNotRechecked": "No secrets connector capability; browser bootstrap lacks originating connected context; cloud-browser tool unavailable.",
+      "browserConnectionAvailable": false
+    },
+    "history": [
+      {
+        "kind": "previous-backend-observation",
+        "projectId": "njrtcxohbkfgrgwhlvua",
+        "observedAtUtc": "2026-11-23T23:34:04.455989Z",
+        "observedAtKst": "2026-11-24T08:34:04.455989+09:00",
+        "method": [
+          "list_migrations",
+          "read-only catalog SELECT"
+        ],
+        "migrationCount": 7,
+        "reportingMigrationApplied": false,
+        "questionSafetyMigrationApplied": false,
+        "privateSchemasAbsent": [
+          "genie_reporting_private",
+          "genie_question_safety_private"
+        ],
+        "expectedPublicRpcCount": 6,
+        "expectedPublicRpcsFound": 0,
+        "expectedPrivateFunctionCount": 7,
+        "expectedPrivateFunctionsFound": 0,
+        "expectedPrivateTableCount": 7,
+        "expectedPrivateTablesFound": 0,
+        "productionUserRowsRead": false,
+        "productionWritesPerformed": false,
+        "previousMigrationApplyStatus": "aborted-by-user-no-retry-performed",
+        "cors": {
+          "recheckedThisTurn": false,
+          "lastObservedAtUtc": "2026-11-23T13:23:23.788Z",
+          "webOrigin": "https://genie-web-rosy.vercel.app",
+          "webHttpStatus": 204,
+          "androidOrigin": "https://localhost",
+          "androidHttpStatus": 403,
+          "androidError": "ORIGIN_DENIED",
+          "currentAllowedOriginsValueRead": false,
+          "currentState": "requires-recheck",
+          "reasonNotRechecked": "Supabase Edge URL is outside this execution environment network allowlist."
+        }
+      }
+    ],
+    "resumptionApproved": true,
+    "additionalBusinessApprovalRequired": false,
+    "resumeExecutionRecord": "qa/production-server-resume-2026-11-24.json"
   },
   "playConsole": {
     "observedOnKst": "2026-11-24",

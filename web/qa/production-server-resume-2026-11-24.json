@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "status": "authorized-resume-blocked-by-execution-runtime-loss-confirmed-unapplied",
+  "projectId": "njrtcxohbkfgrgwhlvua",
+  "observedAtUtc": "2026-11-24 14:06:42.095023+00",
+  "observedAtKst": "2026-11-24T23:06:42.095023+09:00",
+  "userAuthorization": {
+    "resumptionApproved": true,
+    "userInstruction": "그렇게 계속 진행하자.",
+    "additionalBusinessApprovalRequired": false
+  },
+  "attempts": [
+    {
+      "name": "genie_result_reporting",
+      "sqlSha256": "92d40ba68d582bd442ff8d0b3b7d2b70759a2b7b0bf9c3d5fe8f7ad1516a89b6",
+      "outcome": "exec runtime replaced; no completion response received",
+      "followupObservedAtUtc": "2026-11-24 13:04:26.458587+00",
+      "followupNewSchemasAbsent": true,
+      "followupMigrationsCount": 7
+    },
+    {
+      "name": "genie_result_reporting",
+      "sqlSha256": "92d40ba68d582bd442ff8d0b3b7d2b70759a2b7b0bf9c3d5fe8f7ad1516a89b6",
+      "outcome": "exec runtime replaced; no completion response received",
+      "followupObservedAtUtc": "2026-11-24 14:06:42.095023+00",
+      "followupNewSchemasAbsent": true,
+      "followupMigrationsCount": 7
+    }
+  ],
+  "questionMigrationAttempted": false,
+  "furtherAutomaticRetry": false,
+  "sqlFailureReported": false,
+  "automaticApprovalRejectionReported": false,
+  "verification": {
+    "method": [
+      "list_migrations",
+      "metadata-only SELECT"
+    ],
+    "migrations": [
+      {
+        "version": "20260926043902",
+        "name": "init_bestchoice_schema"
+      },
+      {
+        "version": "20260926043926",
+        "name": "index_composite_fks"
+      },
+      {
+        "version": "20260929051831",
+        "name": "bc_ai_retry_and_user_limit"
+      },
+      {
+        "version": "20260929093527",
+        "name": "bc_retention_and_account_delete"
+      },
+      {
+        "version": "20261016144810",
+        "name": "bc_free_quota_and_ad_bonus"
+      },
+      {
+        "version": "20261016150131",
+        "name": "bc_decision_context"
+      },
+      {
+        "version": "20261117014529",
+        "name": "vs_polls_and_votes"
+      }
+    ],
+    "aiSchemaExists": false,
+    "questionSchemaExists": false,
+    "newPublicFunctions": [],
+    "productionUserRowsRead": false,
+    "newMigrationHistoryFound": false
+  },
+  "preparations": {
+    "aiMigrationFile": "supabase/release-prep/cli-generated/20261123161249_genie_result_reporting.sql",
+    "aiMigrationSha256": "92d40ba68d582bd442ff8d0b3b7d2b70759a2b7b0bf9c3d5fe8f7ad1516a89b6",
+    "questionMigrationFile": "supabase/release-prep/cli-generated/20261123161257_genie_question_safety.sql",
+    "questionMigrationSha256": "fc424dadada0dfd074b39dfb12c835adc58ad9880d0637e6370844f4513c9698",
+    "bothSourceHashesRecheckedAfterFirstRuntimeLoss": true,
+    "priorNarrowChecksPassed": 8,
+    "oldFullTestsRepeated": false,
+    "cliFilesRegenerated": false,
+    "appRebuilt": false
+  },
+  "cors": {
+    "changed": false,
+    "actualSettingRead": false,
+    "configuredOrigin": "https://localhost",
+    "existingOriginsMustBePreserved": true,
+    "secretsToolAvailable": false,
+    "browserPluginBootstrap": "originating-browser-context-unavailable",
+    "cloudBrowserToolAvailable": false,
+    "loginPerformed": false,
+    "lastPreflightEvidence": "native-cors-read-2026-11-23.json",
+    "currentPreflightRechecked": false
+  },
+  "candidatePreserved": {
+    "sourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
+    "sha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "storeSubmitted": false
+  },
+  "nextExecution": "Restore a functioning execution/connection channel. User authorization remains valid. Re-read exact project migration history and target-name collisions before any new apply; prior external requests may outlive a lost runtime. Use only the reviewed transactional migration runner. Do not substitute raw SQL DDL, manual history insertion, or overwrite existing functions."
+}
