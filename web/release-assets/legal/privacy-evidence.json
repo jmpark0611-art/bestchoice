@@ -383,7 +383,8 @@
     "otherRuntimeSourceFilesCompared": 56,
     "reviewDocumentSha256": "793ee3437788aae2cdb45f22453ed84ea7c98f9cbdf870ba1f1167eed0f00335",
     "typescriptTypeCheckPerformed": false,
-    "historical21ChecksAndColorContrastNotCopiedAsCurrentResults": true
+    "historical21ChecksAndColorContrastNotCopiedAsCurrentResults": true,
+    "phase": "Focused document checks before root integration; these local checks remain distinct from the later CI evidence below."
   },
   "updatedAtUtc": "2026-11-25T03:45:08.139299+00:00",
   "originalPreparation": {
@@ -551,5 +552,19 @@
       "logicalHeadingSteps"
     ],
     "notReusedAsCurrentPassEvidence": true
+  },
+  "rootIntegration": {
+    "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+    "recordedAtUtc": "2026-11-25T03:59:33.636547+00:00",
+    "allThreeExactSourceNativeWorkflowsSucceeded": true,
+    "isolatedDeviceCasesPassed": 6,
+    "buildEvidence": "web/release-prep/launch-continuation/policy-ci-build-results.json",
+    "deviceEvidence": "web/release-prep/launch-continuation/policy-ci-device-results.json",
+    "runtimeTextSha256": "ecca3ba0675d72276c0c91a1db5ce21e9e0179b3d496fcaa41248257547929a9",
+    "newSignedCandidateCreated": false,
+    "physicalDeviceValidated": false,
+    "productionBackendValidated": false,
+    "publicPolicyFinalized": false,
+    "publicPolicyPublished": false
   }
 }

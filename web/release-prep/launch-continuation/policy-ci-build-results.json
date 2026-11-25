@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "kind": "android-ci-build-results-read-only",
+  "checkedAtUtc": "2026-11-25T03:55:12Z",
+  "repository": "jmpark0611-art/bestchoice",
+  "branch": "codex/genie-android-native-check-20261123",
+  "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+  "allRequestedRunsCompleted": true,
+  "allRequestedRunsSucceeded": true,
+  "scope": "Only native run 45542787531 and release configuration build run 45542787552. The separate device run 45542787577 has its own record.",
+  "runs": [
+    {
+      "runId": 45542787531,
+      "runAttempt": 1,
+      "workflowName": "Genie Android native check (synthetic configuration)",
+      "workflowPath": ".github/workflows/android-native-check.yml",
+      "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787531",
+      "status": "completed",
+      "conclusion": "success",
+      "headSha": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+      "headBranch": "codex/genie-android-native-check-20261123",
+      "exactExpectedCommit": true,
+      "runCreatedAtUtc": "2026-11-25T03:51:05Z",
+      "runStartedAtUtc": "2026-11-25T03:51:05Z",
+      "githubRunUpdatedAtUtc": "2026-11-25T03:52:44Z",
+      "jobId": 138965067221,
+      "jobName": "native-check",
+      "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787531/job/138965067221",
+      "jobStatus": "completed",
+      "jobConclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Select the runner's existing Java 21 and Android SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install only the locked web dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Compile and verify a disposable Android bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Publish the verification receipt in the job summary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        }
+      ],
+      "evidence": {
+        "source": "Unique machine-readable receipt extracted from completed job logs; raw logs not retained.",
+        "receipt": {
+          "status": "native-check-passed-not-a-release",
+          "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+          "node": "v24.22.3",
+          "javac": "javac 21.0.13",
+          "configuredApplicationId": "kr.synthfixture.genie",
+          "versionCode": 12,
+          "versionName": "1.2.0",
+          "aabSha256": "7dac4468939410e7b6a7b060c83f2aa653454724dab6920340cc23e373568032",
+          "nativeCompilation": true,
+          "signatureVerified": true,
+          "packagedAssetsMatch": true,
+          "libraryAssetsVerified": {
+            "base/assets/native-bridge.js": "02dfc17bd41d1e5d0748f7f6c48aa9f2a3e624bb3677df488db466fbc93f2246"
+          },
+          "finalBinaryManifestIdentityVerified": true,
+          "finalApplicationId": "kr.synthfixture.genie",
+          "finalVersionCode": 12,
+          "finalVersionName": "1.2.0",
+          "finalManifestSha256": "1d51b2d36531c6bd0e411e37832e94caca524de23d16729d40b78f6e3a2dc4f2",
+          "syntheticConfigurationOnly": true,
+          "backendContacted": false,
+          "appOrDeviceLaunched": false,
+          "storeSubmission": false,
+          "productionSigningKeyUsed": false,
+          "generatedKeyAndAabDeleted": true
+        }
+      }
+    },
+    {
+      "runId": 45542787552,
+      "runAttempt": 1,
+      "workflowName": "Genie Android release configuration build (no upload)",
+      "workflowPath": ".github/workflows/android-release-build-check.yml",
+      "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787552",
+      "status": "completed",
+      "conclusion": "success",
+      "headSha": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+      "headBranch": "codex/genie-android-native-check-20261123",
+      "exactExpectedCommit": true,
+      "runCreatedAtUtc": "2026-11-25T03:51:05Z",
+      "runStartedAtUtc": "2026-11-25T03:51:05Z",
+      "githubRunUpdatedAtUtc": "2026-11-25T03:53:03Z",
+      "jobId": 138965067167,
+      "jobName": "unsigned-release-check",
+      "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787552/job/138965067167",
+      "jobStatus": "completed",
+      "jobConclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Select existing Java 21 and Android SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install locked dependencies without lifecycle scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Verify published inputs and compile the unsigned release candidate",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Delete this run's unsigned output and preparation workspaces",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        }
+      ],
+      "evidence": {
+        "source": "Unique machine-readable receipt extracted from completed job logs; raw logs not retained.",
+        "receipt": {
+          "schemaVersion": 1,
+          "status": "unsigned-export-awaiting-local-signing",
+          "repository": "jmpark0611-art/bestchoice",
+          "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+          "sourceRef": "refs/heads/codex/genie-android-native-check-20261123",
+          "runId": "45542787552",
+          "runAttempt": "1",
+          "applicationId": "com.jmpark0611.genie",
+          "versionCode": 1,
+          "versionName": "1.0.0",
+          "file": "android/app/build/outputs/bundle/release/app-release.aab",
+          "unsignedAabSha256": "e6bceab548a8e9b45e6c7f8f58ddc24b6d3bb330c7f6fbf3b2faf23ed4b0fb26",
+          "manifestSha256": "162678b2a3ba55c256eb282b5ccb716c7dc92c7654e1a772a6289db877bf90de",
+          "releaseManifestSha256": "14b0058ec3a746e9aa1f421cf20e7ab3d70c45059d3e2627a24d004b9def6682",
+          "identityReceiptSha256": "b58b055cf65a45638a6fb6554994ae91f036dc9e2a1e5adac7d78b2c40653509",
+          "publicConfig": {
+            "supabaseUrl": "https://njrtcxohbkfgrgwhlvua.supabase.co",
+            "publicAppUrl": "https://genie-web-rosy.vercel.app",
+            "publishableKeySha256": "04918d6318b6028779b25e77fc1289cb9dda9e982842d7783ee9ef6f6fb6de21"
+          },
+          "libraryAssets": {
+            "base/assets/native-bridge.js": "02dfc17bd41d1e5d0748f7f6c48aa9f2a3e624bb3677df488db466fbc93f2246"
+          },
+          "nativeCompilation": true,
+          "unsignedVerified": true,
+          "packagedAssetsMatch": true,
+          "finalBinaryManifestIdentityVerified": true,
+          "sourceSnapshotVerified": true,
+          "productionSigningKeyUsed": false,
+          "backendContacted": false,
+          "artifactUploaded": false,
+          "storeSubmission": false,
+          "publishedInputs": {
+            "status": "published-client-config-fingerprint-matched",
+            "htmlSha256": "b792aac07c61ebca7ff945ff47ad63ff8f31ca6174f0951dfe799f424db7b30c",
+            "sourceHashes": [
+              {
+                "path": "/assets/index-DMljNA2l.js",
+                "sha256": "de85214b2f2f17453b518617949649978aba2d43cb62bc67b7fb9ac4e211486e"
+              }
+            ],
+            "publishableKeySha256": "04918d6318b6028779b25e77fc1289cb9dda9e982842d7783ee9ef6f6fb6de21",
+            "staticGetOnly": true,
+            "backendContacted": false
+          },
+          "workflowStatus": "unsigned-native-verified-discard-after-receipt",
+          "signingPending": true,
+          "retainedAab": false
+        }
+      }
+    }
+  ],
+  "conclusions": {
+    "nativeCompilationOnExactSourceVerified": true,
+    "syntheticTemporarySignatureVerified": true,
+    "selectedPublicConfigurationUnsignedBuildVerified": true,
+    "sourceSnapshotVerifiedForSelectedPublicConfiguration": true,
+    "publishedInputsObtainedByStaticGetOnly": true,
+    "productionBackendContacted": false,
+    "productionSigningKeyUsed": false,
+    "newSignedReleaseCandidateCreated": false,
+    "buildArtifactsRetained": false,
+    "artifactUploaded": false,
+    "storeSubmission": false,
+    "deploymentPerformedByTheseWorkflows": false,
+    "existingSignedCandidateSha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "existingCandidateEvidenceChanged": false
+  },
+  "limits": [
+    "Synthetic signing uses a deleted disposable key and different test application identity; it is not the production upload key.",
+    "Selected public configuration compiled successfully, but its AAB was unsigned and was removed by the successful cleanup step.",
+    "Neither of these jobs launched the app on an emulator or physical device; the separate device job must supply its own result.",
+    "No production Auth/RPC/model call or guarded sharing integration was exercised.",
+    "Build success does not complete provider/retention facts, policy finalization, live policy URLs, Play identity/version/signing checks, or store submission.",
+    "Node 24.22.3 Android workflow success is not a Node 22 hosting or release-candidate workflow result."
+  ],
+  "collection": {
+    "readOnly": true,
+    "workflowReruns": 0,
+    "workflowChanges": 0,
+    "otherRunsQueried": [
+      45542787577
+    ],
+    "rawLogsSaved": false,
+    "rawEnvironmentValuesSaved": false,
+    "rawClientKeySaved": false,
+    "receiptContainsKeyFingerprintOnly": true,
+    "commandExecution": "Local JSON artifact creation and parse/hash validation only; no build/test/signing command executed by this collector.",
+    "otherRunsScope": "Listed only as part of exact-source automatic workflow inventory; device receipt is recorded separately."
+  },
+  "sourceSnapshot": {
+    "fileCount": 162,
+    "sha256": "d8fa49d8a1013f5f163442d901cde584e82a3b6f6a6b47df30b5ee3b8ff20e26",
+    "evidence": "policy-source-snapshot.json"
+  },
+  "priorEvidencePreserved": "ci-build-results.json for source 66010c2eca8aca06e22b4feaafaa098df2916f70"
+}

@@ -1,0 +1,309 @@
+{
+  "schemaVersion": 1,
+  "kind": "policy-wording-exact-source-android-device-ci-result",
+  "recordedAtUtc": "2026-11-25T03:57:46Z",
+  "repository": "jmpark0611-art/bestchoice",
+  "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+  "run": {
+    "id": 45542787577,
+    "name": "Genie Android device check (isolated fixture)",
+    "path": ".github/workflows/android-device-check.yml",
+    "headSha": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+    "branch": "codex/genie-android-native-check-20261123",
+    "attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787577",
+    "createdAtUtc": "2026-11-25T03:51:05Z",
+    "startedAtUtc": "2026-11-25T03:51:05Z",
+    "githubRunUpdatedAtUtc": "2026-11-25T03:54:24Z"
+  },
+  "job": {
+    "id": 138965067188,
+    "name": "device-check",
+    "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787577/job/138965067188",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "number": 1,
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 2,
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 3,
+        "name": "Require KVM and existing runner tools before downloading anything",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 4,
+        "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 5,
+        "name": "Install only locked build dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 6,
+        "name": "Verify the fixture driver's guards",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 7,
+        "name": "Resolve official pins, check existing licenses, and build fixture APKs",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 8,
+        "name": "Run the required cases with only loopback networking",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 9,
+        "name": "Record actual results and their limits",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 10,
+        "name": "Retain only a synthetic failure screen and fixed state for one day",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "number": 11,
+        "name": "Remove this job's disposable files",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 21,
+        "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 22,
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "number": 23,
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "receipt": {
+    "schemaVersion": 1,
+    "status": "six-android-emulator-fixture-cases-passed-not-a-release",
+    "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+    "fixtureOnly": true,
+    "applicationId": "dev.local.genie.preview",
+    "debugApkSha256": "65b67b3a442eeeb1018f696bfe1e3be32e415a2b6a189437e12a3d50637e9fc1",
+    "instrumentationApkSha256": "e509814cf99797f6dcd100c23a288fa97b0323616c6de8ba9e5b26863bbea36e",
+    "node": "v24.22.3",
+    "javac": "javac 21.0.13",
+    "apiLevel": 36,
+    "allFourCasesPassed": true,
+    "allRequiredCasesPassed": true,
+    "legalPhasePassed": true,
+    "preparedProcessPreserved": true,
+    "forceStopConfirmed": true,
+    "legalNightMode": {
+      "original": "no",
+      "requested": "yes",
+      "observedBeforeLaunch": "yes",
+      "restored": true,
+      "restoreFailureCode": null
+    },
+    "caseResults": [
+      {
+        "caseId": "launch",
+        "passed": true
+      },
+      {
+        "caseId": "native-back",
+        "passed": true
+      },
+      {
+        "caseId": "narrow-screen",
+        "passed": true
+      },
+      {
+        "caseId": "draft-restore-after-force-stop",
+        "passed": true
+      },
+      {
+        "caseId": "legal-navigation-native-back",
+        "passed": true
+      },
+      {
+        "caseId": "legal-narrow-dark",
+        "passed": true
+      }
+    ],
+    "legalNavigation": {
+      "forward": [
+        {
+          "from": "/",
+          "to": "/about",
+          "trustedClick": true,
+          "headingVisible": true,
+          "headingFocused": false
+        },
+        {
+          "from": "/about",
+          "to": "/privacy",
+          "trustedClick": true,
+          "headingVisible": true,
+          "headingFocused": true
+        },
+        {
+          "from": "/privacy",
+          "to": "/delete-data",
+          "trustedClick": true,
+          "headingVisible": true,
+          "headingFocused": true
+        }
+      ],
+      "systemBack": [
+        {
+          "from": "/delete-data",
+          "to": "/privacy",
+          "systemAction": "GLOBAL_ACTION_BACK",
+          "accepted": true,
+          "headingVisible": true,
+          "headingFocused": true
+        },
+        {
+          "from": "/privacy",
+          "to": "/about",
+          "systemAction": "GLOBAL_ACTION_BACK",
+          "accepted": true,
+          "headingVisible": true,
+          "headingFocused": false
+        }
+      ]
+    },
+    "legalDocumentMeasurements": [
+      {
+        "path": "/privacy",
+        "widthCssPx": 320,
+        "scrollWidthCssPx": 320,
+        "outsideControls": 0,
+        "relatedLinkCount": 2,
+        "minRelatedLinkHeight": 58,
+        "headingFocused": true,
+        "matchMediaDark": true,
+        "nativeNightMask": 32,
+        "configuredNightMode": 2,
+        "colorScheme": "dark",
+        "bodyBackground": "rgb(17, 17, 17)",
+        "bodyColor": "rgb(255, 255, 255)",
+        "surfaceBackground": "rgb(29, 29, 29)",
+        "emailSelectionMatches": true
+      },
+      {
+        "path": "/delete-data",
+        "widthCssPx": 320,
+        "scrollWidthCssPx": 320,
+        "outsideControls": 0,
+        "relatedLinkCount": 2,
+        "minRelatedLinkHeight": 58,
+        "headingFocused": true,
+        "matchMediaDark": true,
+        "nativeNightMask": 32,
+        "configuredNightMode": 2,
+        "colorScheme": "dark",
+        "bodyBackground": "rgb(17, 17, 17)",
+        "bodyColor": "rgb(255, 255, 255)",
+        "surfaceBackground": "rgb(29, 29, 29)",
+        "emailSelectionMatches": true
+      }
+    ],
+    "emailSelectionScope": "DOM-range-and-computed-user-select",
+    "signedReleaseNotTested": true,
+    "physicalDeviceTested": false,
+    "backendContacted": false,
+    "externalNetwork": "blocked-by-loopback-only-network-namespace",
+    "externalMailAppTested": false,
+    "legalLightThemeLayoutTested": false,
+    "disposableAvdAndDebugKeyRemoved": true
+  },
+  "receiptChecks": {
+    "sourceCommitMatches": true,
+    "allRequiredCasesPassed": true,
+    "allFourCasesPassed": true,
+    "legalPhasePassed": true,
+    "exactlySixDistinctExpectedCases": true,
+    "nightModeRestored": true,
+    "fixtureOnly": true,
+    "noPhysicalOrSignedReleaseClaim": true,
+    "noBackendClaim": true,
+    "bothDocumentsMeasured320": true
+  },
+  "receiptExtraction": {
+    "source": "Completed workflow job logs, unique JSON device-result object",
+    "rawLogStored": false,
+    "rawEnvironmentKeysStored": false,
+    "deviceStorageStored": false,
+    "receiptGeneralized": true,
+    "preserved": "Actual source SHA, artifact hashes, all completion flags, six case IDs/results, route outcomes, measured legal dimensions/dark/focus/email values, original/requested/restored night mode, cleanup and scope limits.",
+    "omitted": "Process IDs, detailed touch coordinates/traces, native window-history diagnostics and tool-download metadata.",
+    "fieldMapping": {
+      "caseResults": "Original cases[].caseId/passed",
+      "legalDocumentMeasurements": "Original legal-narrow-dark.documents; width and scrollWidth renamed widthCssPx and scrollWidthCssPx",
+      "legalNavigation": "Original legal-navigation-native-back.forward/back with sensitive/unnecessary traces omitted"
+    }
+  },
+  "inputAttribution": {
+    "sourceCommitExpected": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+    "runAndReceiptBothMatchExpectedCommit": true,
+    "localLegalContentSha256": "ecca3ba0675d72276c0c91a1db5ce21e9e0179b3d496fcaa41248257547929a9",
+    "localLegalContentEvidence": "Read-only SHA-256 of current task working/web/src/legal/legalContent.ts; matches the task lead's supplied prefix.",
+    "sourceManifestFileCount": 162,
+    "sourceManifestSha256": "d8fa49d8a1013f5f163442d901cde584e82a3b6f6a6b47df30b5ee3b8ff20e26",
+    "sourceManifestHashSource": "Task lead's provided new-source manifest; not independently recomputed by this collector.",
+    "prior66010EvidenceReusedAsNewResult": false,
+    "earlierEvidenceFilesModified": false
+  },
+  "scope": {
+    "exactSourceAndroidApi36IsolatedFixture": true,
+    "newPolicyWordingSourceAttributed": true,
+    "physicalDeviceValidated": false,
+    "signedReleaseValidated": false,
+    "externalMailClientValidated": false,
+    "legalLightThemeLayoutValidated": false,
+    "productionBackendValidated": false,
+    "clipboardPermissionOrPhysicalLongPressValidated": false,
+    "emailSelectionValidation": "DOM Range and computed user-select only",
+    "publicPolicyFinalized": false,
+    "publicPolicyPublished": false,
+    "newSignedReleaseCandidateCreated": false,
+    "failureArtifactStep": "skipped",
+    "disposableFixtureCleanupStep": "success",
+    "workflowRerun": false,
+    "workflowOrPermissionChanges": false,
+    "otherWorkflowRunsReadByThisCollector": [],
+    "workingFilesEditedByThisCollector": false
+  }
+}
+

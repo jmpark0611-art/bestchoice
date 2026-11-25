@@ -1504,7 +1504,14 @@
       }
     },
     "consoleObservationEvidence": "release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
-    "consoleObservationPerformedByPacketEditor": false
+    "consoleObservationPerformedByPacketEditor": false,
+    "rootCompletion": {
+      "recordedAtUtc": "2026-11-25T03:59:33.636547+00:00",
+      "scope": "Reconcile new bounded server observation and exact-source policy-copy CI results; preserve original candidate and historical observations.",
+      "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+      "workflowFilesChanged": false,
+      "storeSubmitted": false
+    }
   },
   "copyValidation": {
     "appNameCharacters": 5,
@@ -1743,6 +1750,56 @@
       "emailSelectionScope": "DOM Range and computed user-select; not physical long-press or clipboard permission validation",
       "reexecutedByThisPacketUpdate": false,
       "scope": "Prior CI results for exact source 66010c2 only. Later text changes and a future final signed candidate require evidence attributed to their own source; these receipts are not retroactive validation."
+    },
+    "approvedSupportCopyCiEvidence": {
+      "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+      "sourceSnapshotSha256": "d8fa49d8a1013f5f163442d901cde584e82a3b6f6a6b47df30b5ee3b8ff20e26",
+      "runtimeContentSha256": "ecca3ba0675d72276c0c91a1db5ce21e9e0179b3d496fcaa41248257547929a9",
+      "allThreeWorkflowsSucceeded": true,
+      "runs": [
+        {
+          "id": 45542787531,
+          "name": "Genie Android native check (synthetic configuration)",
+          "path": ".github/workflows/android-native-check.yml",
+          "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+          "attempt": 1,
+          "conclusion": "success",
+          "jobId": 138965067221,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787531",
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787531/job/138965067221"
+        },
+        {
+          "id": 45542787577,
+          "name": "Genie Android device check (isolated fixture)",
+          "path": ".github/workflows/android-device-check.yml",
+          "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+          "attempt": 1,
+          "conclusion": "success",
+          "jobId": 138965067188,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787577",
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787577/job/138965067188"
+        },
+        {
+          "id": 45542787552,
+          "name": "Genie Android release configuration build (no upload)",
+          "path": ".github/workflows/android-release-build-check.yml",
+          "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+          "attempt": 1,
+          "conclusion": "success",
+          "jobId": 138965067167,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787552",
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787552/job/138965067167"
+        }
+      ],
+      "isolatedDeviceCasesPassed": 6,
+      "bothDocumentsWidthCssPx": 320,
+      "bothDocumentsHorizontalOverflow": false,
+      "darkModeAndRestorationVerified": true,
+      "buildReceipts": "release-prep/launch-continuation/policy-ci-build-results.json",
+      "deviceReceipt": "release-prep/launch-continuation/policy-ci-device-results.json",
+      "scope": "New approved support wording source only; no physical-device, production-backend, final-public-policy, current signed AAB or Play submission validation.",
+      "newSignedCandidateCreated": false,
+      "preservedSignedCandidateContainsThisUpdate": false
     }
   },
   "supportHandling": {

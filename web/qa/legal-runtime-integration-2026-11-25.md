@@ -8,7 +8,19 @@
 
 변경된 앱 코드는 `web/src/legal/legalContent.ts`의 본문뿐이다. 스타일·경로·컴포넌트·메일 링크·API·권한은 그대로다. 법정 개인정보 보호책임자 직위, 영업일 달력·운영시간, 시행일·공개 주소, 실제 문의 운영과 전체 인증·로그·백업 삭제는 이 승인으로 확정하지 않는다.
 
-**새 본문 소스의 Android CI는 아직 결과를 기록하지 않았다.** 아래 11:17 KST 통과 기록은 원래 소스 `66010c2…`에 귀속되며 이번 본문을 검사한 결과로 바꾸지 않는다. 같은 과거 전체 테스트나 설치 실패를 반복하지 않고, 실제 수정 소스에 연결된 기존 자동 검사 결과를 별도 기록한다.
+**새 본문 소스 `bd9667cd61f04d8bbfc72d13d5d7263095df50a5`의 자동 검사 세 개가 모두 attempt 1로 성공했다.** 2026-11-25 12:57 KST에 완료 상태와 실행별 소스 일치를 확인했다. 기존 83개 전체 검사나 같은 설치 실패를 반복하지 않았다.
+
+| 이번 소스의 실제 실행 | 확인 결과 |
+| --- | --- |
+| [합성 native 빌드 45542787531](https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787531/job/138965067221) | 성공. Manifest·assets·임시 서명 확인 후 키와 AAB 삭제 |
+| [공개 설정 미서명 빌드 45542787552](https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787552/job/138965067167) | 성공. 정적 공개 설정 fingerprint, sourceSnapshot·Manifest·assets 확인 후 미서명 출력 삭제 |
+| [격리 가상기기 45542787577](https://github.com/jmpark0611-art/bestchoice/actions/runs/45542787577/job/138965067188) | 성공. 지정 여섯 케이스, 새 문구를 포함한 두 문서의 실제 이동·뒤로가기·320px·다크 모드 통과 |
+
+두 문서 모두 화면 폭·스크롤 폭 320px, 가로로 벗어난 조작 요소 0개, 관련 링크 최소 높이 58px였다. 제목 포커스와 DOM 이메일 선택 상태를 확인했고 원래 night 모드를 복원했다. **실물 기기·정식 서명 후보·운영 서버·외부 메일 앱·클립보드 권한 검증은 아니다.** Node 24.22.3 결과이며 Node 22를 실행하지 않았다.
+
+전체 빌드 입력 162개 중 `src/legal/legalContent.ts`만 달라졌다. 새 [입력 목록](../release-prep/launch-continuation/policy-source-snapshot.json)의 SHA-256은 `d8fa49d8a1013f5f163442d901cde584e82a3b6f6a6b47df30b5ee3b8ff20e26`이다. [이번 통합 기록](../release-prep/launch-continuation/policy-alignment-commit-receipt.json)은 변경 대상 외 기존 355개 blob 보존과 준비 브랜치만 갱신한 사실을 기록한다. 전후 브랜치의 웹 배포는 모두 0건이었다.
+
+실제 [빌드 근거](../release-prep/launch-continuation/policy-ci-build-results.json)와 [기기 근거](../release-prep/launch-continuation/policy-ci-device-results.json)를 별도로 보관했다. 아래 11:17 KST 기록과 원래 `66010c2…`의 receipt는 당시 소스의 증거로 그대로 보존한다.
 
 [Play Console 실제 관측](../release-prep/launch-continuation/play-console-readiness-2026-11-25.md)에서는 기존 개발자 계정에 인증된 접근이 가능했다. 기존 앱 2개 목록과 `com.jmpark0611.genie` 검색에 대상 앱이 없어, 신규 등록과 앱별 버전·서명 확인이 남는다. 계정 변경·앱 생성·업로드·제출은 수행하지 않았다.
 
