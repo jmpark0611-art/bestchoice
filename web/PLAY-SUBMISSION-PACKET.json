@@ -179,13 +179,25 @@
     },
     "downloadPriceAndCountries": {
       "value": null,
-      "status": "not-configured-by-this-packet",
+      "status": "free-download-confirmed-countries-and-rollout-unresolved",
       "newUserQuestionAdded": false,
       "createAppFormDownloadType": {
-        "selectedValue": null,
-        "freeSelected": false,
-        "paidSelected": false
-      }
+        "selectedValue": "free",
+        "freeSelected": true,
+        "paidSelected": false,
+        "freeRadioAxValue": 1,
+        "paidRadioAxValue": 0,
+        "selectionConfirmed": true
+      },
+      "valueMeaning": "The legacy combined value remains unset; only the separate downloadType is confirmed. Countries and rollout are not selected.",
+      "downloadType": {
+        "value": "free",
+        "status": "user-approved-and-selected-in-unsubmitted-create-form",
+        "approvalEventId": "free-download-only-2026-11-25",
+        "uiEvidence": "consoleAccess.createAppForm.downloadType"
+      },
+      "countries": null,
+      "rollout": null
     },
     "releaseNotes": {
       "locale": "ko-KR",
@@ -795,13 +807,13 @@
     },
     {
       "id": "play-console-access",
-      "scope": "create-app-form-prepared-package-availability-confirmed-final-creation-pending",
-      "nextResult": "The real create-app form contains 결정해지니, com.jmpark0611.genie, Korean ko-KR and App. Clicking 사용 가능 여부 확인 displayed 사용 가능한 패키지 이름. This is not reservation or registration. Free and paid are both unselected, and developer-policy/US-export declarations are both unchecked. Resolve only the actual remaining choice/declarations with valid authority before any final creation; version and signing remain unverified."
+      "scope": "free-selected-in-prepared-create-form-declarations-and-final-creation-pending",
+      "nextResult": "The user approved free download only with 응 그래, and the form shows free selected (AX 1) and paid unselected (AX 0). Name/package/ko-KR/App were re-entered in a new tab using the existing authenticated session; the availability button again showed 사용 가능한 패키지 이름. Both developer-policy/US-export declarations remain unchecked; final app creation, registration, version and signing remain unperformed/unverified. No further free/paid question is needed."
     },
     {
       "id": "play-entry-and-submission",
       "scope": "separate-observed-console-actions",
-      "nextResult": "Basic create-app form preparation and the package availability UI result are observed, but final 앱 만들기 was not clicked. No app was created, release saved, AAB uploaded or submission made. After an authorized actual registration, inspect app-specific setup/testing/rating/signing requirements and use verified final materials. Support email, 18+ and Productivity were not fields on this observed create-app form."
+      "nextResult": "Free is approved and selected, but the two legal declarations and final 앱 만들기 remain untouched. The automatic-protection notice/사용 안함 button appeared; no protection/default setting was changed. No app creation, release save, AAB upload or submission occurred. Continue only with valid authority for the remaining actual declarations and actions; countries/rollout and app-specific testing/rating/signing remain unresolved."
     }
   ],
   "userDecisions": [
@@ -831,6 +843,25 @@
       "source": "supportHandling.confirmationSource",
       "scope": "Three operating choices only; no final policy, statutory title, exact service calendar, provider retention or implementation completion is inferred.",
       "reaskTheseThreeChoices": false
+    },
+    {
+      "id": "free-download-only-2026-11-25",
+      "value": "free",
+      "status": "confirmed-user-instruction",
+      "userInstruction": "응 그래",
+      "confirmedOnKst": "2026-11-25",
+      "exactApprovedAtUtc": null,
+      "context": "Reply to the immediately preceding question asking whether to confirm free download.",
+      "scope": "Free download only",
+      "doesNotAuthorize": [
+        "countries",
+        "rollout",
+        "legal-declaration-consent",
+        "final-app-creation",
+        "account-setting-changes",
+        "paid-features"
+      ],
+      "numericPriceSet": false
     }
   ],
   "policySources": {
@@ -974,24 +1005,24 @@
     "checkpointScope": "This packet describes its three Play documents. Root's consolidated record also covers four legal drafts and dated release-status updates."
   },
   "consoleAccess": {
-    "status": "create-app-form-prepared-package-availability-ui-confirmed-not-submitted",
-    "recordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
+    "status": "free-download-approved-and-selected-create-app-form-not-submitted",
+    "recordedAtUtc": "2026-11-25T05:05:26.915Z",
     "observation": {
       "date": "2026-11-25",
-      "relativeTiming": "earlier this turn",
+      "relativeTiming": "UI sequence immediately preceding the task lead record at 2026-11-25T05:05:26.915Z",
       "exactObservedAtUtc": null,
-      "timePrecision": "date-and-relative-turn",
+      "timePrecision": "date-and-relative-sequence",
       "recordedAtUtcIsNotObservationTime": true
     },
     "observedAtLocalDate": "2026-11-25",
     "displayTimeZone": "Asia/Seoul",
-    "timePrecision": "date-and-relative-turn",
+    "timePrecision": "date-and-relative-sequence",
     "observedAtUtc": null,
-    "observationSource": "Actual create-app form fields and visible package-availability result reported by the task lead from the existing authenticated session. This document editor did not interact with the Console.",
+    "observationSource": "Task lead observed the re-opened create-app form in the existing authenticated session after the user approved free download; free/paid radio values and package availability result were confirmed. The document editor did not interact with the Console.",
     "evidenceFile": "release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
     "evidenceFileVerifiedLocallyByPacketEditor": true,
-    "evidenceFileSha256": "e901822d03ca9a0e1a904de08a16a7d43b26d1fbda0dcef845f5b7cf00d32abc",
-    "evidenceRecordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
+    "evidenceFileSha256": "b4b6735a440373639789b04e0ba85660deeb5f9e28b7b4fc7704f24f00d75e58",
+    "evidenceRecordedAtUtc": "2026-11-25T05:05:26.915Z",
     "intendedExistingDeveloperAccountSelected": true,
     "authenticatedConsoleOpened": true,
     "loginPageObserved": false,
@@ -1023,9 +1054,12 @@
         "selected": true
       },
       "downloadType": {
-        "selectedValue": null,
-        "freeSelected": false,
-        "paidSelected": false
+        "selectedValue": "free",
+        "freeSelected": true,
+        "paidSelected": false,
+        "freeRadioAxValue": 1,
+        "paidRadioAxValue": 0,
+        "selectionConfirmed": true
       },
       "declarations": {
         "developerPolicyCompliance": {
@@ -1048,7 +1082,22 @@
       "submitted": false,
       "fieldPreparationIsNotAppRegistration": true,
       "tabMarkedHandoff": true,
-      "userTakeoverRequested": false
+      "userTakeoverRequested": false,
+      "freeDownloadApprovalEventId": "free-download-only-2026-11-25",
+      "reopenedForm": {
+        "previousTabAvailable": false,
+        "newTabOpened": true,
+        "initiallyBlank": true,
+        "sameKnownFormReprepared": true,
+        "newAuthenticationAttempted": false
+      },
+      "automaticProtectionNotice": {
+        "shownAfterFreeSelection": true,
+        "disableButtonLabelKo": "사용 안함",
+        "disableButtonVisible": true,
+        "disableButtonClicked": false,
+        "settingsChangedByThisAction": false
+      }
     },
     "packageAvailabilityCheck": {
       "packageName": "com.jmpark0611.genie",
@@ -1058,7 +1107,9 @@
       "uiReportedAvailable": true,
       "scope": "Actual availability-check UI result for the proposed package at the observed moment; not a reservation, registration or guarantee of future availability.",
       "packageReserved": false,
-      "appRegistered": false
+      "appRegistered": false,
+      "recheckedThisObservation": true,
+      "recordedAtUtc": "2026-11-25T05:05:26.915Z"
     },
     "appRegistrationObserved": false,
     "appRegistrationCompleted": false,
@@ -1078,7 +1129,7 @@
       "sessionUrlIncluded": false,
       "otherAppIdentifiersOrStatisticsIncluded": false
     },
-    "nextStep": "Resolve the still-unselected free/paid choice and review the exact developer-policy and US-export declarations with valid authority, including user confirmation where required. Do not infer consent or click final app creation from these observations alone. Only an actual created app can establish its subsequent version/signing/setup records; uploads and submission remain separate actions.",
+    "nextStep": "Free download is now confirmed and visibly selected; do not ask that choice again. Review the actual developer-policy and US-export declarations with valid authority and any required user confirmation. Those declarations and final app creation were not authorized by the free-download reply or performed. Countries/rollout and subsequent version/signing/setup remain unresolved; uploads and submission remain separate.",
     "history": [
       {
         "observedAtLocalDate": "2026-11-23",
@@ -1166,6 +1217,30 @@
         "observedAtUtcMeaning": "Exact observation time is not separately supplied; evidenceRecordedAtUtc is the record time. Observation date is 2026-11-25 KST.",
         "historicalEvent": true,
         "historyEventScope": "Earlier authenticated account-list/search observation recorded at 2026-11-25T03:42:51Z; not the later create-app availability check."
+      }
+    ],
+    "events": [
+      {
+        "id": "create-form-before-free-download-approval",
+        "type": "historical-ui-observation",
+        "recordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
+        "sourceBaselineHead": "3cd46d1fb209aba58a914b6931fe5b9748ee24a9",
+        "observation": {
+          "date": "2026-11-25",
+          "relativeTiming": "earlier this turn",
+          "exactObservedAtUtc": null,
+          "timePrecision": "date-and-relative-turn",
+          "recordedAtUtcIsNotObservationTime": true
+        },
+        "downloadType": {
+          "selectedValue": null,
+          "freeSelected": false,
+          "paidSelected": false
+        },
+        "developerPolicyComplianceChecked": false,
+        "usExportLawsChecked": false,
+        "finalCreateAppButtonClicked": false,
+        "scope": "Earlier form observation only. Its unselected free/paid state is preserved and is not retroactively changed by the later approval."
       }
     ]
   },
@@ -1609,9 +1684,9 @@
     }
   },
   "documentationRevision": {
-    "recordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
-    "baseCommit": "3cd46d1fb209aba58a914b6931fe5b9748ee24a9",
-    "scope": "Console information only in the Play packet plus the separate Console readiness record: actual unsubmitted create-app fields, package availability UI result and unchanged declarations/pricing. Earlier account-list observation is preserved as history.",
+    "recordedAtUtc": "2026-11-25T05:07:57.940677+00:00",
+    "baseCommit": "127b69e3e40e5e923450b8695331e90b546dd1d6",
+    "scope": "Free-download approval and observed free-radio selection only, in the same four Play documents. Existing history is preserved without adding a full duplicate snapshot; declarations, final creation, candidate and code/QA/backend/CI facts remain unchanged.",
     "updatedFiles": [
       "web/release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
       "web/release-prep/launch-continuation/play-console-readiness-2026-11-25.md",
@@ -1665,6 +1740,15 @@
       "serverApplyRepeated": false,
       "publicDeploymentPerformed": false,
       "storeSubmitted": false
+    },
+    "previousRevisionRecordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
+    "freeDownloadEvent": {
+      "approvalEventId": "free-download-only-2026-11-25",
+      "consoleRecordAtUtc": "2026-11-25T05:05:26.915Z",
+      "scope": "free download only",
+      "numericPriceSet": false,
+      "declarationsAgreed": false,
+      "finalAppCreated": false
     }
   },
   "copyValidation": {
@@ -1794,9 +1878,13 @@
       },
       {
         "field": "Download price, countries and production rollout",
-        "preparedValue": null,
-        "answerStatus": "free-and-paid-unselected-other-distribution-values-unresolved",
-        "basis": "Both free and paid were visibly unselected in the create-app form. No price, country or rollout selection or saved setting was made."
+        "preparedValue": {
+          "downloadType": "free",
+          "countries": null,
+          "rollout": null
+        },
+        "answerStatus": "free-approved-and-selected-other-distribution-values-unresolved",
+        "basis": "Explicit user approval 응 그래 covers free download only. The actual create form now shows free AX 1 and paid AX 0. No numeric price, country, rollout, paid-feature, declaration or final creation approval is inferred."
       }
     ],
     "operationalFactsNotConsoleFieldIds": [
@@ -2028,10 +2116,10 @@
     "latestIsolatedAndroidEmulatorEvidence": "Preserved historical eaf89c evidence tied to the b8d9db6 signed candidate. The newer draft-navigation fixture evidence is legalIntegration.draftRuntimeCiEvidence.",
     "recordedAtUtc": "Original packet evidence date; the latest documentation update is documentationRevision.recordedAtUtc.",
     "supportFirstResponseOnlyEvent": "The earlier first-response-only event in privacy-operations.json is historical; later three-choice approval is operatingDecisionsConfirmation.",
-    "consoleAccess": "Current observation is the 2026-11-25 earlier-this-turn unsaved create-app form and available-package UI result. The prior 03:42:51Z account-list/search event, earlier login wall and approval rejection remain historical events in consoleAccess.history.",
+    "consoleAccess": "Current free selection follows the explicit 2026-11-25 approval and the actual UI sequence recorded at 05:05:26.915Z. The earlier unselected create-form state is preserved in consoleAccess.events; existing account-list/login/rejection history is unchanged.",
     "latestExactSourceAndroidEvidence": "Current changed-source Android evidence is historySessionGuard for df5f6dedae9c1d200e3d33a613512f795290eac5. Earlier legal/support-copy and original signed-candidate receipts remain attributed to their own source commits."
   },
-  "consoleOpenedOrChangedMeaning": "Legacy combined field: create-app form opened and populated, package availability checked. No final app creation, saved release or account-setting change.",
+  "consoleOpenedOrChangedMeaning": "Legacy combined field: create-app form re-opened/reprepared and free selected after explicit approval; package availability checked again. No final app creation, release save or account-setting change.",
   "consoleChanged": false,
   "latestServerObservation": {
     "evidenceFile": "release-prep/launch-continuation/server-readiness-20261125T033830Z.json",
@@ -2044,7 +2132,7 @@
     "additionalApplyAttemptMade": false,
     "previousDatabaseEvidencePreserved": true
   },
-  "consoleChangedMeaning": "No persisted registration/release/account-setting change is claimed; the unsubmitted create-app form was populated.",
+  "consoleChangedMeaning": "No persisted registration/release/account-setting change is claimed; the unsubmitted form now has free selected.",
   "historySessionGuard": {
     "sourceCommit": "df5f6dedae9c1d200e3d33a613512f795290eac5",
     "sourceSnapshotSha256": "36ff10f173297eb7e10ed3f5836cf7595af56d11de3d863aa63c619da62a8aed",
