@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "kind": "genie-privacy-deletion-reporting-operations-draft",
   "preparedAtUtc": "2026-11-25",
-  "status": "proposed-not-adopted",
+  "status": "partially-adopted-first-response-target-confirmed",
   "publicPolicyFinalized": false,
   "operationalActionsTaken": false,
   "emailSent": false,
   "loginPerformed": false,
-  "remoteWrites": false,
+  "remoteWrites": true,
   "knownOperator": {
     "company": "에스제이컴퍼니",
     "representative": "박지민",
@@ -17,7 +17,7 @@
   "adoptedOperations": {
     "requestHandler": null,
     "privacyOfficerTitle": null,
-    "firstResponseTargetBusinessDays": null,
+    "firstResponseTargetBusinessDays": 1,
     "caseLedgerRetentionDaysAfterClosure": null,
     "policyEffectiveDate": null
   },
@@ -43,7 +43,7 @@
     {
       "id": "first_response",
       "recommended": "A",
-      "selected": null,
+      "selected": "A",
       "options": [
         {
           "id": "A",
@@ -56,7 +56,9 @@
       ],
       "scope": "acknowledgement and triage only",
       "isLegalDeadline": false,
-      "allDataDeletionSla": false
+      "allDataDeletionSla": false,
+      "confirmedOnKst": "2026-11-25",
+      "confirmationSource": "User message: 1영업일 목표"
     },
     {
       "id": "minimal_ledger_retention",
@@ -311,5 +313,21 @@
     "https://supabase.com/docs/guides/auth/managing-user-data",
     "https://support.google.com/googleplay/android-developer/answer/13327111?hl=en",
     "https://github.com/jmpark0611-art/bestchoice/blob/ab960b8889b91ec27b47f1d336b5dcaf6b381b55/supabase/migrations/20260929093527_bc_retention_and_account_delete.sql"
-  ]
+  ],
+  "updatedAtUtc": "2026-11-25T02:59:39.148809+00:00",
+  "responseTargetConfirmation": {
+    "confirmedOnKst": "2026-11-25",
+    "recordedAtUtc": "2026-11-25T02:59:39.148809+00:00",
+    "userInstruction": "1영업일 목표",
+    "businessDays": 1,
+    "scope": "Initial acknowledgement and triage only",
+    "targetNotGuaranteedCompletionTime": true,
+    "allDataDeletionDeadlineConfirmed": false,
+    "requestHandlerConfirmed": false,
+    "ledgerRetentionConfirmed": false,
+    "businessCalendar": null,
+    "operatingHours": null,
+    "effectiveDate": null
+  },
+  "remoteWriteScope": "Approved development branch documentation only; no operational service changes."
 }

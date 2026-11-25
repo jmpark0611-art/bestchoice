@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAtUtc": "2026-11-25T02:19:08.406259+00:00",
+  "recordedAtUtc": "2026-11-25T02:59:39.148809+00:00",
   "recordedOnKst": "2026-11-25",
   "status": "draft-runtime-integrated-all-three-native-workflows-passed-not-release-ready",
   "repository": "jmpark0611-art/bestchoice",
@@ -171,8 +171,16 @@
     "migrationEvidence": "../release-prep/launch-continuation/migration-readiness.json",
     "supportProcedure": "../release-prep/launch-continuation/privacy-ops/PRIVACY-REQUEST-RUNBOOK.md",
     "replyTemplateCount": 8,
-    "unapprovedOperatingDecisionCount": 3,
-    "operatingChoicesAdopted": false
+    "unapprovedOperatingDecisionCount": 2,
+    "allOperatingChoicesAdopted": false,
+    "adoptedOperatingDecisionCount": 1,
+    "firstResponseTargetBusinessDays": 1,
+    "responseTargetConfirmedOnKst": "2026-11-25",
+    "responseTargetScope": "Initial acknowledgement and triage; not data deletion completion",
+    "remainingOperatingDecisionIds": [
+      "handler",
+      "minimal_ledger_retention"
+    ]
   },
   "deploymentObservation": {
     "vercelProjectId": "prj_qJ15NyIr66vmhYfs8GNrtf5oXHRj",
