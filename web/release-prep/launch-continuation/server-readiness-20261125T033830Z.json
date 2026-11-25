@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "kind": "bounded-read-only-server-readiness-observation",
+  "recordedAtUtc": "2026-11-25T03:38:31.932Z",
+  "sourceBaseline": {
+    "head": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
+    "tree": "f551420fe633e0a32b42d104cee1281e13b551bb",
+    "source": "/workspace/scratch/59b55f9d68c3/validation/genie-policy-and-console-20261125/baseline-manifest.json",
+    "repositoryStateRefetchedByThisCheck": false
+  },
+  "project": {
+    "id": "njrtcxohbkfgrgwhlvua",
+    "ref": "njrtcxohbkfgrgwhlvua",
+    "name": "bestchoice",
+    "region": "ap-northeast-2",
+    "status": "ACTIVE_HEALTHY",
+    "databaseVersion": "17.6.1.166"
+  },
+  "migrationHistory": {
+    "count": 7,
+    "migrations": [
+      {
+        "version": "20260926043902",
+        "name": "init_bestchoice_schema"
+      },
+      {
+        "version": "20260926043926",
+        "name": "index_composite_fks"
+      },
+      {
+        "version": "20260929051831",
+        "name": "bc_ai_retry_and_user_limit"
+      },
+      {
+        "version": "20260929093527",
+        "name": "bc_retention_and_account_delete"
+      },
+      {
+        "version": "20261016144810",
+        "name": "bc_free_quota_and_ad_bonus"
+      },
+      {
+        "version": "20261016150131",
+        "name": "bc_decision_context"
+      },
+      {
+        "version": "20261117014529",
+        "name": "vs_polls_and_votes"
+      }
+    ],
+    "exactVersionsAndNamesMatchPriorPreflight": true,
+    "comparisonSource": "/workspace/scratch/59b55f9d68c3/validation/genie-release-finalization-20261125/database/preflight.json#raw.migrations"
+  },
+  "catalogAndActivity": {
+    "checked_at_utc": "2026-11-25 03:38:30.868654+00",
+    "schemas": [
+      {
+        "name": "genie_question_safety_private",
+        "exists": false
+      },
+      {
+        "name": "genie_reporting_private",
+        "exists": false
+      }
+    ],
+    "public_functions": [
+      {
+        "name": "vs_clear_question_author_blocks",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_report_question",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_report_result",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_set_question_author_block",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_shared_poll_guarded",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_vote_guarded",
+        "overload_count": 0
+      }
+    ],
+    "track_activities": "on",
+    "query_text_capture_limit": "1kB",
+    "has_read_all_stats_role": true,
+    "matching_activity_count": 0,
+    "matching_active_count": 0
+  },
+  "comparisonWithPreviousObservation": {
+    "previousPath": "/workspace/scratch/59b55f9d68c3/validation/genie-launch-continuation-20261125/migration-readiness.json",
+    "previousCheckedAtUtc": "2026-11-25 01:42:11.605901+00",
+    "bothNewSchemasStillAbsent": true,
+    "allSixPublicFunctionNamesStillHaveZeroOverloads": true,
+    "matchingActivityStillZero": true
+  },
+  "isolatedEnvironment": {
+    "explicitEvidenceInInspectedMetadata": false,
+    "limitation": "Only the named project was inspected. No separate environment inventory was requested or inferred, and the absence of another environment was not established."
+  },
+  "outcome": {
+    "committedNewObjectsObserved": false,
+    "directRecoveryEvidenceFound": false,
+    "retryConditionsImproved": false,
+    "decisionKorean": "재개조건 개선 없음",
+    "priorAuthorizationRemainsInEffect": true,
+    "newApprovalRequired": false,
+    "additionalApplyAttemptMade": false,
+    "failureClassification": "Prior apply completion response was lost after exec host/runtime replacement. This observation does not establish a SQL error, automatic approval rejection, or restored mutation completion path."
+  },
+  "limitations": [
+    "ACTIVE_HEALTHY and successful read-only calls establish project/read-path availability only; they do not prove apply_migration completion reporting is repaired.",
+    "Catalog absence and a zero matching activity count describe this instant and do not establish termination of older upstream requests.",
+    "pg_stat_activity query text is capped at 1 kB. No raw query text was returned. Upstream queued work or identifying text outside the captured prefix cannot be ruled out.",
+    "This check did not reread full preflight contracts, security advisors, logs, approval settings, or official status pages.",
+    "No isolated environment was assumed from a production URL or inferred solely from project metadata."
+  ],
+  "scope": {
+    "getProjectCalls": 1,
+    "listMigrationsCalls": 1,
+    "catalogSelectCalls": 1,
+    "listBranchesCalls": 0,
+    "applyMigrationCalls": 0,
+    "ddl": false,
+    "dml": false,
+    "migrationHistoryEdits": false,
+    "applicationRowsRead": false,
+    "authRowsRead": false,
+    "rawLogsRead": false,
+    "credentialsRead": false,
+    "usersCreated": false,
+    "newProjectsCreated": false,
+    "remoteSettingsChanges": false,
+    "advisorsCalls": 0,
+    "fullPreflightRerun": false
+  },
+  "readOnlyQuery": "-- Catalog/activity metadata only; no application rows or raw session query text.\nwith expected_schemas(name) as (\n values ('genie_reporting_private'),('genie_question_safety_private')\n), expected_public_functions(name) as (\n values ('vs_report_result'),('vs_report_question'),('vs_set_question_author_block'),\n ('vs_clear_question_author_blocks'),('vs_shared_poll_guarded'),('vs_vote_guarded')\n), matching_activity as (\n select state\n from pg_catalog.pg_stat_activity\n where datname=pg_catalog.current_database() and pid<>pg_catalog.pg_backend_pid()\n and pg_catalog.lower(query) similar to '%(genie_reporting_private|genie_question_safety_private|genie_result_reporting|genie_question_safety|vs_report_result|vs_report_question|vs_set_question_author_block|vs_clear_question_author_blocks|vs_shared_poll_guarded|vs_vote_guarded)%'\n)\nselect pg_catalog.clock_timestamp() as checked_at_utc,\n (select jsonb_agg(jsonb_build_object('name',e.name,'exists',\n   exists(select 1 from pg_catalog.pg_namespace n where n.nspname=e.name)) order by e.name)\n  from expected_schemas e) as schemas,\n (select jsonb_agg(jsonb_build_object('name',e.name,'overload_count',\n   (select count(*) from pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid=p.pronamespace\n    where n.nspname='public' and p.proname=e.name)) order by e.name)\n  from expected_public_functions e) as public_functions,\n pg_catalog.current_setting('track_activities') as track_activities,\n pg_catalog.current_setting('track_activity_query_size') as query_text_capture_limit,\n pg_catalog.pg_has_role(current_user,'pg_read_all_stats','USAGE') as has_read_all_stats_role,\n (select count(*) from matching_activity) as matching_activity_count,\n (select count(*) from matching_activity where state='active') as matching_active_count;"
+}

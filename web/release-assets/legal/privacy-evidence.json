@@ -2,20 +2,25 @@
   "schemaVersion": 1,
   "kind": "genie-privacy-publication-review",
   "recordedAtUtc": "2026-11-24",
-  "status": "draft-local-only-pending-operational-facts",
+  "status": "draft-approved-support-rules-integrated-pending-provider-and-operational-facts",
   "readyToPublish": false,
   "readyToSubmit": false,
   "repository": {
     "owner": "jmpark0611-art",
     "name": "bestchoice",
     "branch": "codex/genie-android-native-check-20261123",
-    "commit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
-    "tree": "c8da67585b20175c93e4ffb5fa39f98b06ca2d22"
+    "commit": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
+    "tree": "f551420fe633e0a32b42d104cee1281e13b551bb",
+    "treeNote": "Root re-queried the remote e521357 HEAD and verified this tree in baseline-full-tree.json; this agent made no remote query.",
+    "treeEvidence": "validation/genie-policy-and-console-20261125/baseline-full-tree.json"
   },
   "candidate": {
     "aabSha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
     "regeneratedByThisWork": false,
-    "runtimeEditedByThisWork": false
+    "runtimeEditedByThisWork": true,
+    "runtimeTextOnlyChange": true,
+    "includesThisTextUpdate": false,
+    "newSignedCandidateRequiredAfterFinalSourceClosure": true
   },
   "operator": {
     "app": "결정해지니",
@@ -24,7 +29,8 @@
     "supportEmail": "jmpark0611@gmail.com",
     "intendedMinimumAge": 18,
     "privacyOfficer": null,
-    "privacyOfficerNullReason": "대표자 정보만 확인됨. 개인정보 보호책임자 지정 사실은 별도 확인 필요."
+    "privacyOfficerNullReason": "박지민의 문의 담당만 승인됨. 법정 개인정보 보호책임자 직위는 미확정.",
+    "requestHandler": "박지민"
   },
   "publication": {
     "privacyUrl": null,
@@ -37,10 +43,21 @@
       "web/release-assets/legal/privacy.html",
       "web/release-assets/legal/delete-data.html"
     ],
-    "inAppFullPolicyLinkPresentAtBaseline": false,
-    "inAppExternalDeletionLinkPresentAtBaseline": false,
     "reviewNoticePresent": true,
-    "noindexUntilFinalized": true
+    "noindexUntilFinalized": true,
+    "originalBaselineLinkState": {
+      "commit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
+      "inAppFullPolicyLinkPresent": false,
+      "inAppExternalDeletionLinkPresent": false
+    },
+    "inAppDraftPrivacyAndDeletionRoutesPresentAtCurrentBaseline": true,
+    "inAppDraftRoutes": [
+      "/privacy",
+      "/delete-data"
+    ],
+    "inAppPublishedExternalPolicyLinkVerified": false,
+    "proposedPathsScope": "External hosting paths only. Existing in-app draft routes do not establish public URL availability.",
+    "runtimeTextSource": "web/src/legal/legalContent.ts"
   },
   "identity": {
     "userFacingRegistrationUi": false,
@@ -86,7 +103,14 @@
       "user-submitted request content",
       "correspondence"
     ],
-    "platformLogFieldsVerified": false
+    "platformLogFieldsVerified": false,
+    "minimumSupportCaseLedgerPrepared": [
+      "support reference",
+      "received and processed dates",
+      "request category",
+      "processed scope and outcome",
+      "result notice status"
+    ]
   },
   "retention": {
     "decision": {
@@ -144,7 +168,23 @@
       "retention": null
     },
     "emailCorrespondence": {
-      "retention": null
+      "retention": null,
+      "numericPeriodConfirmed": false,
+      "rule": "Remove original messages and sensitive attachments when request handling and actually necessary follow-up purposes have ended and the material is no longer needed",
+      "minimumLedgerThirtyDayCapApplies": false,
+      "mailProviderLogsAndBackupsIncludedInThisRule": false,
+      "actualDeletionVerifiedByThisWork": false
+    },
+    "minimalSupportCaseLedger": {
+      "maximumDaysAfterClosure": 30,
+      "isMaximumNotMandatoryMinimum": true,
+      "deleteEarlierWhenUnnecessary": true,
+      "purpose": "Necessary recontact and omission review only",
+      "rawMessageOrSensitiveAttachmentCopiedToLedger": false,
+      "credentialsCopiedToLedger": false,
+      "automatedExpiryImplementedByThisWork": false,
+      "actualCaseDeletionVerifiedByThisWork": false,
+      "approvalSource": "web/release-prep/launch-continuation/privacy-ops/privacy-operations.json"
     }
   },
   "deletion": {
@@ -216,13 +256,13 @@
     }
   },
   "requiredFacts": [
-    "P1 auth retention/deletion scope",
-    "P2 platform/hosting logs and backups",
-    "P3 provider entities/transfers/legal basis",
-    "P4 actual OpenAI settings",
-    "P5 request operator/verification/correspondence retention",
+    "P1 auth-user retention and ownership-verified complete deletion scope; session configuration only partly resolved by earlier observation",
+    "P2 actual platform/hosting log retention, historical audit data, backups and manual copies",
+    "P3 provider entities, transfers and applicable legal basis",
+    "P4 actual operating OpenAI org/project and account settings; prior observation stopped at sign-in",
+    "P5 privacy-officer designation, access permissions, business calendar/hours/effective date and actual ownership/handling/cleanup implementation; three support choices already approved",
     "P6 report/block production application and operations",
-    "P7 actual public URLs/effective date/in-app policy access"
+    "P7 finalized public URLs/effective date and a refreshed exact candidate; current in-app draft routes already exist"
   ],
   "sources": [
     {
@@ -284,12 +324,232 @@
     }
   ],
   "validation": {
+    "scope": "Current document structure, unchanged UI metadata/styles/routes, and consistency of approved support wording only",
+    "status": "passed-current-document-structure-and-wording-review-only",
+    "staticStructureCheckPassed": true,
     "browserRenderPerformed": false,
     "mailReceiptTestPerformed": false,
     "publicUrlNetworkTestPerformed": false,
     "fullAppTestsRepeated": false,
-    "staticStructureCheckPassed": true,
-    "staticValidationReport": "static-document-validation.json",
-    "staticCheckCountPerHtml": 21
+    "dependenciesInstalled": false,
+    "buildPerformed": false,
+    "nativeVerificationPerformedForThisUpdate": false,
+    "remoteMutationPerformedByThisAgent": false,
+    "oldNativeResultsReusedForThisUpdate": false,
+    "freshNativeCiOwnedByRoot": true,
+    "checkedAtUtc": "2026-11-25T03:47:31.346204+00:00",
+    "htmlStructureChecks": [
+      {
+        "file": "web/release-assets/legal/privacy.html",
+        "sha256": "1ba1df6b9fcc2175cea740c3f2e569e68f1bafd9130956fdcac0e0465c430fd3",
+        "passed": true,
+        "checks": {
+          "balancedHtml": true,
+          "koreanUtf8AndViewport": true,
+          "singleMainAndH1": true,
+          "idsHeadingsAndLinkLabelsPreserved": true,
+          "fragmentAndDocumentLinksResolve": true,
+          "noScriptsFormsAutomaticResourcesOrInlineHandlers": true,
+          "stylesUnchanged": true,
+          "draftNoindexAndNoEffectiveDatePreserved": true,
+          "fourApprovedScopeParagraphsPresentOnce": true
+        }
+      },
+      {
+        "file": "web/release-assets/legal/delete-data.html",
+        "sha256": "e1373e89644759733cf992f34d06b142cdc5d21849ca79d4e4ee800b2d395309",
+        "passed": true,
+        "checks": {
+          "balancedHtml": true,
+          "koreanUtf8AndViewport": true,
+          "singleMainAndH1": true,
+          "idsHeadingsAndLinkLabelsPreserved": true,
+          "fragmentAndDocumentLinksResolve": true,
+          "noScriptsFormsAutomaticResourcesOrInlineHandlers": true,
+          "stylesUnchanged": true,
+          "draftNoindexAndNoEffectiveDatePreserved": true,
+          "fourApprovedScopeParagraphsPresentOnce": true
+        }
+      }
+    ],
+    "runtimeContentChecks": {
+      "documentIdsTitlesLabelsRoutesAndContactUnchanged": true,
+      "balancedContentDelimiters": true,
+      "fourApprovedScopeParagraphsInEachDocument": true,
+      "existingImportExportDeclarationsUnchanged": true,
+      "otherRuntimeSourceFilesUnchanged": true
+    },
+    "runtimeContentSha256": "ecca3ba0675d72276c0c91a1db5ce21e9e0179b3d496fcaa41248257547929a9",
+    "otherRuntimeSourceFilesCompared": 56,
+    "reviewDocumentSha256": "793ee3437788aae2cdb45f22453ed84ea7c98f9cbdf870ba1f1167eed0f00335",
+    "typescriptTypeCheckPerformed": false,
+    "historical21ChecksAndColorContrastNotCopiedAsCurrentResults": true
+  },
+  "updatedAtUtc": "2026-11-25T03:45:08.139299+00:00",
+  "originalPreparation": {
+    "recordedAtUtc": "2026-11-24",
+    "repository": {
+      "owner": "jmpark0611-art",
+      "name": "bestchoice",
+      "branch": "codex/genie-android-native-check-20261123",
+      "commit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
+      "tree": "c8da67585b20175c93e4ffb5fa39f98b06ca2d22"
+    },
+    "runtimeEditedByOriginalWork": false
+  },
+  "supportOperations": {
+    "requestHandler": "박지민",
+    "firstResponseTargetBusinessDays": 1,
+    "firstResponseScope": "Initial acknowledgement, triage and necessary minimal follow-up information only",
+    "allDataDeletionSla": false,
+    "businessCalendar": null,
+    "operatingHours": null,
+    "effectiveDate": null,
+    "privacyOfficerTitle": null,
+    "publicPolicyFinalized": false,
+    "operationalProcedureActivated": false,
+    "actualRequestHandlingVerifiedByThisWork": false,
+    "automaticDeletionImplementedByThisWork": false,
+    "approvalSource": "web/release-prep/launch-continuation/privacy-ops/privacy-operations.json",
+    "approvalSourceSha256": "cc60c60403308c812a648ce5edaed8b5c8e0e90c6c7d3749f503cac56ddd4282",
+    "approvalSourceCommit": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
+    "approvalRecord": {
+      "confirmedOnKst": "2026-11-25",
+      "recordedAtUtc": "2026-11-25T03:30:51.669006+00:00",
+      "userInstruction": "네 추천대로할께",
+      "reference": "Immediately preceding recommendation: 박지민 직접 문의 담당 / 최초 답변 1영업일 목표 / 처리 종료 후 최소 처리표 최대 30일 보관",
+      "requestHandler": "박지민",
+      "firstResponseTargetBusinessDays": 1,
+      "caseLedgerMaximumRetentionDaysAfterClosure": 30,
+      "eraseEarlierWhenUnnecessary": true,
+      "scope": "These three operating choices only",
+      "legalPrivacyOfficerTitleConfirmed": false,
+      "businessCalendar": null,
+      "operatingHours": null,
+      "effectiveDate": null,
+      "publicPolicyFinalized": false,
+      "actualCustomerDataProcessed": false,
+      "automaticDeletionImplemented": false
+    },
+    "earlierResponseOnlyApprovalPreservedAsHistoricalEvent": true
+  },
+  "priorObservedSettings": {
+    "source": "web/release-prep/legal-navigation/PRIVACY-FACTS-RESOLVED.json",
+    "sourceSha256": "669782304139ad4a5052cc808932a7ddbb5a70791bcd33120bc89e491057e165",
+    "observedOnUtc": "2026-11-24",
+    "sourceCodeBaseline": "ab960b8889b91ec27b47f1d336b5dcaf6b381b55",
+    "resolvedGateStates": {
+      "P1": "partial",
+      "P2": "partial",
+      "P4": "sign-in-required"
+    },
+    "currentAccountSettingsRequeried": false,
+    "productionRowsOrRawLogsReadByThisWork": false,
+    "openaiActualOrganizationConfirmed": false,
+    "openaiActualProjectConfirmed": false,
+    "providerDefaultsUsedAsAccountValues": false
+  },
+  "p5Resolution": {
+    "state": "partial-operating-choices-approved",
+    "closed": [
+      "request handler",
+      "initial response target",
+      "maximum minimal case-ledger retention and earlier erasure",
+      "original message and sensitive attachment separation"
+    ],
+    "open": [
+      "formal privacy-officer designation",
+      "actual access controls and ownership-verified handling",
+      "business calendar and operating hours",
+      "effective date",
+      "actual cleanup process and mail-provider conditions"
+    ],
+    "completeRequestHandlingClaimed": false
+  },
+  "currentUpdateSources": [
+    {
+      "path": "web/release-prep/launch-continuation/privacy-ops/privacy-operations.json",
+      "sha256": "cc60c60403308c812a648ce5edaed8b5c8e0e90c6c7d3749f503cac56ddd4282",
+      "commit": "e521357baf68fc0448ce2739acd7ce9b14341d1a"
+    },
+    {
+      "path": "web/release-prep/legal-navigation/PRIVACY-FACTS-RESOLVED.json",
+      "sha256": "669782304139ad4a5052cc808932a7ddbb5a70791bcd33120bc89e491057e165",
+      "commit": "e521357baf68fc0448ce2739acd7ce9b14341d1a"
+    },
+    {
+      "path": "web/qa/legal-runtime-integration-2026-11-25.json",
+      "sha256": "b76cd501a3adb5de8fccd019599cc06e78c3b43aa7e16ae69baf0c4d18f3f4fc",
+      "commit": "e521357baf68fc0448ce2739acd7ce9b14341d1a"
+    },
+    {
+      "path": "web/src/App.tsx",
+      "sha256": "c74d3c4650f91ba4a9e8d41c8435b68f49be94fe0185b448ee027f1a04af8d7d",
+      "commit": "e521357baf68fc0448ce2739acd7ce9b14341d1a"
+    },
+    {
+      "path": "web/src/screens/AboutScreen.tsx",
+      "sha256": "f53db409500b426509122d4dfb9566c9d5435d4414345b84627982d62a30d02d",
+      "commit": "e521357baf68fc0448ce2739acd7ce9b14341d1a"
+    }
+  ],
+  "baselineArtifactSha256": [
+    {
+      "path": "web/release-assets/legal/privacy.html",
+      "sha256": "809ff4e3bffe196ff9175c28cbc2c295d199b3822aa5d34e8d7ed864c8cb7340"
+    },
+    {
+      "path": "web/release-assets/legal/delete-data.html",
+      "sha256": "32c3dfa674e84e85e538db51fd07475805301b8dd2d5921339341f6bf4366fe1"
+    },
+    {
+      "path": "web/release-assets/legal/PRIVACY-RELEASE-REVIEW.md",
+      "sha256": "be1fc664d68e1339ad011b40255f3b991731dfb4ec20e50f96fe26bad66b21c1"
+    },
+    {
+      "path": "web/release-assets/legal/privacy-evidence.json",
+      "sha256": "c63b7b6f0e3551ae07f7d68cb1fc4bf9ba47b017da3e803521157f72245aab96"
+    },
+    {
+      "path": "web/src/legal/legalContent.ts",
+      "sha256": "1352b2aec6ca7ccc34430b3b1035868260550ce83ec391cc883b640e7f523f89"
+    }
+  ],
+  "historicalValidation": {
+    "checkedAtUtc": "2026-11-24",
+    "originalEvidence": {
+      "browserRenderPerformed": false,
+      "mailReceiptTestPerformed": false,
+      "publicUrlNetworkTestPerformed": false,
+      "fullAppTestsRepeated": false,
+      "staticStructureCheckPassed": true,
+      "staticValidationReport": "static-document-validation.json",
+      "staticCheckCountPerHtml": 21
+    },
+    "historicalStaticReportSha256": "e7dd77e5e42913c78501c4f44b2319c972afdeae5f60437d01f4f49e7e5bdf84",
+    "reviewedCheckNames": [
+      "balancedHtml",
+      "koreanLanguage",
+      "utf8",
+      "responsiveViewport",
+      "singleMainAndH1",
+      "noDuplicateIds",
+      "noMissingFragmentLinks",
+      "localDocumentLinksResolve",
+      "noScriptsFormsEmbeds",
+      "noAutomaticExternalResources",
+      "noInlineEventHandlers",
+      "safeAnchorSchemes",
+      "mailRecipientExact",
+      "noPrefilledSensitiveMailBody",
+      "draftNoticeAndNoindex",
+      "noFabricatedEffectiveDate",
+      "skipLink",
+      "keyboardFocusStyle",
+      "responsiveRules",
+      "printRules",
+      "logicalHeadingSteps"
+    ],
+    "notReusedAsCurrentPassEvidence": true
   }
 }

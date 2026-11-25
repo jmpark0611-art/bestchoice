@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "recordedAtUtc": "2026-11-25T03:30:51.669006+00:00",
+  "recordedAtUtc": "2026-11-25T03:47:34.154997+00:00",
   "recordedOnKst": "2026-11-25",
-  "status": "draft-runtime-integrated-all-three-native-workflows-passed-not-release-ready",
+  "status": "approved-support-wording-aligned-pending-exact-source-native-ci-not-release-ready",
   "repository": "jmpark0611-art/bestchoice",
   "branch": "codex/genie-android-native-check-20261123",
   "baseline": {
@@ -34,7 +34,9 @@
     "node": "v24.22.3",
     "configuration": "genie-test.invalid",
     "evidence": "../release-prep/legal-navigation/verification.json",
-    "implementationPatchSha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08"
+    "implementationPatchSha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08",
+    "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+    "scopeNote": "Historical proof of the original six files at source 66010c2. The new support copy changes legalContent.ts and does not reuse this as a current-content pass."
   },
   "newNativeVerification": {
     "status": "passed-six-isolated-android-fixture-cases",
@@ -115,7 +117,8 @@
         "matchMediaDark": true,
         "emailSelectionMatches": true
       }
-    ]
+    ],
+    "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70"
   },
   "ciRuns": [
     {
@@ -168,7 +171,7 @@
     "newSignedCandidateCreated": false
   },
   "operationPreparation": {
-    "migrationEvidence": "../release-prep/launch-continuation/migration-readiness.json",
+    "migrationEvidence": "../release-prep/launch-continuation/server-readiness-20261125T033830Z.json",
     "supportProcedure": "../release-prep/launch-continuation/privacy-ops/PRIVACY-REQUEST-RUNBOOK.md",
     "replyTemplateCount": 8,
     "unapprovedOperatingDecisionCount": 0,
@@ -190,7 +193,8 @@
     "vercelTeamId": "team_XKy1dxRwpPHathhnFHUbCidT",
     "branchAutoDeploymentDisabledInSource": true,
     "preIntegrationBranchDeploymentCount": 0,
-    "postIntegrationBranchDeploymentCount": 0
+    "postIntegrationBranchDeploymentCount": 0,
+    "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70"
   },
   "scope": {
     "fullHistoricalSuiteRepeated": false,
@@ -212,8 +216,8 @@
   "remainingGates": [
     "Finalize provider data handling facts and prepare the already-adopted support procedure for operation, including business calendar and effective date.",
     "Publish finalized privacy resources and verify actual URLs through separately authorized execution.",
-    "Restore a verified migration execution path and reconcile prior requests before the two authorized additive migrations.",
-    "Verify this app package, version and upload-certificate linkage in authenticated Play Console.",
+    "Restore a verified migration execution path and reconcile prior requests before the two authorized additive migrations; 2026-11-25 03:38 UTC metadata still shows no new objects.",
+    "Register this app through the authorized Play flow, then verify package, version and upload-certificate linkage; current authenticated account list and package search contain no target app.",
     "Create and verify a refreshed exact signed candidate after final source closure, then test physical-device behavior and applicable isolated real-backend flows.",
     "Prepare actual final-candidate screenshots and execute the applicable approved release flow."
   ],
@@ -293,7 +297,64 @@
   "sourceSnapshot": {
     "fileCount": 162,
     "sha256": "ad9ebec64f269692a2b5adfa3d8b5bbf46550222bc442889dd5f63402f822a46",
-    "evidence": "../release-prep/launch-continuation/source-snapshot-66010c2.json"
+    "evidence": "../release-prep/launch-continuation/source-snapshot-66010c2.json",
+    "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70"
   },
-  "ciBuildEvidence": "../release-prep/launch-continuation/ci-build-results.json"
+  "ciBuildEvidence": "../release-prep/launch-continuation/ci-build-results.json",
+  "originalIntegrationSourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+  "policyContentAlignment": {
+    "status": "local-changes-reviewed-awaiting-exact-source-ci",
+    "baselineCommit": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
+    "baselineTree": "f551420fe633e0a32b42d104cee1281e13b551bb",
+    "sourceCommit": null,
+    "runtimeTextSource": "web/src/legal/legalContent.ts",
+    "runtimeContentSha256": "ecca3ba0675d72276c0c91a1db5ce21e9e0179b3d496fcaa41248257547929a9",
+    "scope": "Align the three user-approved support choices in two standalone HTML drafts and the in-app legal text; preserve routes, components, styles, metadata, labels, API and database behavior.",
+    "approvedChoices": {
+      "requestHandler": "박지민",
+      "firstResponseTargetBusinessDays": 1,
+      "minimalCaseLedgerMaximumDaysAfterClosure": 30,
+      "earlierErasureWhenUnnecessary": true,
+      "originalMessagesAndSensitiveAttachmentsSeparate": true
+    },
+    "unchangedUnresolvedFacts": [
+      "privacy-officer title",
+      "business calendar and operating hours",
+      "effective date and final public URLs",
+      "provider and authentication/log/backup retention",
+      "actual support operation and ownership verification"
+    ],
+    "independentReview": {
+      "reviewer": "migration_connection_diagnosis",
+      "blockingIssuesFound": false,
+      "runtimeContentSha256": "ecca3ba0675d72276c0c91a1db5ce21e9e0179b3d496fcaa41248257547929a9",
+      "privacyHtmlSha256": "1ba1df6b9fcc2175cea740c3f2e569e68f1bafd9130956fdcac0e0465c430fd3",
+      "deletionHtmlSha256": "e1373e89644759733cf992f34d06b142cdc5d21849ca79d4e4ee800b2d395309",
+      "newApiOrBehaviorIntroduced": false
+    },
+    "currentStaticEvidence": "../release-assets/legal/privacy-evidence.json",
+    "priorNativeProofNotReusedAsCurrentPass": true,
+    "ciRuns": [],
+    "publicPolicyFinalized": false,
+    "publicPolicyPublished": false,
+    "newSignedCandidateCreated": false,
+    "preservedSignedCandidateIncludesThisUpdate": false,
+    "sourceSnapshot": {
+      "fileCount": 162,
+      "sha256": "d8fa49d8a1013f5f163442d901cde584e82a3b6f6a6b47df30b5ee3b8ff20e26",
+      "evidence": "../release-prep/launch-continuation/policy-source-snapshot.json"
+    },
+    "staticStructureChecks": {
+      "htmlChecksPerFile": 9,
+      "bothPassed": true,
+      "otherRuntimeSourceFilesByteIdentical": 56,
+      "evidence": "../release-assets/legal/privacy-evidence.json"
+    }
+  },
+  "playConsoleObservation": {
+    "status": "authenticated-read-complete-no-target-app-found-in-inspected-account",
+    "evidence": "../release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
+    "appCreationPerformed": false,
+    "versionOrCertificateConfirmed": false
+  }
 }
