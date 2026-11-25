@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "kind": "bounded-read-only-pre-apply-readiness-update",
+  "preparedAtUtc": "2026-11-25T01:44:10.901Z",
+  "projectId": "njrtcxohbkfgrgwhlvua",
+  "preparationBranchHead": {
+    "value": "818655e10fe00b65da8bfe64f77e0d928429eb9d",
+    "source": "parent-provided; not fetched by this check"
+  },
+  "previousEvidence": {
+    "path": "/workspace/scratch/59b55f9d68c3/validation/genie-legal-integration-20261125/database/migration-diagnosis.json",
+    "sha256": "ab47efc703428f427bce533d803472b652ac9297a78fc0f7369a1d86537f7a64",
+    "observedAtUtc": "2026-11-24 21:24:40.906863+00"
+  },
+  "currentCatalogAndActivity": {
+    "checked_at_utc": "2026-11-25 01:42:11.605901+00",
+    "schemas": [
+      {
+        "name": "genie_question_safety_private",
+        "exists": false
+      },
+      {
+        "name": "genie_reporting_private",
+        "exists": false
+      }
+    ],
+    "public_functions": [
+      {
+        "name": "vs_clear_question_author_blocks",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_report_question",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_report_result",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_set_question_author_block",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_shared_poll_guarded",
+        "overload_count": 0
+      },
+      {
+        "name": "vs_vote_guarded",
+        "overload_count": 0
+      }
+    ],
+    "track_activities": "on",
+    "query_text_capture_limit": "1kB",
+    "has_read_all_stats_role": true,
+    "matching_activity_count": 0,
+    "matching_active_count": 0,
+    "migration_like_activity": []
+  },
+  "comparison": {
+    "schemaExistenceUnchanged": true,
+    "publicOverloadCountsUnchanged": true,
+    "matchingActivityStillZero": true,
+    "approvedSqlHashesUnchanged": true
+  },
+  "approvedSql": [
+    {
+      "path": "/workspace/scratch/59b55f9d68c3/validation/production-migration-cli/supabase/migrations/20261123161249_genie_result_reporting.sql",
+      "bytes": 9989,
+      "sha256": "92d40ba68d582bd442ff8d0b3b7d2b70759a2b7b0bf9c3d5fe8f7ad1516a89b6"
+    },
+    {
+      "path": "/workspace/scratch/59b55f9d68c3/validation/production-migration-cli/supabase/migrations/20261123161257_genie_question_safety.sql",
+      "bytes": 16653,
+      "sha256": "fc424dadada0dfd074b39dfb12c835adc58ad9880d0637e6370844f4513c9698"
+    }
+  ],
+  "officialSources": [
+    {
+      "url": "https://status.supabase.com/",
+      "ref": "turn790628075view0",
+      "observation": "The inspected status page still lists the Nov 13–16 API degradation incident as monitoring."
+    },
+    {
+      "url": "https://status.supabase.com/incidents/01M85A4AS1YN8A7ZZEFED974TR",
+      "ref": "turn485156477view0",
+      "observation": "The incident narrative describes Nov 13–16 delays/timeouts. It does not identify the Nov 24 request or state that its completion path has recovered."
+    },
+    {
+      "url": "https://supabase.com/docs/guides/ai-tools/mcp",
+      "ref": "turn485156477view3",
+      "observation": "The official MCP guide describes apply_migration and conditional destructive-SQL confirmations. It does not establish the current client's confirmation state or resolve the observed exec-host replacement."
+    },
+    {
+      "url": "https://status.supabase.com/history",
+      "ref": "turn790628075search0",
+      "observation": "A fresh targeted search did not surface a new directly relevant Nov 25 migration recovery notice. Search coverage is not exhaustive."
+    }
+  ],
+  "outcome": {
+    "causeProven": false,
+    "newDirectRecoveryEvidenceFound": false,
+    "retryConditionsImproved": false,
+    "decisionKorean": "재개조건 개선 없음",
+    "observedFailureCategory": "Prior apply completion response lost after exec host/runtime replacement; not established as a SQL error or automatic approval rejection.",
+    "additionalApplyAttemptMade": false,
+    "originalAuthorizationRepeated": false
+  },
+  "limitations": [
+    "A point-in-time absence of committed schema objects does not establish termination of older upstream requests.",
+    "pg_stat_activity SQL visibility is limited to 1 kB; zero matches does not exclude an upstream queue or a statement whose identifying text is outside the captured prefix.",
+    "Official documentation of general confirmation behavior is not evidence that this user's request is waiting on a prompt or that confirmation is its cause.",
+    "No plugin permissions, confirmation settings, credentials, API keys, or external configuration were read or changed."
+  ],
+  "scope": {
+    "catalogSelectCount": 1,
+    "migrationListCalls": 0,
+    "projectHealthCalls": 0,
+    "logQueries": 0,
+    "advisorsCalls": 0,
+    "applicationRowsRead": false,
+    "productionUsersCreated": false,
+    "applyMigration": false,
+    "ddl": false,
+    "dml": false,
+    "settingsChanges": false,
+    "fullPreflightRerun": false
+  },
+  "readOnlyQuery": "-- PostgreSQL catalog/activity only. No application rows or raw activity query text.\nwith expected_schemas(name) as (values ('genie_reporting_private'),('genie_question_safety_private')),\nexpected_public_functions(name) as (values ('vs_report_result'),('vs_report_question'),('vs_set_question_author_block'),('vs_clear_question_author_blocks'),('vs_shared_poll_guarded'),('vs_vote_guarded')),\nmatching_activity as (\n select pid,state,query_start,xact_start,wait_event_type,wait_event,\n (coalesce(application_name,'')<>'') as application_name_present,\n (pg_catalog.lower(coalesce(application_name,'')) like '%mcp%') as application_name_mentions_mcp,\n (pg_catalog.lower(coalesce(application_name,'')) like '%pg-meta%' or pg_catalog.lower(coalesce(application_name,'')) like '%pgmeta%') as application_name_mentions_pgmeta,\n (pg_catalog.lower(ltrim(query)) like 'select%' or pg_catalog.lower(ltrim(query)) like 'with%') as starts_with_read_query\n from pg_catalog.pg_stat_activity\n where datname=pg_catalog.current_database() and pid<>pg_catalog.pg_backend_pid()\n and pg_catalog.lower(query) similar to '%(genie_reporting_private|genie_question_safety_private|genie_result_reporting|genie_question_safety|vs_report_result|vs_report_question|vs_set_question_author_block|vs_clear_question_author_blocks|vs_shared_poll_guarded|vs_vote_guarded)%'\n), bounded_activity as (\n select pid,state,pg_catalog.round(extract(epoch from (pg_catalog.clock_timestamp()-query_start))::numeric,3) as query_age_seconds,\n (xact_start is not null) as transaction_open,wait_event_type,wait_event,application_name_present,application_name_mentions_mcp,application_name_mentions_pgmeta,starts_with_read_query,\n pg_catalog.pg_blocking_pids(pid) as blocking_pids,\n (select count(*) from pg_catalog.pg_locks l where l.pid=matching_activity.pid and not l.granted) as ungranted_lock_count\n from matching_activity order by query_start nulls last,pid limit 20\n)\nselect pg_catalog.clock_timestamp() as checked_at_utc,\n (select jsonb_agg(jsonb_build_object('name',e.name,'exists',exists(select 1 from pg_catalog.pg_namespace n where n.nspname=e.name)) order by e.name) from expected_schemas e) as schemas,\n (select jsonb_agg(jsonb_build_object('name',e.name,'overload_count',(select count(*) from pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname=e.name)) order by e.name) from expected_public_functions e) as public_functions,\n pg_catalog.current_setting('track_activities') as track_activities,\n pg_catalog.current_setting('track_activity_query_size') as query_text_capture_limit,\n pg_catalog.pg_has_role(current_user,'pg_read_all_stats','USAGE') as has_read_all_stats_role,\n (select count(*) from matching_activity) as matching_activity_count,\n (select count(*) from matching_activity where state='active') as matching_active_count,\n coalesce((select jsonb_agg(to_jsonb(a) order by query_age_seconds desc nulls last,pid) from bounded_activity a),'[]'::jsonb) as migration_like_activity;"
+}

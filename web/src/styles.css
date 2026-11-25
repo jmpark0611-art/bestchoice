@@ -238,3 +238,26 @@ h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 18px; 
 .report-consent, .setting-toggle { display: flex; align-items: flex-start; gap: 10px; min-height: 44px; padding: 8px 0; cursor: pointer; }
 .report-consent input, .setting-toggle input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--a); }
 .decision-report .btn.text { min-height: 44px; }
+
+/* In-app legal drafts: readable text, local navigation, and selectable contact. */
+.legal-entry, .legal-document, .legal-heading, .legal-section, .legal-contact, .legal-links {
+  display: flex; flex-direction: column; gap: 12px; min-width: 0; overflow-wrap: anywhere;
+}
+.legal-entry, .legal-review {
+  padding: 14px; border: 2px solid var(--ink); border-radius: 12px; background: var(--a-weak);
+}
+.legal-entry p, .legal-document p { margin: 0; }
+.legal-entry p { font-size: 14px; }
+.legal-links .btn { min-width: 0; min-height: 44px; white-space: normal; overflow-wrap: anywhere; }
+.legal-back { display: flex; align-items: center; min-height: 44px; padding: 8px 0; overflow-wrap: anywhere; }
+.legal-document { gap: 24px; line-height: 1.75; }
+.legal-document h1 { font-size: 28px; line-height: 1.35; }
+.legal-document h2 { font-size: 20px; line-height: 1.45; }
+.legal-review h2 { margin-bottom: 10px; font-size: 18px; }
+.legal-facts { display: flex; flex-direction: column; gap: 16px; margin: 0; }
+.legal-facts > div { padding-left: 12px; border-left: 3px solid var(--a); }
+.legal-facts dt { font-weight: 700; }
+.legal-facts dd { margin: 4px 0 0; }
+.legal-steps { display: flex; flex-direction: column; gap: 10px; margin: 0; padding-left: 24px; }
+.legal-contact { padding-top: 16px; border-top: 2px solid var(--ink); }
+.legal-contact-address { user-select: text; -webkit-user-select: text; overflow-wrap: anywhere; }

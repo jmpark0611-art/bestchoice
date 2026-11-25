@@ -8,9 +8,11 @@ import static org.junit.Assert.assertTrue;
 import android.accessibilityservice.AccessibilityService;
 import android.app.Instrumentation;
 import android.app.UiAutomation;
+import android.app.UiModeManager;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -27,6 +29,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Rule;
 import org.junit.Test;
@@ -316,6 +319,120 @@ public class GenieDeviceCheck {
             + " && b.value===" + JSONObject.quote(B) + " && n.value===" + JSONObject.quote(NOTE) + "; })()";
     }
 
+    private String legalRendered(String path) {
+        if ("/about".equals(path)) return ABOUT_RENDERED;
+        String expectedTitle = "/privacy".equals(path) ? "개인정보처리방침" : "데이터 삭제 안내";
+        return "(() => {const h=document.querySelector('h1#legal-title');if(!h || h.textContent.trim()!=="
+            + JSONObject.quote(expectedTitle) + ")return false;const r=h.getBoundingClientRect(),s=getComputedStyle(h);"
+            + "return r.width>0 && r.height>0 && s.visibility==='visible' && Number(s.opacity)>0;})()";
+    }
+
+    private void awaitLegalRoute(String path) throws Exception {
+        awaitTrue("location.origin==='https://localhost' && location.pathname===" + JSONObject.quote(path),
+            "LEGAL_ROUTE_TIMEOUT: " + path);
+        awaitTrue(legalRendered(path), "LEGAL_HEADING_NOT_RENDERED: " + path);
+        if (!"/about".equals(path)) {
+            awaitTrue("document.activeElement===document.getElementById('legal-title')",
+                "LEGAL_TITLE_NOT_FOCUSED: " + path);
+        }
+    }
+
+    private JSONObject tapLegalLink(String selector, String from, String to) throws Exception {
+        assertEquals("LEGAL_TOUCH_WRONG_START: " + from, "true",
+            evaluate("location.pathname===" + JSONObject.quote(from)));
+        JSONObject planned = tapWebElement(selector);
+        String click = "(() => {const events=window.__genieTapEvents;return Array.isArray(events)"
+            + "?events.find(e=>e.type==='click' && e.trusted===true && e.anchorPath==="
+            + JSONObject.quote(to) + ")??null:null;})()";
+        try {
+            awaitTrue("(" + click + ")!==null", "LEGAL_TRUSTED_TOUCH_MISSING: " + to);
+            JSONObject trustedClick = new JSONObject(evaluate(click));
+            awaitLegalRoute(to);
+            assertEquals("LEGAL_USER_ACTIVATION_MISSING: " + to, "true",
+                evaluate("navigator.userActivation.hasBeenActive"));
+            boolean headingFocused = "true".equals(evaluate("document.activeElement===document.getElementById("
+                + JSONObject.quote("/about".equals(to) ? "about-title" : "legal-title") + ")"));
+            return new JSONObject().put("from", from).put("to", to).put("trustedClick", trustedClick)
+                .put("headingVisible", true).put("headingFocused", headingFocused);
+        } catch (AssertionError failure) {
+            throw navigationFailure(failure, "legalTouch=" + planned, true);
+        }
+    }
+
+    private JSONObject legalSystemBack(String from, String to) throws Exception {
+        assertEquals("LEGAL_BACK_WRONG_START: " + from, "true",
+            evaluate("location.pathname===" + JSONObject.quote(from)));
+        JSONObject before = awaitNativeBackReady();
+        UiAutomation automation = instrumentation.getUiAutomation();
+        assertNotNull("Android system UI automation is unavailable", automation);
+        assertTrue("LEGAL_SYSTEM_BACK_REJECTED: " + from,
+            automation.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK));
+        try {
+            awaitLegalRoute(to);
+        } catch (AssertionError failure) {
+            throw navigationFailure(failure, "legalBackBefore=" + before, true);
+        }
+        boolean headingFocused = "true".equals(evaluate("document.activeElement===document.getElementById("
+            + JSONObject.quote("/about".equals(to) ? "about-title" : "legal-title") + ")"));
+        return new JSONObject().put("from", from).put("to", to).put("accepted", true)
+            .put("systemAction", "GLOBAL_ACTION_BACK").put("headingVisible", true)
+            .put("headingFocused", headingFocused).put("before", before);
+    }
+
+    private JSONObject legalDocumentMetrics(String path) throws Exception {
+        awaitLegalRoute(path);
+        awaitTrue("document.fonts.status==='loaded'", "LEGAL_FONTS_NOT_READY: " + path);
+        awaitTrue("matchMedia('(prefers-color-scheme: dark)').matches", "LEGAL_DARK_MEDIA_NOT_OBSERVED: " + path);
+        // The host changes only the disposable emulator's UiModeManager before
+        // this invocation. Never override matchMedia, CSS, WebSettings or theme.
+        // https://developer.android.com/develop/ui/views/layout/webapps/dark-theme
+        JSONObject measured = new JSONObject(evaluate("(() => {"
+            + "const h=document.getElementById('legal-title'),email=document.querySelector('.legal-contact-address');"
+            + "const links=[...document.querySelectorAll('.legal-document nav[aria-label=\"관련 안내\"] a')];"
+            + "const controls=[...document.querySelectorAll('a,button,input,select,textarea')]"
+            + ".map(e=>e.getBoundingClientRect()).filter(r=>r.width>0&&r.height>0);"
+            + "const emailStyle=email?getComputedStyle(email):null,er=email?.getBoundingClientRect();"
+            + "const headingFocused=document.activeElement===h;let emailSelectionMatches=false;"
+            + "const selection=window.getSelection();if(email && selection){const r=document.createRange();"
+            + "r.selectNodeContents(email);selection.removeAllRanges();selection.addRange(r);"
+            + "emailSelectionMatches=email.textContent.trim().length>0 && selection.toString().trim()===email.textContent.trim();"
+            + "selection.removeAllRanges();}"
+            + "return {path:location.pathname,width:innerWidth,"
+            + "scrollWidth:Math.max(document.documentElement.scrollWidth,document.body.scrollWidth),"
+            + "outsideControls:controls.filter(r=>r.left < -1 || r.right > innerWidth+1).length,"
+            + "relatedLinkCount:links.length,relatedLinkPaths:links.map(e=>new URL(e.href).pathname),"
+            + "minRelatedLinkHeight:links.length?Math.min(...links.map(e=>e.getBoundingClientRect().height)):0,"
+            + "emailVisible:!!er && er.width>0 && er.height>0 && emailStyle.visibility==='visible',"
+            + "emailUserSelect:emailStyle?.userSelect??'',emailWebkitUserSelect:emailStyle?.webkitUserSelect??'',"
+            + "emailSelectionMatches,headingFocused,matchMediaDark:matchMedia('(prefers-color-scheme: dark)').matches,"
+            + "colorScheme:getComputedStyle(document.documentElement).colorScheme,"
+            + "bodyBackground:getComputedStyle(document.body).backgroundColor,bodyColor:getComputedStyle(document.body).color,"
+            + "surfaceBackground:getComputedStyle(document.querySelector('.screen')).backgroundColor};})()"));
+        UiModeManager modes = instrumentation.getTargetContext().getSystemService(UiModeManager.class);
+        assertNotNull("LEGAL_UI_MODE_SERVICE_MISSING", modes);
+        int nightMask = activity.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        measured.put("nativeNightMask", nightMask).put("configuredNightMode", modes.getNightMode());
+        String observed = "; observed=" + measured;
+        assertEquals("LEGAL_NATIVE_DARK_NOT_OBSERVED" + observed, Configuration.UI_MODE_NIGHT_YES, nightMask);
+        assertEquals("LEGAL_CONFIGURED_DARK_NOT_OBSERVED" + observed, UiModeManager.MODE_NIGHT_YES, modes.getNightMode());
+        assertTrue("LEGAL_DARK_MEDIA_NOT_OBSERVED" + observed, measured.getBoolean("matchMediaDark"));
+        assertEquals("LEGAL_DARK_CSS_NOT_APPLIED" + observed, "dark", measured.getString("colorScheme"));
+        assertEquals("LEGAL_DARK_BACKGROUND_MISMATCH" + observed, "rgb(17, 17, 17)", measured.getString("bodyBackground"));
+        assertEquals("LEGAL_DARK_TEXT_MISMATCH" + observed, "rgb(255, 255, 255)", measured.getString("bodyColor"));
+        assertEquals("LEGAL_DARK_SURFACE_MISMATCH" + observed, "rgb(29, 29, 29)", measured.getString("surfaceBackground"));
+        assertEquals("LEGAL_VIEWPORT_NOT_320" + observed, 320, measured.getInt("width"));
+        assertTrue("LEGAL_HORIZONTAL_OVERFLOW" + observed, measured.getDouble("scrollWidth") <= 321);
+        assertEquals("LEGAL_CONTROL_OUTSIDE_VIEWPORT" + observed, 0, measured.getInt("outsideControls"));
+        assertEquals("LEGAL_RELATED_LINKS_MISSING" + observed, 2, measured.getInt("relatedLinkCount"));
+        assertTrue("LEGAL_LINK_TOUCH_TARGET_TOO_SMALL" + observed, measured.getDouble("minRelatedLinkHeight") >= 44);
+        assertTrue("LEGAL_EMAIL_NOT_VISIBLE" + observed, measured.getBoolean("emailVisible"));
+        assertTrue("LEGAL_EMAIL_SELECTION_DISABLED" + observed,
+            "text".equals(measured.getString("emailUserSelect")) || "text".equals(measured.getString("emailWebkitUserSelect")));
+        assertTrue("LEGAL_EMAIL_SELECTION_FAILED" + observed, measured.getBoolean("emailSelectionMatches"));
+        assertTrue("LEGAL_TITLE_NOT_FOCUSED" + observed, measured.getBoolean("headingFocused"));
+        return measured;
+    }
+
     @Test
     public void launchBackNarrowAndPrepareDraft() throws Exception {
         launch();
@@ -402,5 +519,32 @@ public class GenieDeviceCheck {
         JSONObject evidence = layout();
         evidence.put("explicitRestoreRequired", true).put("exactFieldsRestored", 3);
         report("draft-restore-after-force-stop", evidence);
+    }
+
+    @Test
+    public void legalNavigationNarrowAndDark() throws Exception {
+        launch();
+        awaitTrue("location.origin==='https://localhost' && location.pathname==='/' && !!document.querySelector('a[href=\"/about\"]')",
+            "LEGAL_HOME_ENTRY_MISSING");
+        // The draft prompt may still be present after the separate restore test.
+        // Use its real About link without reading, restoring or clearing drafts.
+        JSONArray forward = new JSONArray();
+        forward.put(tapLegalLink("a[href=\"/about\"]", "/", "/about"));
+        forward.put(tapLegalLink(".legal-entry a[href=\"/privacy\"]", "/about", "/privacy"));
+        forward.put(tapLegalLink(".legal-document nav a[href=\"/delete-data\"]", "/privacy", "/delete-data"));
+        JSONArray back = new JSONArray();
+        back.put(legalSystemBack("/delete-data", "/privacy"));
+        back.put(legalSystemBack("/privacy", "/about"));
+        report("legal-navigation-native-back", new JSONObject().put("schemaVersion", 1)
+            .put("forward", forward).put("back", back).put("externalMailAppTested", false));
+
+        JSONArray documents = new JSONArray();
+        tapLegalLink(".legal-entry a[href=\"/privacy\"]", "/about", "/privacy");
+        documents.put(legalDocumentMetrics("/privacy"));
+        tapLegalLink(".legal-document nav a[href=\"/delete-data\"]", "/privacy", "/delete-data");
+        documents.put(legalDocumentMetrics("/delete-data"));
+        report("legal-narrow-dark", new JSONObject().put("schemaVersion", 1).put("documents", documents)
+            .put("emailSelectionMethod", "DOM-range-and-computed-user-select")
+            .put("externalMailAppTested", false));
     }
 }

@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-25T02:08:24.180852+00:00",
+  "recordedOnKst": "2026-11-25",
+  "status": "draft-runtime-integrated-native-verification-pending",
+  "repository": "jmpark0611-art/bestchoice",
+  "branch": "codex/genie-android-native-check-20261123",
+  "baseline": {
+    "commit": "818655e10fe00b65da8bfe64f77e0d928429eb9d",
+    "tree": "5777b3fb5d24cbc6d62f49f5560f097cf8f7f99a",
+    "blobCount": 345,
+    "materializedExactFiles": 255
+  },
+  "runtimeIntegration": {
+    "routes": [
+      "/privacy",
+      "/delete-data"
+    ],
+    "draftNoticePreserved": true,
+    "publicPolicyFinalized": false,
+    "publicPolicyPublished": false,
+    "publicPolicyUrl": null,
+    "policyEffectiveDate": null,
+    "newBackendCallIntroduced": false,
+    "sourceCommit": null,
+    "scope": "New draft read-only legal screens and About navigation in the approved development branch."
+  },
+  "priorFocusedValidation": {
+    "repeatedThisTurn": false,
+    "uiPassed": 6,
+    "uiSourceFilesByteIdenticalToPriorPassingResult": true,
+    "typeCheckPassed": true,
+    "syntheticWebBuildPassed": true,
+    "node": "v24.22.3",
+    "configuration": "genie-test.invalid",
+    "evidence": "../release-prep/legal-navigation/verification.json",
+    "implementationPatchSha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08"
+  },
+  "newNativeVerification": {
+    "status": "pending",
+    "existingCaseCount": 4,
+    "newCaseCount": 2,
+    "expectedTotalCases": 6,
+    "allFourCasesPassed": false,
+    "allRequiredCasesPassed": false,
+    "physicalDeviceValidated": false,
+    "signedReleaseValidated": false,
+    "externalMailClientValidated": false,
+    "productionBackendValidated": false,
+    "isolatedFixtureOnly": true,
+    "workflowRunId": null,
+    "workflowJobId": null,
+    "caseIds": [
+      "launch",
+      "native-back",
+      "narrow-screen",
+      "draft-restore-after-force-stop",
+      "legal-navigation-native-back",
+      "legal-narrow-dark"
+    ],
+    "driverGuards": {
+      "command": "node --test scripts/android-device-check.test.mjs",
+      "node": "v24.22.3",
+      "passed": 28,
+      "failed": 0,
+      "executor": "local isolated working source",
+      "newGuardTests": 8,
+      "oldCaseBodiesUnchanged": true,
+      "realAndroidExecutedLocally": false,
+      "evidence": "../release-prep/launch-continuation/android-legal-driver-tests.json"
+    },
+    "legalLightThemeLayoutValidated": false,
+    "independentSourceReview": {
+      "reviewedAtUtc": "2026-11-25T02:11:45.021318+00:00",
+      "reviewer": "operational_release_records",
+      "blockingIssuesFound": false,
+      "existingFourCaseMethodBodiesUnchanged": true,
+      "networkBoundaryUnchanged": true,
+      "nativeDarkAndCssEvidenceRequired": true,
+      "nightModeRestorationRequired": true,
+      "actualDeviceRuntimeNotClaimed": true,
+      "workflowLabelsAlignedByRoot": true
+    }
+  },
+  "ciRuns": [],
+  "nodeScope": {
+    "availableLocalExecutable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "version": "v24.22.3",
+    "node22Executed": false,
+    "node22InstalledThisTurn": false,
+    "checkedExecutableScope": "PATH node, CODEX_PRIMARY_RUNTIME_NODE and /usr/bin/node; resolved to one existing executable",
+    "vercelProjectConfiguredNodeVersion": "22.x",
+    "vercelSettingDoesNotEstablishSourceValidation": true
+  },
+  "preservedCandidate": {
+    "sha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "sourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "includesNewLegalRoutes": false,
+    "newSignedCandidateCreated": false
+  },
+  "operationPreparation": {
+    "migrationEvidence": "../release-prep/launch-continuation/migration-readiness.json",
+    "supportProcedure": "../release-prep/launch-continuation/privacy-ops/PRIVACY-REQUEST-RUNBOOK.md",
+    "replyTemplateCount": 8,
+    "unapprovedOperatingDecisionCount": 3,
+    "operatingChoicesAdopted": false
+  },
+  "deploymentObservation": {
+    "vercelProjectId": "prj_qJ15NyIr66vmhYfs8GNrtf5oXHRj",
+    "vercelTeamId": "team_XKy1dxRwpPHathhnFHUbCidT",
+    "branchAutoDeploymentDisabledInSource": true,
+    "preIntegrationBranchDeploymentCount": 0,
+    "postIntegrationBranchDeploymentCount": null
+  },
+  "scope": {
+    "fullHistoricalSuiteRepeated": false,
+    "dependenciesInstalledLocally": false,
+    "productionDataWritten": false,
+    "productionSettingsChangedThisTurn": false,
+    "migrationAppliedThisTurn": false,
+    "openAIAuthenticationRetried": false,
+    "playUploaded": false,
+    "storeSubmitted": false,
+    "publicWebDeployed": false,
+    "pullRequestCreated": false,
+    "defaultBranchMerged": false,
+    "releaseExportWorkflowChanged": false,
+    "releaseProfileChanged": false
+  },
+  "remainingGates": [
+    "Finalize provider data handling facts and the actual support operating decisions.",
+    "Publish finalized privacy resources and verify actual URLs through separately authorized execution.",
+    "Restore a verified migration execution path and reconcile prior requests before the two authorized additive migrations.",
+    "Verify this app package, version and upload-certificate linkage in authenticated Play Console.",
+    "Create and verify a refreshed exact signed candidate after final source closure, then test physical-device behavior and applicable isolated real-backend flows.",
+    "Prepare actual final-candidate screenshots and execute the applicable approved release flow."
+  ],
+  "changedCodeAndWorkflowFiles": [
+    {
+      "path": "web/src/App.tsx",
+      "bytes": 1196,
+      "sha256": "c74d3c4650f91ba4a9e8d41c8435b68f49be94fe0185b448ee027f1a04af8d7d",
+      "gitBlob": "de284c5c35bd385e87d4253af3ea3f1232d890bc",
+      "existedAtBaseline": true
+    },
+    {
+      "path": "web/src/screens/AboutScreen.tsx",
+      "bytes": 9874,
+      "sha256": "f53db409500b426509122d4dfb9566c9d5435d4414345b84627982d62a30d02d",
+      "gitBlob": "33db041de6427f67ad614ba659d532a157458544",
+      "existedAtBaseline": true
+    },
+    {
+      "path": "web/src/screens/LegalInfoScreen.tsx",
+      "bytes": 2981,
+      "sha256": "1e4eefd45dd2dbe43601afa3b0e07dcf4a4c74e100becddbef472bf2580b3f6f",
+      "gitBlob": "7268da14cf8672a28e7032d625ec34ba2e8495aa",
+      "existedAtBaseline": false
+    },
+    {
+      "path": "web/src/legal/legalContent.ts",
+      "bytes": 16063,
+      "sha256": "1352b2aec6ca7ccc34430b3b1035868260550ce83ec391cc883b640e7f523f89",
+      "gitBlob": "8506f83f810858e9325eedf0af95df0a1ff671cb",
+      "existedAtBaseline": false
+    },
+    {
+      "path": "web/src/styles.css",
+      "bytes": 13987,
+      "sha256": "4c024fd1024bd35ad9de5106b525ab6f83f37c5df400c7bef36315f08751f189",
+      "gitBlob": "c51812b08f357f31589188f2345eb58755ff5f33",
+      "existedAtBaseline": true
+    },
+    {
+      "path": "web/src/screens/LegalInfoScreen.integration.test.tsx",
+      "bytes": 6961,
+      "sha256": "5de8d751a6e4d955ba6c718ec714f60c6c9ac542ed30590f198a6e449ff29aef",
+      "gitBlob": "ec2e7cbe78f9a2a79a9591b7869d69621f663744",
+      "existedAtBaseline": false
+    },
+    {
+      "path": "web/android/app/src/androidTest/java/dev/local/genie/preview/GenieDeviceCheck.java",
+      "bytes": 35786,
+      "sha256": "e335fb566e4108d2443ef79ac68823fc3df75d0e5785d5d72c1097ec809cee6a",
+      "gitBlob": "9caae1faaa8ad051580fb7ea9a1ed7af8a2e9108",
+      "existedAtBaseline": true
+    },
+    {
+      "path": "web/scripts/android-device-check.mjs",
+      "bytes": 54615,
+      "sha256": "f9f12a78a350375bf912c94bd1fdf2d5fce432344d4856b1afc9752d7827e06c",
+      "gitBlob": "be45d7b2f0b0c51746e2a6b6d5a998c9042e33fb",
+      "existedAtBaseline": true
+    },
+    {
+      "path": "web/scripts/android-device-check.test.mjs",
+      "bytes": 39178,
+      "sha256": "df44387555e522718162fe6a9bad1b3607264fa72e96515dc77303dff5e7f0dd",
+      "gitBlob": "40c133b94baba5ffba8df34eae75202f7ef3b8be",
+      "existedAtBaseline": true
+    },
+    {
+      "path": ".github/workflows/android-device-check.yml",
+      "bytes": 5464,
+      "sha256": "be01b1832b1c966efd68577c8f322517dbf40c62a6254c2ad7e5d736e3358504",
+      "gitBlob": "83f76fb964c85062add83f5a93314f92b0f55999",
+      "existedAtBaseline": true
+    }
+  ]
+}

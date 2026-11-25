@@ -1,0 +1,543 @@
+{
+  "schemaVersion": 1,
+  "kind": "android-final-candidate-input-decisions-not-console-import",
+  "recordedAtUtc": "2026-11-25T01:55:18Z",
+  "evidenceBase": {
+    "repository": "jmpark0611-art/bestchoice",
+    "commit": "818655e10fe00b65da8bfe64f77e0d928429eb9d",
+    "tree": "5777b3fb5d24cbc6d62f49f5560f097cf8f7f99a",
+    "branch": "codex/genie-android-native-check-20261123",
+    "latestRemoteRefRecheckedByThisAgent": false,
+    "rootOwnsLatestRefAndRemoteWrites": true
+  },
+  "verdicts": {
+    "draftLocalIntegration": "ready",
+    "draftIntegrationOnApprovedBranch": "possible-with-three-existing-automatic-jobs-and-conditional-failure-artifact",
+    "finalPolicyComplete": false,
+    "finalCandidateInputsComplete": false,
+    "newFinalCandidateCreated": false,
+    "currentSignedCandidateContainsLegalPatch": false,
+    "readyForPlayUpload": false,
+    "readyForProductionRelease": false,
+    "iosSequence": "after-Android"
+  },
+  "currentSignedCandidate": {
+    "applicationId": "com.jmpark0611.genie",
+    "versionCode": 1,
+    "versionName": "1.0.0",
+    "sourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
+    "sha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "sizeBytes": 4161320,
+    "uploadCertificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+    "metadataEvidence": "web/ANDROID-RELEASE-PROFILE.json",
+    "currentScratchMatchingBinaryFound": false,
+    "localSearchScope": "All named .aab files in /workspace/scratch/59b55f9d68c3; archive interiors and remote file storage not searched.",
+    "olderBinaryHashesFound": [
+      "347b580ca3a3a86c50453e55adb31375b3124cdafe1cd6c790fca7ccb6a7b5c3",
+      "93c4412834df05e156028cdcccd973f18fa9d09ff7d6f0511f05e8171bf75031",
+      "c737b458e8e606bd616ee5f5b8698ac6e2ca886d04c474e3a47a1a2fffddb56c"
+    ],
+    "absenceBlocksDraftIntegration": false,
+    "absenceMeansRebuildOldCandidateRequired": false,
+    "rule": "Preserve the existing receipt. Restore and hash-check the exact old binary only if needed; never substitute an older local AAB or mark it as refreshed."
+  },
+  "legalPatch": {
+    "storedPath": "web/release-prep/legal-navigation/implementation.patch",
+    "sha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08",
+    "originalBaselineCommit": "ab960b8889b91ec27b47f1d336b5dcaf6b381b55",
+    "fileCount": 6,
+    "modifiedFiles": 3,
+    "newFiles": 3,
+    "appliesToExaminedCommitByBlobComparison": true,
+    "targetComparisons": [
+      {
+        "path": "web/src/App.tsx",
+        "baselineBlob": "5d8afe39d98a80c51122086db3d5273bb1adc991",
+        "examinedCommitBlob": "5d8afe39d98a80c51122086db3d5273bb1adc991",
+        "preparedResultBlob": "de284c5c35bd385e87d4253af3ea3f1232d890bc",
+        "preparedResultSha256": "c74d3c4650f91ba4a9e8d41c8435b68f49be94fe0185b448ee027f1a04af8d7d"
+      },
+      {
+        "path": "web/src/screens/AboutScreen.tsx",
+        "baselineBlob": "8a919f6cf56e8d9321dc0bfc073f0f4102451225",
+        "examinedCommitBlob": "8a919f6cf56e8d9321dc0bfc073f0f4102451225",
+        "preparedResultBlob": "33db041de6427f67ad614ba659d532a157458544",
+        "preparedResultSha256": "f53db409500b426509122d4dfb9566c9d5435d4414345b84627982d62a30d02d"
+      },
+      {
+        "path": "web/src/screens/LegalInfoScreen.tsx",
+        "baselineBlob": null,
+        "examinedCommitBlob": null,
+        "preparedResultBlob": "7268da14cf8672a28e7032d625ec34ba2e8495aa",
+        "preparedResultSha256": "1e4eefd45dd2dbe43601afa3b0e07dcf4a4c74e100becddbef472bf2580b3f6f"
+      },
+      {
+        "path": "web/src/legal/legalContent.ts",
+        "baselineBlob": null,
+        "examinedCommitBlob": null,
+        "preparedResultBlob": "8506f83f810858e9325eedf0af95df0a1ff671cb",
+        "preparedResultSha256": "1352b2aec6ca7ccc34430b3b1035868260550ce83ec391cc883b640e7f523f89"
+      },
+      {
+        "path": "web/src/styles.css",
+        "baselineBlob": "a3303c04f5c9bde4b6d70c455838da0a37451c47",
+        "examinedCommitBlob": "a3303c04f5c9bde4b6d70c455838da0a37451c47",
+        "preparedResultBlob": "c51812b08f357f31589188f2345eb58755ff5f33",
+        "preparedResultSha256": "4c024fd1024bd35ad9de5106b525ab6f83f37c5df400c7bef36315f08751f189"
+      },
+      {
+        "path": "web/src/screens/LegalInfoScreen.integration.test.tsx",
+        "baselineBlob": null,
+        "examinedCommitBlob": null,
+        "preparedResultBlob": "ec2e7cbe78f9a2a79a9591b7869d69621f663744",
+        "preparedResultSha256": "5de8d751a6e4d955ba6c718ec714f60c6c9ac542ed30590f198a6e449ff29aef"
+      }
+    ],
+    "runtimeSourceAppliedAtExaminedCommit": false,
+    "policyReviewLabelRequired": true,
+    "rootReportedLocalApplicationToNewWorkingCopy": true,
+    "focusedUiTestsAlreadyPassed": 6,
+    "testsOrBuildsRerunByThisTask": false,
+    "parallelNativePhase2": "Root separately assigned additional fixture cases; not yet audited or claimed complete in this plan. Bind future receipts to the final integration commit."
+  },
+  "buildInputs": [
+    {
+      "field": "GENIE_ANDROID_APPLICATION_ID",
+      "value": "com.jmpark0611.genie",
+      "status": "selected-existing-input-console-registration-unconfirmed",
+      "blocksDraftIntegration": false,
+      "blocksFinalIdentityFreeze": true,
+      "nextAction": "Inspect this package in the authenticated existing Play account; do not choose a new ID or another app's ID.",
+      "actor": "assistant-after-secure-account-access"
+    },
+    {
+      "field": "GENIE_ANDROID_VERSION_CODE",
+      "currentCandidateValue": 1,
+      "finalValue": null,
+      "status": "actual-upload-history-unconfirmed",
+      "blocksDraftIntegration": false,
+      "blocksFinalIdentityFreeze": true,
+      "nextAction": "Read all relevant app bundle/version history; keep 1 only if confirmed unused, otherwise choose the next valid greater code.",
+      "actor": "assistant-after-console-observation"
+    },
+    {
+      "field": "GENIE_ANDROID_VERSION_NAME",
+      "currentCandidateValue": "1.0.0",
+      "finalValue": null,
+      "status": "proposed-first-release-label-bind-after-version-check",
+      "blocksDraftIntegration": false,
+      "actor": "assistant"
+    },
+    {
+      "field": "VITE_SUPABASE_URL",
+      "value": "https://njrtcxohbkfgrgwhlvua.supabase.co",
+      "status": "existing-selected-production-origin-no-backend-request-in-build",
+      "operationalFlowValidated": false,
+      "actor": "assistant"
+    },
+    {
+      "field": "VITE_SUPABASE_PUBLISHABLE_KEY",
+      "value": null,
+      "expectedSha256": "04918d6318b6028779b25e77fc1289cb9dda9e982842d7783ee9ef6f6fb6de21",
+      "status": "fingerprint-known-do-not-print-or-commit-value",
+      "nextAction": "Existing loadPublishedReleaseConfig reads only public HTML/static JS and accepts only the pinned fingerprint; do not invent a key or ask for it in chat.",
+      "actor": "existing-build-helper"
+    },
+    {
+      "field": "VITE_PUBLIC_APP_URL",
+      "value": "https://genie-web-rosy.vercel.app",
+      "status": "existing-selected-origin-not-verified-final-policy-or-guarded-web",
+      "sharedWebCompatibilityVerified": false,
+      "actor": "assistant"
+    },
+    {
+      "field": "VITE_PRIVACY_URL",
+      "value": null,
+      "status": "not-a-supported-input-do-not-add",
+      "reason": "Current config rejects other VITE_* names. In-app draft routes need no new environment variable."
+    },
+    {
+      "field": "finalSourceCommit",
+      "value": null,
+      "status": "pending-runtime-and-native-phase2-freeze",
+      "nextAction": "Record the actual final commit and sourceSnapshot; never use old b8d9db6 or old CI run IDs for changed inputs.",
+      "actor": "root"
+    },
+    {
+      "field": "nativeCompileToolchain",
+      "node": "24.22.3",
+      "java": "21",
+      "compileSdk": 36,
+      "targetSdk": 36,
+      "minSdk": 24,
+      "buildTools": "35.0.0",
+      "gradle": "8.14.3-all",
+      "status": "exact-existing-workflow-inputs-current-local-sdk-cache-not-audited",
+      "actor": "CI-or-explicitly-prepared-local-environment"
+    },
+    {
+      "field": "privateSigningInputs",
+      "value": null,
+      "status": "existing-private-inputs-not-read-or-discovered-this-task",
+      "expectedCertificateSha256": "1f9dace46345078bcd9089be6c38b6259b83a4e2040611558c9e108eea22ea71",
+      "nextAction": "Use only explicit approved private keystore/access-json/alias paths at local signing; confirm actual Console upload certificate. No new key generation or reset is proposed.",
+      "actor": "authorized-local-signing"
+    },
+    {
+      "field": "finalPublicPolicyUrl",
+      "value": null,
+      "status": "blocked-unpublished-and-provider-retention-procedure-facts-unfinished",
+      "blocksDraftIntegration": false,
+      "blocksFinalCandidate": true,
+      "actor": "assistant-plus-owner-only-operating-decisions"
+    },
+    {
+      "field": "publicDeletionRequestUrl",
+      "value": null,
+      "status": "unpublished-applicability-and-request-scope-not-final",
+      "blocksDraftIntegration": false,
+      "actor": "assistant-maps-actual-console-and-account-behavior",
+      "required": null,
+      "blocksFinalCandidateIfRequired": true,
+      "unresolvedDeletionScopeBlocksFinalDeclaration": true,
+      "nextAction": "Determine applicability from actual account functionality and the current Console questionnaire; do not infer a blanket requirement or exemption from anonymous Auth alone. Prepare public data-deletion guidance consistently with confirmed handling."
+    },
+    {
+      "field": "fullProductionFlow",
+      "value": false,
+      "status": "reporting-guarded-contract-and-shared-web-completion-pending",
+      "blocksDraftIntegration": false,
+      "blocksStoreSubmission": true,
+      "actor": "root-separate-authorized-operational-work"
+    }
+  ],
+  "playInputs": [
+    {
+      "field": "Existing developer account secure sign-in",
+      "preparedValue": null,
+      "classification": "user-secure-authentication-if-needed",
+      "userMustRepeatPriorDecision": false,
+      "reason": "Last evidence is a login wall, not authenticated Console access. Never ask for password or OTP in a file."
+    },
+    {
+      "field": "App name / language / type / support email",
+      "preparedValue": {
+        "name": "결정해지니",
+        "language": "ko-KR",
+        "type": "App",
+        "supportEmail": "jmpark0611@gmail.com"
+      },
+      "classification": "ready-assistant-can-enter-after-authorized-console-access",
+      "userInputNeeded": false
+    },
+    {
+      "field": "Operator / representative / target ages",
+      "preparedValue": {
+        "operator": "에스제이컴퍼니",
+        "representative": "박지민",
+        "targetAgeGroups": [
+          "18+"
+        ]
+      },
+      "classification": "already-confirmed-do-not-ask-again",
+      "userInputNeeded": false
+    },
+    {
+      "field": "Category",
+      "preparedValue": "Productivity",
+      "classification": "prepared-feature-based-proposal-not-saved",
+      "userInputNeeded": false
+    },
+    {
+      "field": "Short/full description and release notes",
+      "preparedValueSource": "PLAY-SUBMISSION-PACKET.json storeListing",
+      "characterCounts": {
+        "short": 48,
+        "full": 1075,
+        "releaseNotes": 102
+      },
+      "classification": "copy-ready-reconcile-final-visible-behavior-before-entry",
+      "userInputNeeded": false
+    },
+    {
+      "field": "Ads / in-app purchases",
+      "preparedValue": {
+        "containsAds": false,
+        "inAppPurchasesOrSubscriptions": false
+      },
+      "classification": "current-candidate-code-facts-recheck-only-if-feature-or-sdk-changes",
+      "userInputNeeded": false
+    },
+    {
+      "field": "Package/version/signing linkage",
+      "preparedValue": null,
+      "classification": "authenticated-console-fact-not-a-user-guess",
+      "userInputNeeded": "secure-access-only",
+      "reason": "Existing other published apps do not prove this package registration, unused version code or upload-key registration."
+    },
+    {
+      "field": "Data safety collection and encryption",
+      "preparedValue": {
+        "collectsData": true,
+        "encryptedInTransit": true
+      },
+      "classification": "code-facts-final-provider-log-declaration-incomplete",
+      "userInputNeeded": "only-operating-facts-not-observable-in-authorized-settings"
+    },
+    {
+      "field": "Data safety sharing/logs/retention/deletion",
+      "preparedValue": null,
+      "classification": "technical-fact-closure-plus-real-owner-procedure",
+      "userInputNeeded": "owner-must-set-unresolved-retention/contact-handling-policy-after-available-settings-are-read"
+    },
+    {
+      "field": "Account creation/deletion-policy applicability",
+      "preparedValue": null,
+      "existingPacketInterpretation": false,
+      "classification": "qualified-draft-map-to-actual-console-question",
+      "userInputNeeded": false,
+      "reason": "Internal anonymous Auth neither automatically proves a user-facing account nor creates a blanket exemption; do not auto-import false."
+    },
+    {
+      "field": "Content rating questionnaire",
+      "preparedValue": null,
+      "classification": "actual-questionnaire-required-assistant-uses-feature-facts",
+      "userInputNeeded": "only-a-question-requiring-an-unknown-owner-fact",
+      "reason": "18+ intended audience is already confirmed but is not the generated rating."
+    },
+    {
+      "field": "App access instructions",
+      "preparedValueSource": "PLAY-SUBMISSION-PACKET.json appAccess.instructions",
+      "instructionCount": 5,
+      "classification": "text-ready-functional-access-not-yet-proven",
+      "userInputNeeded": false,
+      "doNotCreateReviewerCredentials": true
+    },
+    {
+      "field": "Privacy/deletion public URLs",
+      "preparedValue": null,
+      "classification": "assistant-produces-and-verifies-after-factual-closure-and-authorized-publication",
+      "userInputNeeded": false,
+      "doNotUseHomeUrlAsPolicy": true
+    },
+    {
+      "field": "Phone screenshots",
+      "preparedValue": null,
+      "classification": "capture-from-identified-final-candidate-not-owner-text-input",
+      "userInputNeeded": "physical-device-access-if-not-already-available",
+      "fixtureScreenshotsAreStoreScreenshots": false
+    },
+    {
+      "field": "App-specific test requirements",
+      "preparedValue": null,
+      "classification": "read-actual-console-no-fixed-tester-count-or-duration-assumed",
+      "userInputNeeded": "secure-access-only"
+    },
+    {
+      "field": "Download price and countries",
+      "preparedValue": null,
+      "classification": "unresolved-owner-distribution-decision",
+      "userInputNeeded": true,
+      "noNewPaymentDecisionMade": true
+    },
+    {
+      "field": "Rollout scope and submission",
+      "preparedValue": null,
+      "classification": "explicit-release-action-after-gates-not-part-of-this-audit",
+      "userInputNeeded": "only-decisions-not-already-authorized",
+      "submitted": false
+    },
+    {
+      "field": "Policy/export/signing declarations",
+      "preparedValue": null,
+      "classification": "read-exact-console-terms-and-confirm-valid-existing-authority",
+      "userInputNeeded": "if-new-terms-or-owner-attestation-is-required",
+      "automaticallyAcceptedByThisTask": false
+    }
+  ],
+  "staleOrScopeSensitiveFields": [
+    {
+      "path": "ANDROID-RELEASE-PROFILE.json androidNativeCorsAllowed/androidNativeCorsHttpStatus/androidNativeCorsKnownError",
+      "recorded": [
+        false,
+        403,
+        "ORIGIN_DENIED"
+      ],
+      "classification": "superseded-observation-not-current-blocker",
+      "currentEvidence": "ANDROID-RELEASE-READINESS-2026-11-24.json backend.cors: both 204 at 2026-11-24T15:44:19.640Z",
+      "action": "Use latest evidence in readiness, preserve old candidate profile/history; no CORS rerun needed for this audit."
+    },
+    {
+      "path": "ANDROID-RELEASE-PROFILE.json androidDeviceValidated",
+      "recorded": true,
+      "classification": "scoped-historical-preview-only",
+      "action": "Do not transfer to signedReleaseDeviceValidated or physicalDeviceValidated; both remain false."
+    },
+    {
+      "path": "ANDROID-RELEASE-PROFILE.json releaseAabCreated/releaseAabSignedAndVerified",
+      "recorded": true,
+      "classification": "true-for-5fbf0887-only",
+      "action": "Keep existing candidate. New source needs a new receipt and hash."
+    },
+    {
+      "path": "ANDROID-RELEASE-PROFILE.json isolatedBackendValidated",
+      "recorded": true,
+      "classification": "historical-isolated-scope-not-production",
+      "action": "Do not set actualBackendValidated/operationalBackendValidated true."
+    },
+    {
+      "path": "ANDROID-RELEASE-PROFILE.json productionDeploymentMetadataState",
+      "recorded": "READY",
+      "classification": "old-deployment-metadata-only",
+      "action": "Does not verify guarded shared-web compatibility, final policy URLs or production end-to-end."
+    },
+    {
+      "path": "PLAY-SUBMISSION-PACKET.json dataSafety.accountCreation.value",
+      "recorded": false,
+      "classification": "qualified-interpretation-not-final-console-answer",
+      "action": "Map to actual current questionnaire, keep automatic anonymous user data disclosed."
+    },
+    {
+      "path": "PLAY-SUBMISSION-PACKET.json legalIntegration + readiness privacyRelease",
+      "recorded": "runtime not applied at examined HEAD",
+      "classification": "correct-at-818655e-patch-prepared-separately",
+      "action": "After later source integration record draft navigation separately; final policy and public URL stay false."
+    },
+    {
+      "path": ".github/workflows/android-release-export.yml comments",
+      "recorded": "old emulator commit and unresolved CORS wording",
+      "classification": "historical-comment-do-not-correct-casually",
+      "action": "Editing this workflow itself triggers unsigned candidate artifact export. Keep unchanged in the current developer-integration step."
+    }
+  ],
+  "localAssets": {
+    "icon": {
+      "path": "/workspace/scratch/59b55f9d68c3/deliverables/genie-android-release/genie-play-icon.png",
+      "sha256": "3df6e1946662f01270edca02a7e20a6d4a18b4f5c21e633ae7402359f47743f8",
+      "bytes": 12352,
+      "width": 512,
+      "height": 512,
+      "pngColorType": 6
+    },
+    "feature": {
+      "path": "/workspace/scratch/59b55f9d68c3/deliverables/genie-android-release/genie-play-feature.png",
+      "sha256": "10a79a883c84c149be38db64080d4f848c8d1067031401c72d25d8aa75252576",
+      "bytes": 26869,
+      "width": 1024,
+      "height": 500,
+      "pngColorType": 2
+    },
+    "inspectionScope": "PNG signature/IHDR dimensions/color type and SHA-256 only; no new render review or Console upload.",
+    "bundletool": {
+      "path": "/workspace/scratch/59b55f9d68c3/validation/bundletool-1.18.3-45180450888/bundletool-all-1.18.3.jar",
+      "versionPin": "1.18.3",
+      "bytes": 32520401,
+      "sha256": "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29",
+      "pinMatches": true,
+      "executedByThisTask": false
+    }
+  },
+  "workflowImpact": {
+    "approvedBranch": "codex/genie-android-native-check-20261123",
+    "runtimePushAutoJobs": [
+      {
+        "workflow": "android-native-check.yml",
+        "configuration": "synthetic",
+        "productionBackendContacted": false,
+        "signing": "ephemeral test key generated and deleted",
+        "uploadKeyUsed": false,
+        "artifactUpload": false,
+        "runner": "ubuntu-24.04",
+        "publicRepoGuard": true,
+        "timeoutMinutes": 25
+      },
+      {
+        "workflow": "android-device-check.yml",
+        "configuration": "isolated fixture",
+        "productionBackendContacted": false,
+        "signing": "fixture APK signing only; not release upload key",
+        "artifactUpload": "on failure only: diagnostics/failure.png and state.json, 1 day",
+        "runner": "ubuntu-24.04",
+        "publicRepoGuard": true,
+        "timeoutMinutes": 40,
+        "casesAtBaseline": 4
+      },
+      {
+        "workflow": "android-release-build-check.yml",
+        "configuration": "selected real public config from static website GET",
+        "productionBackendContacted": false,
+        "signing": "none, unsigned AAB",
+        "artifactUpload": false,
+        "output": "verified then deleted",
+        "runner": "ubuntu-24.04",
+        "publicRepoGuard": true,
+        "timeoutMinutes": 25
+      }
+    ],
+    "runtimePushDoesNotTrigger": [
+      "android-release-export.yml",
+      "android-release-input-check.yml unless profile also changes",
+      "genie-local-integration.yml unless its selected scripts/fixture change",
+      "genie-native-cors-read.yml",
+      "android-bundletool-fetch.yml",
+      "supabase-cli-fetch.yml",
+      "android-sdk-license-diagnostic.yml",
+      "release-candidate.yml without PR or manual dispatch"
+    ],
+    "pullRequestWebChanges": {
+      "workflow": "release-candidate.yml",
+      "node": "22",
+      "fullVerifyAndBuild": true,
+      "artifactUpload": "web/dist",
+      "npmCache": true,
+      "appliesToDocsUnderWebToo": true,
+      "recommendedThisTask": false
+    },
+    "vercel": {
+      "branchDeploymentEnabled": false,
+      "automaticProductionDeploymentInExaminedWorkflows": false,
+      "otherBranchDeploymentBehaviorNotAssumed": true,
+      "parentReportedPrepushObservation": {
+        "observationDateUtc": "2026-11-25",
+        "exactCheckedAtUtc": null,
+        "deploymentCount": 0,
+        "projectNodeVersion": "22.x",
+        "readOnly": true,
+        "independentlyRequeriedByThisAgent": false,
+        "source": "Root task message: prepush Vercel deployments 0 and project nodeVersion 22.x observed read-only.",
+        "interpretation": "Hosting Node 22 is distinct from the existing Android CI Node 24.22.3. No deployment or extra Node 22 run is implied by this audit."
+      }
+    },
+    "storeUploadInExaminedWorkflows": false,
+    "billing": {
+      "standardPublicRunnerCompute": "free-under-current-official-GitHub-documentation",
+      "accountBillingStateRead": false,
+      "artifactAndCacheStorageGuarantee": "not-assessed; do not claim zero total storage cost",
+      "largerRunnerOrPaymentSettingSelected": false
+    },
+    "exportBoundary": {
+      "workflowChangedThisTask": false,
+      "appPushTriggersExport": false,
+      "workflowDispatchSupported": false,
+      "newExportNeedsSeparateConcreteExecutionPlan": true,
+      "oldRunRerunBuildsOldSource": true
+    },
+    "noWorkflowRunTriggeredByThisAgent": true
+  },
+  "safetyAndScope": {
+    "remoteWrites": false,
+    "productionDataWrites": false,
+    "productionSettingsChanged": false,
+    "externalAccountChanges": false,
+    "paymentChanges": false,
+    "storeSubmission": false,
+    "newSigningOperation": false,
+    "newCandidateBuild": false,
+    "oldFullTestSuiteRepeated": false,
+    "newDependencyInstallation": false,
+    "filesWrittenOnlyUnder": "/workspace/scratch/59b55f9d68c3/validation/genie-launch-continuation-20261125/android-preflight"
+  },
+  "sourceIndex": "SOURCE-INDEX.json",
+  "nullMeaning": "Unresolved, not a No answer. Conditional requirements must be mapped to the actual app behavior and current Console question."
+}

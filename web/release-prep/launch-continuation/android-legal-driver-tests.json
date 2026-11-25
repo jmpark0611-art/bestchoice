@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-25T02:10:33.362573+00:00",
+  "executedAtUtc": null,
+  "executionTimestampNote": "Exact execution timestamp was not retained. This is a retrospective record of the successful tool result already observed in this agent turn; tests were not rerun to produce this file.",
+  "evidenceKind": "observed-exec-command-result",
+  "cwd": "/workspace/scratch/59b55f9d68c3/validation/genie-launch-continuation-20261125/working/web",
+  "command": "node --test scripts/android-device-check.test.mjs",
+  "nodeVersion": "v24.22.3",
+  "exitCode": 0,
+  "tests": 28,
+  "passed": 28,
+  "failed": 0,
+  "cancelled": 0,
+  "skipped": 0,
+  "todo": 0,
+  "baselineTestCount": 20,
+  "rawLogSaved": false,
+  "scope": "Focused host-driver Node tests. ADB, download, and process interactions are mocked test fixtures; not an Android runtime pass.",
+  "preservedByteIdenticalBodies": [
+    "GenieDeviceCheck.launchBackNarrowAndPrepareDraft",
+    "GenieDeviceCheck.restoreDraftAfterHostForceStop",
+    "prepareDraftAndForceStop"
+  ],
+  "verifiedFailureConditions": [
+    "Missing or duplicate legal events",
+    "Failed legal event",
+    "Missing real dark-mode evidence",
+    "Incomplete original force-stop/restore boundary",
+    "Night-mode restoration failure",
+    "Restoration error preserves prior instrumentation error and phase log"
+  ],
+  "notExecuted": [
+    "Android build",
+    "Android installation",
+    "Android instrumentation",
+    "Node 22 runtime",
+    "Full web test suite",
+    "Production network behavior",
+    "Real mail app or mail send"
+  ],
+  "fileSha256": {
+    "web/android/app/src/androidTest/java/dev/local/genie/preview/GenieDeviceCheck.java": "e335fb566e4108d2443ef79ac68823fc3df75d0e5785d5d72c1097ec809cee6a",
+    "web/scripts/android-device-check.mjs": "f9f12a78a350375bf912c94bd1fdf2d5fce432344d4856b1afc9752d7827e06c",
+    "web/scripts/android-device-check.test.mjs": "df44387555e522718162fe6a9bad1b3607264fa72e96515dc77303dff5e7f0dd"
+  }
+}

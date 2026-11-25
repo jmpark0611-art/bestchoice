@@ -15,7 +15,11 @@ export const TEST_CLASS = FIXTURE_APP_ID + '.GenieDeviceCheck';
 export const PHASES = Object.freeze({
   first: { method: 'launchBackNarrowAndPrepareDraft', cases: ['launch', 'native-back', 'narrow-screen'] },
   restore: { method: 'restoreDraftAfterHostForceStop', cases: ['draft-restore-after-force-stop'] },
+  legal: { method: 'legalNavigationNarrowAndDark', cases: ['legal-navigation-native-back', 'legal-narrow-dark'] },
 });
+const originalCaseIds = [...PHASES.first.cases, ...PHASES.restore.cases];
+const requiredCaseIds = Object.values(PHASES).flatMap(phase => phase.cases);
+const phaseLogFiles = Object.keys(PHASES).map(phase => 'phase-' + phase + '.log');
 export const EMULATOR_PIN = Object.freeze({
   revision: '37.3.10',
   url: 'https://dl.google.com/android/repository/emulator-linux_x64-16970787.zip',
@@ -357,7 +361,7 @@ export async function prepareDeviceCheck({ workDir, webRoot = defaultWebRoot, sd
         schemaVersion: 1, status: 'blocked-before-binary-download-license-not-accepted',
         sourceCommit: /^[0-9a-f]{40}$/.test(env.GITHUB_SHA ?? '') ? env.GITHUB_SHA : null,
         failureCode: error.code, licenseDiagnostic: error.licenseDiagnostic, pins,
-        fixtureOnly: true, allFourCasesPassed: false, cases: [],
+        fixtureOnly: true, allFourCasesPassed: false, allRequiredCasesPassed: false, cases: [],
         binariesDownloaded: false, physicalDeviceTested: false, signedReleaseNotTested: true,
       });
     }
@@ -431,6 +435,54 @@ export function instrumentationArgs(phase) {
 
 const validPid = pid => Number.isSafeInteger(pid) && pid > 0 && pid <= 2_147_483_647;
 
+function validLegalEvidence(report) {
+  if (!PHASES.legal.cases.includes(report?.caseId)) return true;
+  if (report.schemaVersion !== 1 || report.externalMailAppTested !== false) return false;
+  if (report.caseId === 'legal-navigation-native-back') {
+    const forward = [['/', '/about'], ['/about', '/privacy'], ['/privacy', '/delete-data']];
+    const back = [['/delete-data', '/privacy'], ['/privacy', '/about']];
+    return Array.isArray(report.forward) && report.forward.length === forward.length &&
+      report.forward.every((step, i) => step?.from === forward[i][0] && step.to === forward[i][1] &&
+        step.trustedClick?.type === 'click' && step.trustedClick.trusted === true &&
+        step.trustedClick.anchorPath === step.to && step.headingVisible === true &&
+        (step.to === '/about' || step.headingFocused === true)) &&
+      Array.isArray(report.back) && report.back.length === back.length &&
+      report.back.every((step, i) => step?.from === back[i][0] && step.to === back[i][1] &&
+        step.systemAction === 'GLOBAL_ACTION_BACK' && step.accepted === true && step.headingVisible === true &&
+        (step.to === '/about' || step.headingFocused === true) && step.before?.focused === true &&
+        step.before.canGoBack === true && step.before.finishing === false && step.before.destroyed === false);
+  }
+  return report.emailSelectionMethod === 'DOM-range-and-computed-user-select' &&
+    Array.isArray(report.documents) && report.documents.length === 2 &&
+    report.documents.every((document, i) => document?.path === ['/privacy', '/delete-data'][i] &&
+      document.width === 320 && Number.isFinite(document.scrollWidth) && document.scrollWidth >= 320 && document.scrollWidth <= 321 &&
+      document.outsideControls === 0 && document.relatedLinkCount === 2 &&
+      JSON.stringify(document.relatedLinkPaths) === JSON.stringify([i === 0 ? '/delete-data' : '/privacy', '/about']) &&
+      Number.isFinite(document.minRelatedLinkHeight) && document.minRelatedLinkHeight >= 44 &&
+      document.emailVisible === true && (document.emailUserSelect === 'text' || document.emailWebkitUserSelect === 'text') &&
+      document.emailSelectionMatches === true && document.headingFocused === true &&
+      document.nativeNightMask === 32 && document.configuredNightMode === 2 && document.matchMediaDark === true &&
+      document.colorScheme === 'dark' && document.bodyBackground === 'rgb(17, 17, 17)' &&
+      document.bodyColor === 'rgb(255, 255, 255)' && document.surfaceBackground === 'rgb(29, 29, 29)');
+}
+
+/** Preserve the original four-case gate; the release fixture requires all six. */
+export function deviceCaseCompletion(receipt) {
+  const cases = Array.isArray(receipt.cases) ? receipt.cases : [];
+  const passedOnce = id => {
+    const matches = cases.filter(report => report?.caseId === id);
+    return matches.length === 1 && matches[0].passed === true && validLegalEvidence(matches[0]);
+  };
+  const allFourCasesPassed = receipt.preparedProcessPreserved === true && receipt.forceStopConfirmed === true &&
+    originalCaseIds.every(passedOnce);
+  return {
+    allFourCasesPassed,
+    allRequiredCasesPassed: allFourCasesPassed && cases.length === requiredCaseIds.length && requiredCaseIds.every(passedOnce) &&
+      receipt.legalPhasePassed === true && receipt.legalNightMode?.observedBeforeLaunch === 'yes' &&
+      receipt.legalNightMode.restored === true,
+  };
+}
+
 export function parseInstrumentation(result, phase) {
   const expected = PHASES[phase]?.cases;
   if (!expected) reject('UNKNOWN_INSTRUMENTATION_PHASE');
@@ -456,8 +508,10 @@ export function parseInstrumentation(result, phase) {
     if (start < 0) continue;
     try { reports.push(JSON.parse(line.slice(start + 'GENIE_DEVICE_CASE '.length))); } catch { reject('MALFORMED_DEVICE_CASE_REPORT'); }
   }
-  if (reports.length !== expected.length || reports.some(report => report.passed !== true || !expected.includes(report.caseId)) ||
+  if (reports.length !== expected.length || reports.some(report => !report || typeof report !== 'object' ||
+      Array.isArray(report) || report.passed !== true || !expected.includes(report.caseId)) ||
       new Set(reports.map(report => report.caseId)).size !== expected.length) reject('MISSING_OR_DUPLICATE_DEVICE_CASE');
+  if (reports.some(report => !validLegalEvidence(report))) reject('INVALID_LEGAL_CASE_EVIDENCE');
   if (preparations.length !== (phase === 'first' ? 1 : 0)) reject('MISSING_OR_DUPLICATE_DRAFT_PREPARATION');
   return { cases: reports, preparedPid: preparations[0] ?? null };
 }
@@ -494,6 +548,62 @@ export async function prepareDraftAndForceStop({ workDir, adb, receipt }) {
   receipt.forceStopConfirmed = true;
 }
 
+function nightMode(result, failureCode) {
+  const match = /^Night mode: (yes|no|auto|custom_schedule|custom_bedtime)\s*$/.exec(result.stdout ?? '');
+  if (result.status !== 0 || result.stderr?.trim() || !match) reject(failureCode);
+  return match[1];
+}
+
+/** A new invocation avoids stale Activity/WebView references during theme changes.
+ * Android 16's cmd uimode night delegates to UiModeManager.setNightMode and prints
+ * Night mode: <mode>. Change only the disposable, verified API36 emulator, restore
+ * its original setting even after a failed/aborted test, and confirm both reads.
+ * https://android.googlesource.com/platform/frameworks/base/+/android16-release/services/core/java/com/android/server/UiModeManagerService.java
+ * https://developer.android.com/reference/android/app/UiModeManager#setNightMode(int)
+ */
+export async function runLegalPhase({ workDir, adb, receipt }) {
+  if (!deviceCaseCompletion(receipt).allFourCasesPassed || receipt.cases.length !== originalCaseIds.length) {
+    reject('ORIGINAL_FOUR_CASES_REQUIRED_BEFORE_LEGAL');
+  }
+  receipt.currentPhase = 'legal';
+  receipt.legalPhasePassed = false;
+  for (const [property, expected] of [['ro.kernel.qemu', '1'], ['ro.build.version.sdk', '36']]) {
+    const result = await adb(['-s', serial, 'shell', 'getprop', property]);
+    if (result.status !== 0 || result.stderr?.trim() || result.stdout?.trim() !== expected) reject('LEGAL_API36_EMULATOR_REQUIRED');
+  }
+  const command = ['-s', serial, 'shell', 'cmd', 'uimode', 'night'];
+  const original = nightMode(await adb(command), 'LEGAL_ORIGINAL_NIGHT_MODE_UNCONFIRMED');
+  receipt.legalNightMode = { original, requested: 'yes', observedBeforeLaunch: null, restored: false, restoreFailureCode: null };
+  let failure, legalCases;
+  try {
+    if (nightMode(await adb([...command, 'yes']), 'LEGAL_NIGHT_MODE_SET_FAILED') !== 'yes') reject('LEGAL_NIGHT_MODE_SET_FAILED');
+    receipt.legalNightMode.observedBeforeLaunch = nightMode(await adb(command), 'LEGAL_NIGHT_MODE_UNCONFIRMED');
+    if (receipt.legalNightMode.observedBeforeLaunch !== 'yes') reject('LEGAL_NIGHT_MODE_UNCONFIRMED');
+    const result = await adb(instrumentationArgs('legal'), 180_000);
+    writeFileSync(path.join(workDir, 'phase-legal.log'), result.stdout ?? '', { flag: 'wx', mode: 0o600 });
+    // A shell setting is insufficient: require native night, real matchMedia,
+    // computed CSS, trusted input, OS Back and both documents in the receipts.
+    legalCases = parseInstrumentation(result, 'legal').cases;
+  } catch (error) {
+    failure = error;
+  } finally {
+    try {
+      if (nightMode(await adb([...command, original]), 'LEGAL_NIGHT_MODE_RESTORE_FAILED') !== original ||
+          nightMode(await adb(command), 'LEGAL_NIGHT_MODE_RESTORE_FAILED') !== original) reject('LEGAL_NIGHT_MODE_RESTORE_FAILED');
+      receipt.legalNightMode.restored = true;
+    } catch {
+      receipt.legalNightMode.restoreFailureCode = 'LEGAL_NIGHT_MODE_RESTORE_FAILED';
+      if (!failure) {
+        failure = new Error('LEGAL_NIGHT_MODE_RESTORE_FAILED');
+        failure.code = 'LEGAL_NIGHT_MODE_RESTORE_FAILED';
+      }
+    }
+  }
+  if (failure) throw failure;
+  receipt.cases.push(...legalCases);
+  receipt.legalPhasePassed = true;
+}
+
 /** Only this fixed, small emulator screenshot may enter failure artifacts. */
 export function inspectFailurePng(file) {
   if (path.basename(file) !== 'failure.png' || !regular(file) || lstatSync(file).size > 1_048_576) reject('INVALID_FAILURE_PNG');
@@ -508,13 +618,16 @@ export function inspectFailurePng(file) {
 
 /** Best-effort capture. Its error must never replace the original test failure. */
 export async function captureFailureEvidence({ workDir, adb, receipt, emulatorAlive }) {
-  const knownCases = [...PHASES.first.cases, ...PHASES.restore.cases];
+  const knownCases = requiredCaseIds;
   const state = {
     schemaVersion: 1, kind: 'android-emulator-fixture-failure', fixtureOnly: true,
     signedReleaseNotTested: true, applicationId: FIXTURE_APP_ID, expectedApiLevel: 36,
     sourceCommit: /^[0-9a-f]{40}$/.test(receipt.sourceCommit ?? '') ? receipt.sourceCommit : null,
     failureCode: /^[A-Z][A-Z0-9_]+$/.test(receipt.failureCode ?? '') ? receipt.failureCode : 'DEVICE_CHECK_FAILED',
-    allFourCasesPassed: false,
+    allFourCasesPassed: deviceCaseCompletion(receipt).allFourCasesPassed,
+    allRequiredCasesPassed: false,
+    failedPhase: Object.hasOwn(PHASES, receipt.currentPhase ?? '') ? receipt.currentPhase : null,
+    externalMailAppTested: false,
     observedPassedCaseIds: knownCases.filter(id => receipt.observedPassedCaseIds?.includes(id)),
     screenshot: null, screenshotTiming: null, captureError: null,
   };
@@ -623,7 +736,9 @@ export async function runDeviceCheck(workDir, env = process.env, run = execute) 
     emulator: prepared.pins.emulator, image: prepared.pins.image, node: prepared.node, javac: prepared.javac,
     firstInstrumentationNoRestart: true, firstLaunchMode: 'activity-recreated-in-prelaunched-process',
     preparedProcessPreserved: false, prelaunchPid: null, preparedPid: null, pidBeforeForceStop: null,
-    forceStopConfirmed: false, cases, allFourCasesPassed: false,
+    forceStopConfirmed: false, cases, allFourCasesPassed: false, allRequiredCasesPassed: false,
+    legalPhasePassed: false, legalNightMode: null, externalMailAppTested: false,
+    legalLightThemeLayoutTested: false, currentPhase: null,
   };
   let failure;
   try {
@@ -670,20 +785,27 @@ export async function runDeviceCheck(workDir, env = process.env, run = execute) 
     }
     await mustAdb(['-s', serial, 'install', prepared.apk]);
     await mustAdb(['-s', serial, 'install', prepared.testApk]);
+    receipt.currentPhase = 'first';
     await prepareDraftAndForceStop({ workDir, adb, receipt });
+    receipt.currentPhase = 'restore';
     const restored = await adb(instrumentationArgs('restore'), 120_000);
     writeFileSync(path.join(workDir, 'phase-restore.log'), restored.stdout, { flag: 'wx', mode: 0o600 });
     cases.push(...parseInstrumentation(restored, 'restore').cases);
-    receipt.allFourCasesPassed = cases.length === 4 && receipt.preparedProcessPreserved && receipt.forceStopConfirmed;
-    receipt.status = 'four-android-emulator-fixture-cases-passed-not-a-release';
+    Object.assign(receipt, deviceCaseCompletion(receipt));
+    await runLegalPhase({ workDir, adb, receipt });
+    Object.assign(receipt, deviceCaseCompletion(receipt));
+    if (!receipt.allRequiredCasesPassed) reject('REQUIRED_DEVICE_CASES_INCOMPLETE');
+    receipt.status = 'six-android-emulator-fixture-cases-passed-not-a-release';
   } catch (error) {
     failure = error;
+    Object.assign(receipt, deviceCaseCompletion(receipt));
+    receipt.allRequiredCasesPassed = false;
     receipt.failureCode = /^[A-Z][A-Z0-9_]+$/.test(error.code ?? '') ? error.code : 'DEVICE_CHECK_FAILED';
     // Preserve separately observed subcase evidence without relaxing the full
     // instrumentation/force-stop success gate or treating a failed phase as passed.
     const observed = new Set(cases.map(value => value.caseId));
     receipt.failureScreenshotBeforeExit = false;
-    for (const file of ['phase-first.log', 'phase-restore.log']) {
+    for (const file of phaseLogFiles) {
       const logFile = path.join(workDir, file);
       if (!regular(logFile)) continue;
       let output;
@@ -694,16 +816,16 @@ export async function runDeviceCheck(workDir, env = process.env, run = execute) 
         if (marker < 0) continue;
         try {
           const value = JSON.parse(line.slice(marker + 'GENIE_DEVICE_CASE '.length));
-          if (value.passed === true) observed.add(value.caseId);
+          if (value?.passed === true && requiredCaseIds.includes(value.caseId) && validLegalEvidence(value)) observed.add(value.caseId);
         } catch {}
       }
     }
-    receipt.observedPassedCaseIds = [...PHASES.first.cases, ...PHASES.restore.cases].filter(id => observed.has(id));
+    receipt.observedPassedCaseIds = requiredCaseIds.filter(id => observed.has(id));
     try {
       receipt.failureEvidence = await captureFailureEvidence({ workDir, adb, receipt,
         emulatorAlive: Boolean(emulator && emulator.exitCode === null && emulator.pid) });
     } catch { receipt.failureEvidence = { saved: false, captureError: 'FAILURE_EVIDENCE_CAPTURE_FAILED' }; }
-    for (const file of ['phase-first.log', 'phase-restore.log', 'emulator.log']) {
+    for (const file of [...phaseLogFiles, 'emulator.log']) {
       const logFile = path.join(workDir, file);
       if (regular(logFile)) console.error(file + '\n' + readFileSync(logFile, 'utf8').slice(-10_000));
     }

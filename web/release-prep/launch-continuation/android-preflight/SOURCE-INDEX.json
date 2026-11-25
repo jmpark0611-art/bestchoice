@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "repository": "jmpark0611-art/bestchoice",
+  "ref": "818655e10fe00b65da8bfe64f77e0d928429eb9d",
+  "tree": "5777b3fb5d24cbc6d62f49f5560f097cf8f7f99a",
+  "recordedAtUtc": "2026-11-25T01:55:18Z",
+  "scope": "Read-only source audit; original repository files and runtime working copy were not modified by this task.",
+  "sources": [
+    {
+      "path": ".github/workflows/android-bundletool-fetch.yml",
+      "gitBlob": "9dec6a0693d1c5b6d11b1096f227acfb4880c5af",
+      "bytes": 5722,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/android-bundletool-fetch.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/android-device-check.yml",
+      "gitBlob": "32fd9ca2c5891e6bfbce9ea2aef8640c5a6c42ac",
+      "bytes": 5302,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/android-device-check.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/android-native-check.yml",
+      "gitBlob": "896bbf5486aa52356083e236c255f348887240ba",
+      "bytes": 2955,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/android-native-check.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/android-release-build-check.yml",
+      "gitBlob": "de64d7177fa8f16c642dc3b3ab1c8c61c4bb2c4f",
+      "bytes": 4414,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/android-release-build-check.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/android-release-export.yml",
+      "gitBlob": "4d844d48f8283fd8cb2d0b2e47385aee008b9324",
+      "bytes": 5809,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/android-release-export.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/android-release-input-check.yml",
+      "gitBlob": "10195499f70730b4c04a528ae7d1c160420741e3",
+      "bytes": 4347,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/android-release-input-check.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/android-sdk-license-diagnostic.yml",
+      "gitBlob": "4c073f198b5aab5a337fe53b92fa01df3c0a3794",
+      "bytes": 7453,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/android-sdk-license-diagnostic.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/genie-local-integration.yml",
+      "gitBlob": "8f53cd972ef33b63909ad894bdd587d83c2642fd",
+      "bytes": 1992,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/genie-local-integration.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/genie-native-cors-read.yml",
+      "gitBlob": "258c07030d03f7b4fa0371b87972db07d4e5f532",
+      "bytes": 3900,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/genie-native-cors-read.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/release-candidate.yml",
+      "gitBlob": "75df84aeda664eb21f2adb6089f61c809916c6a2",
+      "bytes": 890,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/release-candidate.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": ".github/workflows/supabase-cli-fetch.yml",
+      "gitBlob": "da7c94bbe349066e363ae5412bb17bee258cc7ae",
+      "bytes": 8609,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/.github/workflows/supabase-cli-fetch.yml",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/vercel.json",
+      "gitBlob": "700c223dbefedd80a7f9506daca79c6292bc9da8",
+      "bytes": 179,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/vercel.json",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/PLAY-SUBMISSION-PACKET.json",
+      "gitBlob": "6618a6c932e43ea1751aab21a032171cbe3bf3e0",
+      "bytes": 71677,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/PLAY-SUBMISSION-PACKET.json",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/PLAY-SUBMISSION-PACKET.md",
+      "gitBlob": "ef7cfc8d3ad76996c2db233c96fa0e50fd91c88c",
+      "bytes": 49637,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/PLAY-SUBMISSION-PACKET.md",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/ANDROID-RELEASE-PROFILE.json",
+      "gitBlob": "3ac1e8f6eafc2f2118f381cfd2959e0cfbe826b4",
+      "bytes": 14520,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/ANDROID-RELEASE-PROFILE.json",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/ANDROID-RELEASE-READINESS-2026-11-24.json",
+      "gitBlob": "33fb48c06f404ff2a4c91f5dea27c8e524a659cc",
+      "bytes": 12376,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/ANDROID-RELEASE-READINESS-2026-11-24.json",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/release-prep/legal-navigation/README.md",
+      "gitBlob": "8af9fe21e1183737b7be4cf5615e38d6b554da79",
+      "bytes": 9525,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/release-prep/legal-navigation/README.md",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/release-prep/legal-navigation/verification.json",
+      "gitBlob": "e8009315d62934ca5152a657e8f3af957fe38ca5",
+      "bytes": 2183,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/release-prep/legal-navigation/verification.json",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/release-prep/legal-navigation/source-manifest.json",
+      "gitBlob": "9f033c7de100650e1734bf6b93b32664f8fa8ca3",
+      "bytes": 4535,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/release-prep/legal-navigation/source-manifest.json",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/release-prep/legal-navigation/implementation.patch",
+      "gitBlob": "bd66400433e05b6f71757e3e72164263397778cd",
+      "bytes": 34839,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/release-prep/legal-navigation/implementation.patch",
+      "access": "Exact-ref tree identity plus root-materialized baseline read"
+    },
+    {
+      "path": "web/release-prep/legal-navigation/patch-replay.json",
+      "gitBlob": "69eaa66a31b90031f100f7d69c17c43ad590136d",
+      "bytes": 456,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/release-prep/legal-navigation/patch-replay.json",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/release-prep/legal-navigation/validation/source-provenance.json",
+      "gitBlob": "b2ecde13aa3c77ca7c4918724757d46b7394f1cf",
+      "bytes": 902,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/release-prep/legal-navigation/validation/source-provenance.json",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/release-prep/legal-navigation/validation/focused-test-scope.json",
+      "gitBlob": "bdc256b94d940fe267e0a43a12317c5300c7f4c6",
+      "bytes": 1941,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/release-prep/legal-navigation/validation/focused-test-scope.json",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/scripts/android-release.mjs",
+      "gitBlob": "d87535ad95e76aade9966160a3e976d544d455cd",
+      "bytes": 15045,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/scripts/android-release.mjs",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/scripts/android-public-config.mjs",
+      "gitBlob": "25709634810cc0727d8a707521f038af02771522",
+      "bytes": 4771,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/scripts/android-public-config.mjs",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/scripts/android-release-config.mjs",
+      "gitBlob": "0f8c9de20576aaf92655b9c5fa2a7523d6853c6d",
+      "bytes": 7383,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/scripts/android-release-config.mjs",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/scripts/android-release-environment.mjs",
+      "gitBlob": "19694ef18df8adab1a0fe14a86671c370c731c93",
+      "bytes": 6903,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/scripts/android-release-environment.mjs",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/scripts/android-release-manifest.mjs",
+      "gitBlob": "52762f33801ec9242facad38054ac17827f7e00f",
+      "bytes": 7872,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/scripts/android-release-manifest.mjs",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/scripts/android-unsigned-export.mjs",
+      "gitBlob": "731509ce6596b2b080461ce962837f2fab6adf52",
+      "bytes": 18874,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/scripts/android-unsigned-export.mjs",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/scripts/sign-android-export.mjs",
+      "gitBlob": "d4a05d17c3c28f1eadb1a31a5b9e7ac19ff3c2f9",
+      "bytes": 22786,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/scripts/sign-android-export.mjs",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/scripts/android-candidate-device-prep.mjs",
+      "gitBlob": "0a48eecd48abe14ed2aff0e5aece61b8089beff3",
+      "bytes": 26111,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/scripts/android-candidate-device-prep.mjs",
+      "access": "GitHub exact-ref read"
+    },
+    {
+      "path": "web/scripts/android-native-smoke.mjs",
+      "gitBlob": "f44aef6d2362eb0d6e1e6c0a0d5a67d0a9173daf",
+      "bytes": 11672,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/scripts/android-native-smoke.mjs",
+      "access": "Exact-ref tree identity plus root-materialized baseline read"
+    },
+    {
+      "path": "web/android/variables.gradle",
+      "gitBlob": "ee4ba41c46f546910a153b2938cad859cd7cd86e",
+      "bytes": 498,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/android/variables.gradle",
+      "access": "Exact-ref tree identity plus root-materialized baseline read"
+    },
+    {
+      "path": "web/android/app/build.gradle",
+      "gitBlob": "343db8e5d262c7404108d9597ce98c1b956852eb",
+      "bytes": 2222,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/android/app/build.gradle",
+      "access": "Exact-ref tree identity plus root-materialized baseline read"
+    },
+    {
+      "path": "web/android/gradle/wrapper/gradle-wrapper.properties",
+      "gitBlob": "e62db30ca9ae7cdca0f6f013b878d362dc5e58e9",
+      "bytes": 340,
+      "url": "https://github.com/jmpark0611-art/bestchoice/blob/818655e10fe00b65da8bfe64f77e0d928429eb9d/web/android/gradle/wrapper/gradle-wrapper.properties",
+      "access": "Exact-ref tree identity plus root-materialized baseline read"
+    }
+  ],
+  "officialSources": [
+    {
+      "id": "GHA",
+      "url": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+      "checkedOnUtc": "2026-11-25",
+      "scope": "Public standard runner compute is free; artifact/cache storage has separate allowances. No account billing state was read."
+    },
+    {
+      "id": "VERSION",
+      "url": "https://developer.android.com/studio/publish/versioning",
+      "checkedOnUtc": "2026-11-25",
+      "scope": "Increasing versionCode and no reuse of an already used version code; actual package history must be inspected."
+    },
+    {
+      "id": "CREATE",
+      "url": "https://support.google.com/googleplay/android-developer/answer/9859152?hl=en",
+      "checkedOnUtc": "2026-11-25",
+      "scope": "Actual app creation fields, declarations, permanent package identity, account-specific setup."
+    },
+    {
+      "id": "SIGN",
+      "url": "https://support.google.com/googleplay/android-developer/answer/9842756?hl=en",
+      "checkedOnUtc": "2026-11-25",
+      "scope": "Upload key and Play app-signing key are distinct; actual app signing configuration must be inspected."
+    }
+  ],
+  "localBaselineVerification": {
+    "rootMaterializedBaseline": "/workspace/scratch/59b55f9d68c3/validation/genie-launch-continuation-20261125/baseline",
+    "sourceCount": 35,
+    "allListedGitBlobHashesAndLengthsMatch": true,
+    "legalImplementationPatchSha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08",
+    "legalImplementationPatchHashMatches": true,
+    "method": "Read-only byte length, Git blob SHA-1 and stored-patch SHA-256; no test or build execution."
+  }
+}

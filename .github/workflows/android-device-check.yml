@@ -75,7 +75,7 @@ jobs:
             --work-dir "$GENIE_DEVICE_WORK" \
             --sdk-root "$ANDROID_HOME" \
             --java-home "$JAVA_HOME_21_X64"
-      - name: Run the four cases with only loopback networking
+      - name: Run the required cases with only loopback networking
         run: node scripts/android-device-check.mjs isolate --work-dir "$GENIE_DEVICE_WORK"
       - name: Record actual results and their limits
         if: always()
@@ -87,9 +87,9 @@ jobs:
           const result = work && path.join(work, 'result.json');
           const receipt = result && existsSync(result)
             ? readFileSync(result, 'utf8')
-            : JSON.stringify({ status: 'blocked-before-device-receipt', allFourCasesPassed: false, fixtureOnly: true, signedReleaseNotTested: true }, null, 2);
+            : JSON.stringify({ status: 'blocked-before-device-receipt', allFourCasesPassed: false, allRequiredCasesPassed: false, fixtureOnly: true, signedReleaseNotTested: true }, null, 2);
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,
-            '## Android emulator fixture check\n\nOnly the four named cases below are evaluated. A physical phone, signed release, shared voting, clipboard denial, and a real backend are not validated by this job.\n\n```json\n' + receipt + '\n```\n');
+            '## Android emulator fixture check\n\nOnly the named fixture cases below are evaluated, including the draft privacy/deletion screens. Passing does not finalize or publish their policy text. A physical phone, signed release, external mail client, shared voting, clipboard denial, and a real backend are not validated by this job.\n\n```json\n' + receipt + '\n```\n');
           JS
       - name: Retain only a synthetic failure screen and fixed state for one day
         if: failure() && env.GENIE_DEVICE_WORK != ''

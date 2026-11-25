@@ -5,9 +5,9 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { deflateSync } from 'node:zlib';
-import { captureFailureEvidence, checkFixtureEnvironment, copyFixture, downloadArchive, EMULATOR_PIN, FIXTURE_APP_ID, fixtureEnvironment, inspectFailurePng,
+import { captureFailureEvidence, checkFixtureEnvironment, copyFixture, deviceCaseCompletion, downloadArchive, EMULATOR_PIN, FIXTURE_APP_ID, fixtureEnvironment, inspectFailurePng,
   instrumentationArgs, parseInstrumentation, parseSdkMetadata, PHASES, prepareDeviceCheck, prepareDraftAndForceStop,
-  requireAcceptedLicense, validateNamespace } from './android-device-check.mjs';
+  requireAcceptedLicense, runLegalPhase, validateNamespace } from './android-device-check.mjs';
 
 const hash = (algorithm, value) => createHash(algorithm).update(value).digest('hex');
 const temp = t => {
@@ -176,20 +176,128 @@ test('requires a different namespace with exactly loopback and no external IPv4 
 });
 
 const preparedReceipt = pid => 'GENIE_DRAFT_PREPARED ' + JSON.stringify({ schemaVersion: 1, pid });
-const phaseOutput = (phase, pid = 4242) => PHASES[phase].cases.map(caseId => 'GENIE_DEVICE_CASE ' + JSON.stringify({ caseId, passed: true })).join('\n')
+const legalReports = () => [
+  { caseId: 'legal-navigation-native-back', passed: true, schemaVersion: 1, externalMailAppTested: false,
+    forward: [['/', '/about'], ['/about', '/privacy'], ['/privacy', '/delete-data']].map(([from, to]) => ({
+      from, to, trustedClick: { type: 'click', trusted: true, anchorPath: to }, headingVisible: true, headingFocused: to !== '/about',
+    })),
+    back: [['/delete-data', '/privacy'], ['/privacy', '/about']].map(([from, to]) => ({
+      from, to, systemAction: 'GLOBAL_ACTION_BACK', accepted: true, headingVisible: true, headingFocused: to !== '/about',
+      before: { focused: true, canGoBack: true, finishing: false, destroyed: false },
+    })),
+  },
+  { caseId: 'legal-narrow-dark', passed: true, schemaVersion: 1, externalMailAppTested: false,
+    emailSelectionMethod: 'DOM-range-and-computed-user-select',
+    documents: ['/privacy', '/delete-data'].map((route, i) => ({
+      path: route, width: 320, scrollWidth: 320, outsideControls: 0, relatedLinkCount: 2,
+      relatedLinkPaths: [i === 0 ? '/delete-data' : '/privacy', '/about'], minRelatedLinkHeight: 44,
+      emailVisible: true, emailUserSelect: 'text', emailWebkitUserSelect: 'text', emailSelectionMatches: true,
+      headingFocused: true, nativeNightMask: 32, configuredNightMode: 2, matchMediaDark: true,
+      colorScheme: 'dark', bodyBackground: 'rgb(17, 17, 17)', bodyColor: 'rgb(255, 255, 255)', surfaceBackground: 'rgb(29, 29, 29)',
+    })),
+  },
+];
+const caseOutput = reports => reports.map(report => 'GENIE_DEVICE_CASE ' + JSON.stringify(report)).join('\n');
+const legalOutput = reports => caseOutput(reports) + '\nOK (1 test)\nINSTRUMENTATION_CODE: -1\n';
+const phaseOutput = (phase, pid = 4242) => caseOutput(phase === 'legal' ? legalReports() : PHASES[phase].cases.map(caseId => ({ caseId, passed: true })))
   + (phase === 'first' ? '\n' + preparedReceipt(pid) : '') + '\nOK (1 test)\nINSTRUMENTATION_CODE: -1\n';
 
-test('selects only the two intended instrumentation methods and verifies all named case receipts', () => {
+test('selects the three intended instrumentation methods and verifies all six named case receipts', () => {
   assert.match(instrumentationArgs('first').at(-2), /GenieDeviceCheck#launchBackNarrowAndPrepareDraft$/);
   assert.match(instrumentationArgs('restore').at(-2), /GenieDeviceCheck#restoreDraftAfterHostForceStop$/);
+  assert.match(instrumentationArgs('legal').at(-2), /GenieDeviceCheck#legalNavigationNarrowAndDark$/);
   assert.equal(instrumentationArgs('first').filter(arg => arg === '--no-restart').length, 1);
   assert.equal(instrumentationArgs('restore').includes('--no-restart'), false);
+  assert.equal(instrumentationArgs('legal').includes('--no-restart'), false);
   assert.equal(instrumentationArgs('first').includes('waitForActivitiesToComplete'), false);
   assert.equal(instrumentationArgs('first').includes('clearPackageData'), false);
   const first = parseInstrumentation({ status: 0, stdout: phaseOutput('first') }, 'first');
   assert.equal(first.cases.length, 3); assert.equal(first.preparedPid, 4242);
   const restored = parseInstrumentation({ status: 0, stdout: phaseOutput('restore') }, 'restore');
   assert.equal(restored.cases.length, 1); assert.equal(restored.preparedPid, null);
+  const legal = parseInstrumentation({ status: 0, stdout: phaseOutput('legal') }, 'legal');
+  assert.equal(legal.cases.length, 2); assert.equal(legal.preparedPid, null);
+});
+
+test('legal receipts require observed trusted touch, OS Back, both documents, dark media and actual CSS', () => {
+  for (const mutate of [
+    reports => { delete reports[0].forward; },
+    reports => { reports[0].forward[1].trustedClick.trusted = false; },
+    reports => { reports[0].forward[2].trustedClick.anchorPath = '/privacy'; },
+    reports => { reports[0].back[0].systemAction = 'history.back'; },
+    reports => { reports[0].back[0].accepted = false; },
+    reports => { reports[0].back[0].headingFocused = false; },
+    reports => { reports[0].back[1].before.canGoBack = false; },
+    reports => { reports[1].documents.pop(); },
+    reports => { reports[1].documents[1].path = '/privacy'; },
+    reports => { reports[1].documents[0].width = 360; },
+    reports => { reports[1].documents[0].scrollWidth = 322; },
+    reports => { reports[1].documents[0].scrollWidth = null; },
+    reports => { reports[1].documents[0].outsideControls = 1; },
+    reports => { reports[1].documents[0].relatedLinkPaths = ['/about', '/about']; },
+    reports => { reports[1].documents[1].minRelatedLinkHeight = 43.99; },
+    reports => { reports[1].documents[1].emailVisible = false; },
+    reports => { reports[1].documents[1].emailUserSelect = reports[1].documents[1].emailWebkitUserSelect = 'none'; },
+    reports => { reports[1].documents[1].emailSelectionMatches = false; },
+    reports => { reports[1].documents[1].headingFocused = false; },
+    reports => { reports[1].documents[1].nativeNightMask = 16; },
+    reports => { reports[1].documents[1].configuredNightMode = 1; },
+    reports => { reports[1].documents[1].matchMediaDark = false; },
+    reports => { delete reports[1].documents[1].matchMediaDark; },
+    reports => { reports[1].documents[1].colorScheme = 'light'; },
+    reports => { reports[1].documents[1].bodyBackground = 'rgb(255, 217, 59)'; },
+    reports => { reports[1].documents[1].bodyColor = 'rgb(17, 17, 17)'; },
+    reports => { reports[1].documents[1].surfaceBackground = 'rgb(255, 253, 245)'; },
+    reports => { reports[1].externalMailAppTested = true; },
+  ]) {
+    const reports = legalReports(); mutate(reports);
+    assert.throws(() => parseInstrumentation({ status: 0, stdout: legalOutput(reports) }, 'legal'),
+      { code: 'INVALID_LEGAL_CASE_EVIDENCE' });
+  }
+});
+
+test('missing, duplicate, false or aborted legal events cannot pass even with zero adb exit', () => {
+  const reports = legalReports();
+  for (const values of [[], reports.slice(0, 1), [...reports, reports[0]], [reports[0], reports[0]],
+    [null, reports[1]], [reports[0], { ...reports[1], passed: false }],
+    [{ caseId: 'launch', passed: true }, reports[1]]]) {
+    assert.throws(() => parseInstrumentation({ status: 0, stdout: legalOutput(values) }, 'legal'),
+      { code: 'MISSING_OR_DUPLICATE_DEVICE_CASE' });
+  }
+  for (const failure of ['INSTRUMENTATION_STATUS_CODE: -2', 'INSTRUMENTATION_ABORTED', 'Process crashed']) {
+    assert.throws(() => parseInstrumentation({ status: 0, stdout: phaseOutput('legal') + failure + '\n' }, 'legal'),
+      { code: 'INSTRUMENTATION_DID_NOT_PASS' });
+  }
+  assert.throws(() => parseInstrumentation({ status: 0, stdout: phaseOutput('legal') + preparedReceipt(4242) }, 'legal'),
+    { code: 'MISSING_OR_DUPLICATE_DRAFT_PREPARATION' });
+});
+
+const fourCaseReceipt = () => ({
+  cases: [...parseInstrumentation({ status: 0, stdout: phaseOutput('first') }, 'first').cases,
+    ...parseInstrumentation({ status: 0, stdout: phaseOutput('restore') }, 'restore').cases],
+  preparedProcessPreserved: true, forceStopConfirmed: true, legalPhasePassed: false, legalNightMode: null,
+});
+
+test('the original four cases remain distinct from the six-case completion and cleanup gate', () => {
+  const receipt = fourCaseReceipt();
+  assert.deepEqual(deviceCaseCompletion(receipt), { allFourCasesPassed: true, allRequiredCasesPassed: false });
+  receipt.cases.push(...legalReports());
+  assert.equal(deviceCaseCompletion(receipt).allRequiredCasesPassed, false, 'bare case reports are not a passed phase');
+  receipt.legalPhasePassed = true;
+  receipt.legalNightMode = { observedBeforeLaunch: 'yes', restored: false };
+  assert.equal(deviceCaseCompletion(receipt).allRequiredCasesPassed, false, 'cleanup must be confirmed');
+  receipt.legalNightMode.restored = true;
+  assert.deepEqual(deviceCaseCompletion(receipt), { allFourCasesPassed: true, allRequiredCasesPassed: true });
+  for (const mutate of [
+    r => { r.cases.pop(); }, r => { r.cases.push(r.cases[5]); },
+    r => { r.cases[5].documents[0].matchMediaDark = false; },
+    r => { r.legalNightMode.observedBeforeLaunch = 'no'; }, r => { r.legalPhasePassed = false; },
+  ]) {
+    const copy = structuredClone(receipt); mutate(copy);
+    assert.deepEqual(deviceCaseCompletion(copy), { allFourCasesPassed: true, allRequiredCasesPassed: false });
+  }
+  receipt.cases.push(receipt.cases[0]);
+  assert.deepEqual(deviceCaseCompletion(receipt), { allFourCasesPassed: false, allRequiredCasesPassed: false });
 });
 
 test('adb exit zero cannot turn failed, missing, duplicate or crashed tests into success', () => {
@@ -325,6 +433,106 @@ test('requires the host stop to succeed and the target PID to be absent before r
   }
 });
 
+const legalFixture = (t, { original = 'no', overrides = {} } = {}) => {
+  const workDir = temp(t), calls = [], receipt = fourCaseReceipt();
+  let writes = 0, reads = 0, currentMode = original;
+  return { workDir, calls, receipt, run: () => runLegalPhase({ workDir, receipt,
+    adb: async (args, timeout) => {
+      let stage, result;
+      if (args[3] === 'getprop') {
+        stage = args[4] === 'ro.kernel.qemu' ? 'emulator' : 'api';
+        result = { status: 0, stdout: stage === 'emulator' ? '1\n' : '36\n' };
+      } else if (args[3] === 'cmd' && args[4] === 'uimode' && args[5] === 'night') {
+        if (args.length === 7) {
+          stage = writes++ === 0 ? 'set-dark' : 'restore';
+          currentMode = args[6];
+        } else stage = reads++ === 0 ? 'read-original' : writes === 1 ? 'read-dark' : 'read-restored';
+        result = { status: 0, stdout: 'Night mode: ' + currentMode + '\n' };
+      } else {
+        assert.deepEqual(args, instrumentationArgs('legal'), 'only the legal method may run here');
+        stage = 'instrumentation';
+        result = { status: 0, stdout: phaseOutput('legal') };
+      }
+      calls.push({ stage, args, timeout });
+      assert.ok(calls.length <= 8, 'no retries or extra device mutations');
+      return overrides[stage] ?? result;
+    },
+  }) };
+};
+
+test('legal checks start after the original four, use a fresh dark launch and restore the exact night setting', async t => {
+  for (const original of ['no', 'yes', 'auto', 'custom_schedule', 'custom_bedtime']) {
+    const fixture = legalFixture(t, { original });
+    await fixture.run();
+    assert.deepEqual(fixture.calls.map(call => call.stage), [
+      'emulator', 'api', 'read-original', 'set-dark', 'read-dark', 'instrumentation', 'restore', 'read-restored',
+    ]);
+    assert.equal(fixture.calls[3].args.at(-1), 'yes');
+    assert.equal(fixture.calls[5].timeout, 180_000);
+    assert.equal(fixture.calls[6].args.at(-1), original);
+    assert.equal(fixture.calls.some(call => call.args.includes('force-stop') || call.args.includes('install') || call.args.includes('clear')), false);
+    assert.equal(fixture.receipt.cases.length, 6);
+    assert.equal(fixture.receipt.legalPhasePassed, true);
+    assert.equal(fixture.receipt.legalNightMode.original, original);
+    assert.equal(fixture.receipt.legalNightMode.restored, true);
+    assert.deepEqual(deviceCaseCompletion(fixture.receipt), { allFourCasesPassed: true, allRequiredCasesPassed: true });
+    assert.equal(readFileSync(path.join(fixture.workDir, 'phase-legal.log'), 'utf8'), phaseOutput('legal'));
+  }
+});
+
+test('legal checks refuse incomplete restore, real devices, wrong API or unknown original mode before changing settings', async t => {
+  const incomplete = legalFixture(t); incomplete.receipt.forceStopConfirmed = false;
+  await assert.rejects(incomplete.run(), { code: 'ORIGINAL_FOUR_CASES_REQUIRED_BEFORE_LEGAL' });
+  assert.equal(incomplete.calls.length, 0);
+  for (const [stage, result, code] of [
+    ['emulator', { status: 0, stdout: '0\n' }, 'LEGAL_API36_EMULATOR_REQUIRED'],
+    ['api', { status: 0, stdout: '35\n' }, 'LEGAL_API36_EMULATOR_REQUIRED'],
+    ['read-original', { status: 0, stdout: 'Night mode: invalid\n' }, 'LEGAL_ORIGINAL_NIGHT_MODE_UNCONFIRMED'],
+    ['read-original', { status: 0, stdout: 'Night mode: no\nNight mode: yes\n' }, 'LEGAL_ORIGINAL_NIGHT_MODE_UNCONFIRMED'],
+    ['read-original', { status: 0, stdout: 'Night mode: no\n', stderr: 'permission denied' }, 'LEGAL_ORIGINAL_NIGHT_MODE_UNCONFIRMED'],
+  ]) {
+    const fixture = legalFixture(t, { overrides: { [stage]: result } });
+    await assert.rejects(fixture.run(), { code });
+    assert.equal(fixture.calls.some(call => ['set-dark', 'restore', 'instrumentation'].includes(call.stage)), false);
+    assert.equal(fixture.receipt.cases.length, 4);
+  }
+});
+
+test('dark setting, missing dark observation or failed legal instrumentation restore the original mode without a pass', async t => {
+  for (const [stage, result, code] of [
+    ['set-dark', { status: 1, stdout: '' }, 'LEGAL_NIGHT_MODE_SET_FAILED'],
+    ['read-dark', { status: 0, stdout: 'Night mode: no\n' }, 'LEGAL_NIGHT_MODE_UNCONFIRMED'],
+    ['instrumentation', { status: 0, stdout: phaseOutput('legal') + 'INSTRUMENTATION_ABORTED\n' }, 'INSTRUMENTATION_DID_NOT_PASS'],
+    ['instrumentation', { status: 0, stdout: legalOutput(legalReports().map(report => ({ caseId: report.caseId, passed: true }))) }, 'INVALID_LEGAL_CASE_EVIDENCE'],
+  ]) {
+    const fixture = legalFixture(t, { overrides: { [stage]: result } });
+    await assert.rejects(fixture.run(), { code });
+    assert.deepEqual(fixture.calls.slice(-2).map(call => call.stage), ['restore', 'read-restored']);
+    assert.equal(fixture.receipt.legalNightMode.restored, true);
+    assert.equal(fixture.receipt.legalPhasePassed, false);
+    assert.equal(fixture.receipt.cases.length, 4);
+    assert.deepEqual(deviceCaseCompletion(fixture.receipt), { allFourCasesPassed: true, allRequiredCasesPassed: false });
+  }
+});
+
+test('night-mode cleanup failures cannot overwrite the original legal failure or yield six-case success', async t => {
+  for (const stage of ['restore', 'read-restored']) {
+    const cleanupFailure = { status: 0, stdout: 'Night mode: yes\n' };
+    const fixture = legalFixture(t, { overrides: { [stage]: cleanupFailure } });
+    await assert.rejects(fixture.run(), { code: 'LEGAL_NIGHT_MODE_RESTORE_FAILED' });
+    assert.equal(fixture.receipt.legalNightMode.restored, false);
+    assert.equal(fixture.receipt.legalNightMode.restoreFailureCode, 'LEGAL_NIGHT_MODE_RESTORE_FAILED');
+    assert.deepEqual(deviceCaseCompletion(fixture.receipt), { allFourCasesPassed: true, allRequiredCasesPassed: false });
+  }
+  const both = legalFixture(t, { overrides: {
+    instrumentation: { status: 0, stdout: 'INSTRUMENTATION_FAILED\n' },
+    restore: { status: 1, stdout: '' },
+  } });
+  await assert.rejects(both.run(), { code: 'INSTRUMENTATION_DID_NOT_PASS' });
+  assert.equal(both.receipt.legalNightMode.restoreFailureCode, 'LEGAL_NIGHT_MODE_RESTORE_FAILED');
+  assert.equal(both.receipt.legalPhasePassed, false);
+});
+
 const syntheticPng = (width = 640, height = 1280) => {
   const chunk = (type, data) => {
     const payload = Buffer.concat([Buffer.from(type, 'ascii'), data]);
@@ -393,4 +601,18 @@ test('failure capture rejects bad image and preserves original failure when capt
   const state = JSON.parse(readFileSync(path.join(workDir, 'diagnostics/state.json'), 'utf8'));
   assert.equal(state.failureCode, 'ORIGINAL_TOUCH_FAILURE'); assert.equal(state.screenshot, null);
   assert.equal(state.allFourCasesPassed, false); assert.equal(calls.length, 3);
+});
+
+test('legal failure artifacts preserve four completed cases while keeping partial new cases separate', async t => {
+  const workDir = temp(t), receipt = fourCaseReceipt();
+  Object.assign(receipt, { currentPhase: 'legal', failureCode: 'INVALID_LEGAL_CASE_EVIDENCE',
+    observedPassedCaseIds: ['launch', 'native-back', 'narrow-screen', 'draft-restore-after-force-stop',
+      'legal-navigation-native-back', 'invented-legal-case'] });
+  await captureFailureEvidence({ workDir, receipt, emulatorAlive: false, adb: async () => assert.fail('no live emulator') });
+  const state = JSON.parse(readFileSync(path.join(workDir, 'diagnostics/state.json'), 'utf8'));
+  assert.equal(state.allFourCasesPassed, true);
+  assert.equal(state.allRequiredCasesPassed, false);
+  assert.equal(state.failedPhase, 'legal');
+  assert.equal(state.externalMailAppTested, false);
+  assert.deepEqual(state.observedPassedCaseIds, receipt.observedPassedCaseIds.slice(0, -1));
 });

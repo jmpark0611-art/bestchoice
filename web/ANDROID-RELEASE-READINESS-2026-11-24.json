@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "recordedAtUtc": "2026-11-24T16:41:29Z",
-  "status": "signed-candidate-preserved-awaiting-database-policy-integration-console-and-device",
+  "recordedAtUtc": "2026-11-25T01:56:18.869929+00:00",
+  "status": "draft-policy-navigation-integrated-native-check-pending-final-policy-and-backend",
   "candidate": {
     "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
     "sizeBytes": 4161320,
@@ -92,7 +92,7 @@
     "cors": {
       "referenceJson": "qa/native-cors-applied-2026-11-25.json",
       "referenceMarkdown": "qa/native-cors-applied-2026-11-25.md",
-      "recheckedThisTurn": true,
+      "recheckedThisTurn": false,
       "lastObservedAtUtc": "2026-11-24T15:44:19.640Z",
       "lastObservedAtKst": "2026-11-25T00:44:19.640+09:00",
       "webOrigin": "https://genie-web-rosy.vercel.app",
@@ -178,6 +178,46 @@
     "resumeExecutionRecord": "qa/production-server-resume-2026-11-24.json",
     "databaseObservationScope": "The migration count, catalog and productionWritesPerformed fields describe the dated database-only read above; the separately recorded CORS setting was subsequently changed.",
     "latestMigrationDiagnosis": {
+      "observedAtUtc": "2026-11-25T01:42:11.605901Z",
+      "observedAtKst": "2026-11-25T10:42:11.605901+09:00",
+      "migrationCount": 7,
+      "projectStatus": "ACTIVE_HEALTHY",
+      "privateSchemasAbsent": [
+        "genie_question_safety_private",
+        "genie_reporting_private"
+      ],
+      "newPublicFunctionOverloadCounts": {
+        "vs_clear_question_author_blocks": 0,
+        "vs_report_question": 0,
+        "vs_report_result": 0,
+        "vs_set_question_author_block": 0,
+        "vs_shared_poll_guarded": 0,
+        "vs_vote_guarded": 0
+      },
+      "matchingActivityCount": 0,
+      "currentBlocker": "No new evidence of completed/cancelled prior apply or restored mutation completion path",
+      "newApplyAttemptThisPreparation": false,
+      "automaticApprovalRejectionObserved": false,
+      "mcpWritePathRecoveryVerified": false,
+      "additionalBusinessApprovalRequired": false,
+      "evidence": "release-prep/launch-continuation/migration-readiness.json"
+    },
+    "priorMigrationDiagnosis": {
+      "observedAtUtc": "2026-11-24T15:46:39.680Z",
+      "observedAtKst": "2026-11-25T00:46:39.680+09:00",
+      "projectStatus": "ACTIVE_HEALTHY",
+      "migrationCount": 7,
+      "privateSchemasAbsent": [
+        "genie_reporting_private",
+        "genie_question_safety_private"
+      ],
+      "currentBlocker": "previous apply completion lost; current catalog unapplied",
+      "newApplyAttemptThisTurn": false,
+      "pendingManagementRequestCancellationProven": false,
+      "mcpWritePathRecoveryVerified": false
+    },
+    "latestMigrationAttemptRecord": "qa/release-finalization-2026-11-25.json",
+    "previousMigrationDiagnosisBeforeDraftRuntimeIntegration": {
       "observedAtUtc": "2026-11-24T16:39:25.443040Z",
       "observedAtKst": "2026-11-25T01:39:25.443040+09:00",
       "migrationHistoryObservedDuringUtcMinute": "2026-11-24T16:35Z",
@@ -202,22 +242,7 @@
       "mcpWritePathRecoveryVerified": false,
       "additionalBusinessApprovalRequired": false,
       "evidence": "qa/release-finalization-2026-11-25.json"
-    },
-    "priorMigrationDiagnosis": {
-      "observedAtUtc": "2026-11-24T15:46:39.680Z",
-      "observedAtKst": "2026-11-25T00:46:39.680+09:00",
-      "projectStatus": "ACTIVE_HEALTHY",
-      "migrationCount": 7,
-      "privateSchemasAbsent": [
-        "genie_reporting_private",
-        "genie_question_safety_private"
-      ],
-      "currentBlocker": "previous apply completion lost; current catalog unapplied",
-      "newApplyAttemptThisTurn": false,
-      "pendingManagementRequestCancellationProven": false,
-      "mcpWritePathRecoveryVerified": false
-    },
-    "latestMigrationAttemptRecord": "qa/release-finalization-2026-11-25.json"
+    }
   },
   "playConsole": {
     "observedOnKst": "2026-11-24",
@@ -235,17 +260,17 @@
   "signedCandidateAvailableForInternalTrackPreparation": true,
   "nextSequence": [
     "Confirm unresolved actual privacy/provider and request-handling facts, finalize the prepared HTML, and obtain verified public policy/deletion URLs through authorized publication.",
-    "Add final policy/deletion access within the app, then create and focus-check a refreshed candidate; the existing AAB does not contain these changes.",
+    "Finalize the integrated draft policy/deletion screens after actual policy facts and public URLs are confirmed, then create and verify a refreshed candidate; the old AAB does not contain the new routes.",
     "Resume the two already-authorized exact migrations through a working completion path after reconciling pending requests; verify real history, grants, RLS, preserved existing contracts and advisor delta. Android and existing-web CORS preflights are already verified.",
     "Access the existing Play developer account and verify package, version code and upload certificate before selecting the refreshed candidate; do not infer account-specific testing requirements.",
     "Verify approved isolated synthetic-data backend flows and install the intended build on a physical Android device; capture actual screenshots and finalize observed Console declarations.",
     "Proceed to the specifically authorized internal release or review submission only after applicable gates are satisfied; iOS follows Android."
   ],
-  "previousRecordedAtUtc": "2026-11-24T15:46:39.680Z",
+  "previousRecordedAtUtc": "2026-11-24T16:41:29Z",
   "operationalSettingChangeRecord": "qa/native-cors-applied-2026-11-25.json",
   "privacyRelease": {
     "sourceFile": "web/src/screens/AboutScreen.tsx",
-    "sourceGitBlob": "8a919f6cf56e8d9321dc0bfc073f0f4102451225",
+    "sourceGitBlob": "33db041de6427f67ad614ba659d532a157458544",
     "trialUseNoticePresent": true,
     "finalPolicyOrFinalPolicyLinkPresent": false,
     "publicDeletionResourceLinkPresent": false,
@@ -259,13 +284,32 @@
     "policyUrl": null,
     "deletionUrl": null,
     "effectiveDate": null,
-    "sourceChangeImplemented": false,
+    "sourceChangeImplemented": true,
     "candidateRefreshRequiredAfterRuntimeIntegration": true,
     "accountDeletionApplicability": "Confirm against actual anonymous-session behavior and Console questions; do not infer standard account-creation answers solely from anonymous Auth.",
     "candidateSourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
     "candidateAboutScreenGitBlob": "8a919f6cf56e8d9321dc0bfc073f0f4102451225",
-    "candidateAboutScreenMatchesCurrentSource": true,
-    "evidence": "qa/release-finalization-2026-11-25.md"
+    "candidateAboutScreenMatchesCurrentSource": false,
+    "evidence": "qa/release-finalization-2026-11-25.md",
+    "sourceChangeScope": "Draft privacy/deletion navigation integrated in the approved development branch; final policy facts and URLs remain pending",
+    "draftRuntimeIntegrated": true,
+    "draftRuntimeRoutes": [
+      "/privacy",
+      "/delete-data"
+    ],
+    "runtimeIntegrationEvidence": "qa/legal-runtime-integration-2026-11-25.json"
   },
-  "currentCandidateRequiresPolicyRuntimeUpdateBeforeStoreSubmission": true
+  "currentCandidateRequiresPolicyRuntimeUpdateBeforeStoreSubmission": true,
+  "currentDevelopmentVerification": {
+    "status": "native-fixture-validation-pending",
+    "baselineCommit": "818655e10fe00b65da8bfe64f77e0d928429eb9d",
+    "legalPatchSha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08",
+    "priorFocusedUiTests": 6,
+    "priorFocusedUiSourceBytesPreserved": true,
+    "newNativeLegalCaseCount": 2,
+    "existingNativeCaseCount": 4,
+    "newSignedCandidateCreated": false,
+    "storeSubmission": false,
+    "evidence": "qa/legal-runtime-integration-2026-11-25.json"
+  }
 }

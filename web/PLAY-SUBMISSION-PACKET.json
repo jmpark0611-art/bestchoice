@@ -1397,11 +1397,15 @@
     }
   },
   "documentationRevision": {
-    "baseCommit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
-    "previousPacketRecordedAtUtc": "2026-11-23T23:36:41Z",
-    "preparedOnKst": "2026-11-25",
-    "officialPolicyCheckedOnUtc": "2026-11-24",
-    "scope": "Three Play documentation files reconstructed from exact-base originals and the retained authoring transcript after executor/store loss. Root reviewed and reconciled the later exact-name catalog evidence, then prepared the documents for the already-authorized branch checkpoint. No Console entry, runtime edit, new build or live app validation."
+    "recordedAtUtc": "2026-11-25T02:06:46.279834+00:00",
+    "scope": "Draft runtime navigation integrated; final policy answers and preserved signed candidate unchanged.",
+    "previous": {
+      "baseCommit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
+      "previousPacketRecordedAtUtc": "2026-11-23T23:36:41Z",
+      "preparedOnKst": "2026-11-25",
+      "officialPolicyCheckedOnUtc": "2026-11-24",
+      "scope": "Three Play documentation files reconstructed from exact-base originals and the retained authoring transcript after executor/store loss. Root reviewed and reconciled the later exact-name catalog evidence, then prepared the documents for the already-authorized branch checkpoint. No Console entry, runtime edit, new build or live app validation."
+    }
   },
   "copyValidation": {
     "appNameCharacters": 5,
@@ -1551,7 +1555,16 @@
     "currentCandidateHashPreserved": true,
     "finalPrivacyEffectiveDateConfirmed": false,
     "accountDeletionPolicyApplicabilityNotAssumed": true,
-    "scope": "Prepared HTML is review material, not a live/final policy. Resolve facts, publish final resources, and integrate final in-app policy access; runtime changes require a new candidate and relevant checks.",
-    "evidence": "qa/release-finalization-2026-11-25.md"
+    "scope": "Draft policy/deletion screens are integrated in development source. Public policy/deletion resources, actual provider facts and final policy remain incomplete. The preserved signed candidate predates these routes and requires a refresh after finalization.",
+    "evidence": "qa/release-finalization-2026-11-25.md",
+    "draftRuntimeIntegrated": true,
+    "draftRuntimeRoutes": [
+      "/privacy",
+      "/delete-data"
+    ],
+    "draftRuntimeSourceScope": "Approved development branch only; review notice remains visible.",
+    "runtimePolicyIntegrationCompletedMeaning": "Final policy facts and public URLs; draft navigation is recorded separately.",
+    "currentCandidateIncludesDraftRoutes": false,
+    "runtimeIntegrationEvidence": "qa/legal-runtime-integration-2026-11-25.json"
   }
 }

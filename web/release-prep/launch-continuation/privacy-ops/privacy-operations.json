@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "kind": "genie-privacy-deletion-reporting-operations-draft",
+  "preparedAtUtc": "2026-11-25",
+  "status": "proposed-not-adopted",
+  "publicPolicyFinalized": false,
+  "operationalActionsTaken": false,
+  "emailSent": false,
+  "loginPerformed": false,
+  "remoteWrites": false,
+  "knownOperator": {
+    "company": "에스제이컴퍼니",
+    "representative": "박지민",
+    "supportEmail": "jmpark0611@gmail.com",
+    "intendedMinimumAge": 18
+  },
+  "adoptedOperations": {
+    "requestHandler": null,
+    "privacyOfficerTitle": null,
+    "firstResponseTargetBusinessDays": null,
+    "caseLedgerRetentionDaysAfterClosure": null,
+    "policyEffectiveDate": null
+  },
+  "proposedDecisions": [
+    {
+      "id": "handler",
+      "recommended": "A",
+      "selected": null,
+      "options": [
+        {
+          "id": "A",
+          "label": "박지민 직접 문의 담당",
+          "type": "role_assignment_proposal"
+        },
+        {
+          "id": "B",
+          "label": "별도 담당자 지정",
+          "requiresNamedHandler": true
+        }
+      ],
+      "doesNotAutomaticallyDesignateLegalPrivacyOfficer": true
+    },
+    {
+      "id": "first_response",
+      "recommended": "A",
+      "selected": null,
+      "options": [
+        {
+          "id": "A",
+          "businessDays": 1
+        },
+        {
+          "id": "B",
+          "businessDays": 2
+        }
+      ],
+      "scope": "acknowledgement and triage only",
+      "isLegalDeadline": false,
+      "allDataDeletionSla": false
+    },
+    {
+      "id": "minimal_ledger_retention",
+      "recommended": "A",
+      "selected": null,
+      "options": [
+        {
+          "id": "A",
+          "daysAfterClosure": 30
+        },
+        {
+          "id": "B",
+          "daysAfterClosure": 90
+        }
+      ],
+      "purpose": "limited recontact and omission review, subject to actual necessity/adoption/disclosure",
+      "isUniversalStatutoryRetention": false,
+      "rawBodyCopiedToLedger": false,
+      "blanketRefusalOfErasureDuringPeriod": false
+    }
+  ],
+  "minimumIntake": {
+    "required": [
+      "request category",
+      "approximate target date",
+      "whether original app/session still accessible"
+    ],
+    "ifNeeded": [
+      "short error message",
+      "app or web"
+    ],
+    "optional": [
+      "existing share URL",
+      "existing server report receipt"
+    ],
+    "prohibited": [
+      "identity document",
+      "passport",
+      "password",
+      "OTP",
+      "access token",
+      "refresh token",
+      "entire local storage",
+      "unnecessary sensitive narrative"
+    ],
+    "newShareOrPaidAiCallRequired": false
+  },
+  "ownership": {
+    "currentlyVerifiedMechanism": "Original authenticated session, owner-filtered vs_delete_poll and owned-history refresh",
+    "deleteRpcReturnsCount": false,
+    "successfulRpcIsOwnershipProof": false,
+    "emailLinkScreenshotProvesAccountOwnership": false,
+    "reportReceiptProvesAuthorOwnership": false,
+    "thirdPartyPrivacyReportRequiresAuthorOwnership": false,
+    "futureAuthenticatedSupportRequest": {
+      "implemented": false,
+      "serverDerivesActorFromAuth": true,
+      "serverValidatesTargetAndScope": true,
+      "receiptIsReferenceNotAuthority": true,
+      "emailDeliveryOfTokens": false,
+      "scopeChangesRequireNewAuthenticatedConfirmation": true
+    }
+  },
+  "caseStates": [
+    "received",
+    "needs_minimal_details",
+    "self_service_guidance",
+    "verification_required",
+    "technical_review",
+    "scope_approved",
+    "executed_needs_verification",
+    "verified_for_scope",
+    "replied",
+    "closed_with_result"
+  ],
+  "resultTypes": [
+    "complete_for_confirmed_scope",
+    "partial",
+    "not_executed_pending_verification",
+    "self_service_reported_complete",
+    "reviewed_no_action"
+  ],
+  "caseTemplate": {
+    "exampleOnly": true,
+    "supportCaseId": null,
+    "receivedAtUtc": null,
+    "channel": "email",
+    "requestCategory": null,
+    "originalSessionAccessible": null,
+    "appReportReceiptReference": null,
+    "targetReferenceRestricted": null,
+    "legalDeadlineRule": null,
+    "legalDueAt": null,
+    "assignedHandler": null,
+    "nextReviewAt": null,
+    "ownershipMethod": null,
+    "ownershipStatus": "not_assessed",
+    "approvedScope": [],
+    "approver": null,
+    "executionReference": null,
+    "verifiedScope": [],
+    "unverifiedScope": [],
+    "retainedScopeAndReason": [],
+    "resultType": null,
+    "customerNoticeAt": null,
+    "appealRoute": "reply with support case reference",
+    "closedAt": null,
+    "ledgerDeletionDueAt": null,
+    "retentionDecisionRef": null
+  },
+  "requestRoutes": [
+    {
+      "kind": "owned_decision",
+      "currentSelfService": true,
+      "steps": [
+        "결정 기록 전체 보기",
+        "대상 기록 삭제",
+        "확인",
+        "새로 고침"
+      ],
+      "verifyOriginalSession": true,
+      "scope": [
+        "decision",
+        "associated votes",
+        "attempt linked local reflection/draft cleanup"
+      ]
+    },
+    {
+      "kind": "local_draft_reflection_preference",
+      "currentSelfService": true,
+      "operatorRemoteDeletion": false
+    },
+    {
+      "kind": "single_vote_removal",
+      "currentIndependentUi": false,
+      "requiresVerifiedVoterAndScopedImplementation": true,
+      "deleteOtherAuthorsPollInstead": false
+    },
+    {
+      "kind": "complete_identity",
+      "currentGeneralUi": false,
+      "requiresCrossServiceImpactReview": true
+    },
+    {
+      "kind": "lost_original_session",
+      "intakeAllowed": true,
+      "reinstallRequired": false,
+      "emailOnlyDeletion": false,
+      "alternativeVerificationReview": true,
+      "automaticPurgeNotSubstituteForRightsResponse": true
+    },
+    {
+      "kind": "third_party_content_privacy",
+      "intakeAllowed": true,
+      "requiresAuthorAccountOwnership": false,
+      "reviewAgainstActualPolicy": true,
+      "automaticDeletionOnAllegation": false
+    },
+    {
+      "kind": "report_server_unavailable",
+      "emailSupportReceiptSeparate": true,
+      "claimAppReportReceivedWithoutReceipt": false
+    }
+  ],
+  "legacyDeletion": {
+    "sourceCommit": "ab960b8889b91ec27b47f1d336b5dcaf6b381b55",
+    "sourcePath": "supabase/migrations/20260929093527_bc_retention_and_account_delete.sql",
+    "function": "public.bc_delete_account()",
+    "deletesAuthUsersCurrentUid": true,
+    "vsAuthForeignKeysCascade": true,
+    "reuseAsVsSupportShortcut": false,
+    "requiresLiveDefinitionScopeAndRelatedDataReview": true
+  },
+  "legalRules": [
+    {
+      "id": "L1",
+      "source": "PIPA Article 36",
+      "scope": "investigation, required rectification/erasure and notice for applicable requests",
+      "operatorSlaSetByThisDocument": false
+    },
+    {
+      "id": "L2",
+      "source": "PIPA Enforcement Decree Articles 43 and 46, effective 2026-11-10",
+      "noticePeriodDays": 10,
+      "appliesTo": "applicable statutory rectification/erasure result notice",
+      "universalAllBackupsErasedWithin10Days": false,
+      "automaticPauseDuringIdentityReviewAsserted": false,
+      "verifyDataSubjectOrAuthorizedRepresentative": true,
+      "mandatoryGovernmentIdCollectionAsserted": false
+    },
+    {
+      "id": "L3",
+      "source": "PIPA Article 38",
+      "scope": "accessible request and appeal process, authorized representative requests"
+    },
+    {
+      "id": "L4",
+      "source": "PIPA Article 21",
+      "scope": "disposal when data become unnecessary; actual statutory retention exceptions assessed separately",
+      "fixedAllCaseRetentionAsserted": false
+    }
+  ],
+  "googleAccountDeletion": {
+    "assessment": "not_determined_by_automatic_anonymous_uuid_alone",
+    "emailCanBeRequestChannelIfOperational": true,
+    "reinstallationOnlyExternalRequestFlow": false
+  },
+  "evidence": {
+    "settingsSource": "validation/genie-legal-integration-20261125/checkpoint/web/release-prep/legal-navigation/PRIVACY-FACTS-RESOLVED.json",
+    "settingsObservedOnUtc": "2026-11-24",
+    "openaiSettings": "sign-in-required; actual values unknown",
+    "reportBackendApplyConfirmed": false,
+    "readOnlySourceAndDocsReview": true,
+    "sourceCodeBaseline": "ab960b8889b91ec27b47f1d336b5dcaf6b381b55",
+    "reportBackendStatusIsPriorObservationNotFreshProductionQuery": true,
+    "sourceArtifacts": [
+      {
+        "path": "validation/genie-legal-integration-20261125/checkpoint/web/release-prep/legal-navigation/PRIVACY-FACTS-RESOLVED.json",
+        "sha256": "669782304139ad4a5052cc808932a7ddbb5a70791bcd33120bc89e491057e165"
+      },
+      {
+        "path": "validation/genie-legal-integration-20261125/baseline/supabase/migrations/20261115000000_vs_polls_and_votes.sql",
+        "sha256": "a11c228c811cf8f04030a6507755863a4a3c6a771f86caa5268db59c77a136f1"
+      },
+      {
+        "path": "validation/genie-legal-integration-20261125/baseline/web/src/screens/AboutScreen.tsx",
+        "sha256": "e232613bd8be6a5f5a26b49482a245dc93a87d716e2171e2dc22fe64658fdbcb"
+      },
+      {
+        "path": "validation/genie-legal-integration-20261125/baseline/web/src/screens/HistoryScreen.tsx",
+        "sha256": "939df78992e175658d23add037a8f6ef5481c453f2b5e34bc77a75cd071e90a5"
+      },
+      {
+        "path": "validation/genie-legal-integration-20261125/baseline/web/src/lib/api.ts",
+        "sha256": "bd83eacd4016a7946f2f83f20671a64dc2eecd06e8c16e1c4719df8056cbac65"
+      },
+      {
+        "path": "validation/genie-legal-integration-20261125/baseline/web/src/lib/decisionReports.ts",
+        "sha256": "7cee8c494f0e259ccabbc0fc36489ec76db8f7e32b433aae39b495a706cd2638"
+      },
+      {
+        "path": "validation/genie-legal-integration-20261125/baseline/web/src/lib/contentPolicy.ts",
+        "sha256": "2680e3628296fee90d5e45250beb7eab2d874f050dbf9030af0b84992a801ab0"
+      }
+    ]
+  },
+  "sourceUrls": [
+    "https://www.law.go.kr/LSW/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1029335317",
+    "https://www.law.go.kr/LSW/lsInfoR.do?efYd=20261110&lsiSeq=291731",
+    "https://www.law.go.kr/LSW/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1027192787",
+    "https://law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1029335625",
+    "https://supabase.com/docs/guides/auth/managing-user-data",
+    "https://support.google.com/googleplay/android-developer/answer/13327111?hl=en",
+    "https://github.com/jmpark0611-art/bestchoice/blob/ab960b8889b91ec27b47f1d336b5dcaf6b381b55/supabase/migrations/20260929093527_bc_retention_and_account_delete.sql"
+  ]
+}
