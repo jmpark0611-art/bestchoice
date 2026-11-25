@@ -38,7 +38,7 @@ HEAD `818655e10fe00b65da8bfe64f77e0d928429eb9d`의 정확한 소스를 바탕으
 
 ## 운영 준비
 
-[문의 처리 절차](../release-prep/launch-continuation/privacy-ops/PRIVACY-REQUEST-RUNBOOK.md)는 최소 접수정보, 본인 직접 삭제, 접근 상실, 일부 삭제 실패, 타인의 개인정보 노출 신고, 결과 확인·통지를 구체화했다. [답변 8종](../release-prep/launch-continuation/privacy-ops/REPLY-TEMPLATES.md)을 준비했으며 실제 발송은 하지 않았다. [운영 방식 선택 현황](../release-prep/launch-continuation/privacy-ops/OPERATOR-DECISIONS.md) 중 **최초 접수·분류 답변의 1영업일 목표는 2026-11-25 KST 사용자의 선택으로 확정**했다. 문의 담당자와 최소 처리표 보관기간은 미선택이다. 이 목표는 전체 데이터 삭제 완료기한이나 운영 개시일을 확정하지 않는다.
+[문의 처리 절차](../release-prep/launch-continuation/privacy-ops/PRIVACY-REQUEST-RUNBOOK.md)는 최소 접수정보, 본인 직접 삭제, 접근 상실, 일부 삭제 실패, 타인의 개인정보 노출 신고, 결과 확인·통지를 구체화했다. [답변 8종](../release-prep/launch-continuation/privacy-ops/REPLY-TEMPLATES.md)을 준비했으며 실제 발송은 하지 않았다. [운영 방식 선택 현황](../release-prep/launch-continuation/privacy-ops/OPERATOR-DECISIONS.md)의 세 항목은 **2026-11-25 KST 사용자의 승인으로 박지민 직접 담당, 최초 접수·분류 답변 1영업일 목표, 처리 종료 후 최소 처리표 최대 30일 보관으로 모두 확정**됐다. 최소 처리표도 필요가 없어지면 30일 전 정리한다. 원문·민감 첨부와 최소 처리표의 보관을 구분한다. 실제 적용 준비와 제공자 사실 확인은 남아 있으며, 전체 데이터 삭제 완료기한이나 운영 개시일을 확정한 것은 아니다.
 
 [서버 관측](../release-prep/launch-continuation/migration-readiness.json)은 11월25일 10:42 KST 기준 신규 스키마 두 개와 공개 함수 여섯 이름의 부재를 기록한다. 완료 응답을 확인할 수 없었던 이전 적용 요청의 해결 근거는 새로 확보되지 않았다. 같은 적용 요청은 반복하지 않았다. 이전에 완료한 Android·웹 CORS의 204 관측은 보존한다.
 

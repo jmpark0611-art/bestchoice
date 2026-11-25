@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordedAtUtc": "2026-11-25T02:59:39.148809+00:00",
+  "recordedAtUtc": "2026-11-25T03:30:51.669006+00:00",
   "recordedOnKst": "2026-11-25",
   "status": "draft-runtime-integrated-all-three-native-workflows-passed-not-release-ready",
   "repository": "jmpark0611-art/bestchoice",
@@ -171,16 +171,19 @@
     "migrationEvidence": "../release-prep/launch-continuation/migration-readiness.json",
     "supportProcedure": "../release-prep/launch-continuation/privacy-ops/PRIVACY-REQUEST-RUNBOOK.md",
     "replyTemplateCount": 8,
-    "unapprovedOperatingDecisionCount": 2,
-    "allOperatingChoicesAdopted": false,
-    "adoptedOperatingDecisionCount": 1,
+    "unapprovedOperatingDecisionCount": 0,
+    "allOperatingChoicesAdopted": true,
+    "adoptedOperatingDecisionCount": 3,
     "firstResponseTargetBusinessDays": 1,
     "responseTargetConfirmedOnKst": "2026-11-25",
     "responseTargetScope": "Initial acknowledgement and triage; not data deletion completion",
-    "remainingOperatingDecisionIds": [
-      "handler",
-      "minimal_ledger_retention"
-    ]
+    "remainingOperatingDecisionIds": [],
+    "requestHandler": "박지민",
+    "caseLedgerMaximumRetentionDaysAfterClosure": 30,
+    "eraseLedgerEarlierWhenUnnecessary": true,
+    "allThreeChoicesConfirmedOnKst": "2026-11-25",
+    "adoptionScope": "Request handler, initial response target and maximum minimum-ledger retention only; service implementation and final policy are separate",
+    "operationalProcedureActivated": false
   },
   "deploymentObservation": {
     "vercelProjectId": "prj_qJ15NyIr66vmhYfs8GNrtf5oXHRj",
@@ -207,7 +210,7 @@
     "buildArtifactsRetained": false
   },
   "remainingGates": [
-    "Finalize provider data handling facts and the actual support operating decisions.",
+    "Finalize provider data handling facts and prepare the already-adopted support procedure for operation, including business calendar and effective date.",
     "Publish finalized privacy resources and verify actual URLs through separately authorized execution.",
     "Restore a verified migration execution path and reconcile prior requests before the two authorized additive migrations.",
     "Verify this app package, version and upload-certificate linkage in authenticated Play Console.",

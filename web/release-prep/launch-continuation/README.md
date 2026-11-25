@@ -5,7 +5,7 @@
 - [실제 코드 통합 및 Android 검사 기록](../../qa/legal-runtime-integration-2026-11-25.md)
 - [문의·삭제·신고 처리 절차](privacy-ops/PRIVACY-REQUEST-RUNBOOK.md)
 - [답변 초안 8종](privacy-ops/REPLY-TEMPLATES.md)
-- [운영 방식 선택 현황 — 최초 답변 1영업일 목표 확정](privacy-ops/OPERATOR-DECISIONS.md)
+- [확정 운영 방식 — 박지민 담당·최초 답변 1영업일 목표·최소 처리표 최대 30일](privacy-ops/OPERATOR-DECISIONS.md)
 - [새 서명 후보 제작 계획](android-preflight/FINAL-CANDIDATE-PLAN.md)
 - [확보된 입력과 미확정 항목](android-preflight/INPUT-DECISIONS.json)
 - [서버 적용 경로의 현재 근거](migration-readiness.md)
