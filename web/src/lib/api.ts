@@ -167,7 +167,9 @@ export async function listDecisionHistory(offset = 0, limit = 30): Promise<Decis
     const {data,error} = await getSupabase().from('vs_polls')
       .select('id, option_a, option_b, pick, did, created_at')
       .order('created_at', {ascending:false}).order('id', {ascending:false})
-      .range(offset, offset + limit - 1).abortSignal(signal);
+      .range(offset, offset + limit - 1)
+      .setHeader('Authorization', `Bearer ${token}`).abortSignal(signal);
+    if(signal.aborted) throw new AppError('TIMEOUT');
     if(error) rpcError(error);
     return (data ?? []).map(r => ({id:r.id,a:r.option_a,b:r.option_b,pick:r.pick,did:r.did,createdAt:r.created_at}));
   }, 15000);
@@ -177,7 +179,28 @@ export async function deleteDecision(id:string): Promise<void> {
     const token = await getExistingSessionToken();
     if(signal.aborted) throw new AppError('TIMEOUT');
     if(token === null) throw new AppError('AUTH_REQUIRED');
-    const {error} = await getSupabase().rpc('vs_delete_poll', {p_id:id}).abortSignal(signal);
-    if(error) rpcError(error);
+    const client = getSupabase();
+    const authorization = `Bearer ${token}`;
+    // SELECT RLS is owner-only; all three requests must keep the same captured token.
+    const readOwned = () => client.from('vs_polls').select('id').eq('id', id)
+      .setHeader('Authorization', authorization).abortSignal(signal);
+    const before = await readOwned();
+    if(signal.aborted) throw new AppError('TIMEOUT');
+    if(before?.error) rpcError(before.error);
+    if(!Array.isArray(before?.data)) throw new AppError('RESULT_INVALID');
+    if(before.data.length === 0) throw new AppError('NOT_FOUND');
+    if(before.data.length !== 1 || before.data[0]?.id !== id) throw new AppError('RESULT_INVALID');
+
+    const deleted = await client.rpc('vs_delete_poll', {p_id:id})
+      .setHeader('Authorization', authorization).abortSignal(signal);
+    if(signal.aborted) throw new AppError('TIMEOUT');
+    if(deleted?.error) rpcError(deleted.error);
+    if(deleted?.data !== null) throw new AppError('RESULT_INVALID');
+
+    // A void RPC has no affected-row receipt; verify this owner's final absence only.
+    const after = await readOwned();
+    if(signal.aborted) throw new AppError('TIMEOUT');
+    if(after?.error) rpcError(after.error);
+    if(!Array.isArray(after?.data) || after.data.length !== 0) throw new AppError('RESULT_INVALID');
   },15000);
 }

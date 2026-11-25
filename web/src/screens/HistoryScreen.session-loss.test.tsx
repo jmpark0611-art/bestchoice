@@ -45,7 +45,7 @@ it('preserves history and local records when the session is lost before confirme
   expect(reflection.ok && reflectionDraft.ok && homeDraft.ok).toBe(true);
 
   const query = {
-    select: vi.fn().mockReturnThis(), order: vi.fn().mockReturnThis(), range: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(), order: vi.fn().mockReturnThis(), range: vi.fn().mockReturnThis(), setHeader: vi.fn().mockReturnThis(),
     abortSignal: vi.fn(async () => ({
       data: [{ id: 'p1', option_a: '커피', option_b: '차', pick: 'a', did: 'b', created_at: '2026-11-25T00:00:00Z' }],
       error: null,

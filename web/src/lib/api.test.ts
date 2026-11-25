@@ -52,15 +52,20 @@ it('does not issue late deletion after auth timeout',async()=>{
  expect(sb.ensureSession).not.toHaveBeenCalled();
 });
 it('uses owner-scoped delete RPC once and propagates errors',async()=>{
- const rpc=vi.fn(()=>({abortSignal:()=>Promise.resolve({error:{message:'NOT_FOUND'}})}));sb.getSupabase.mockReturnValue({rpc});
+  const query={select:vi.fn().mockReturnThis(),eq:vi.fn().mockReturnThis(),setHeader:vi.fn().mockReturnThis(),
+    abortSignal:vi.fn(async()=>({data:[{id:'p1'}],error:null}))};
+  const deletion={setHeader:vi.fn().mockReturnThis(),abortSignal:vi.fn(async()=>({data:null,error:{message:'NOT_FOUND'}}))};
+  const rpc=vi.fn(()=>deletion);sb.getSupabase.mockReturnValue({from:()=>query,rpc});
  await expect(deleteDecision('p1')).rejects.toMatchObject({code:'NOT_FOUND'});expect(rpc).toHaveBeenCalledExactlyOnceWith('vs_delete_poll',{p_id:'p1'});
+  expect(query.abortSignal).toHaveBeenCalledTimes(1);
  expect(sb.ensureSession).not.toHaveBeenCalled();
 });
 it('maps history with pagination and actual choice',async()=>{
- const chain:any={};for(const name of ['select','order','range'])chain[name]=vi.fn(()=>chain);
+  const chain:any={};for(const name of ['select','order','range','setHeader'])chain[name]=vi.fn(()=>chain);
  chain.abortSignal=vi.fn(async()=>({data:[{id:'p1',option_a:'A',option_b:'B',pick:'a',did:'b',created_at:'date'}],error:null}));
  sb.getSupabase.mockReturnValue({from:()=>chain});
  await expect(listDecisionHistory(30,30)).resolves.toEqual([{id:'p1',a:'A',b:'B',pick:'a',did:'b',createdAt:'date'}]);expect(chain.range).toHaveBeenCalledWith(30,59);
+  expect(chain.setHeader).toHaveBeenCalledExactlyOnceWith('Authorization','Bearer existing-token');
  expect(sb.ensureSession).not.toHaveBeenCalled();
 });
 
@@ -103,10 +108,20 @@ describe('history and deletion existing sessions', () => {
   });
 
   it('uses the existing session for a successful delete without anonymous fallback', async () => {
-    const rpc = vi.fn(() => ({ abortSignal: async () => ({ error: null }) }));
-    sb.getSupabase.mockReturnValue({ rpc });
+    const query = {
+      select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), setHeader: vi.fn().mockReturnThis(),
+      abortSignal: vi.fn().mockResolvedValueOnce({ data: [{ id: 'p1' }], error: null })
+        .mockResolvedValueOnce({ data: [], error: null }),
+    };
+    const deletion = { setHeader: vi.fn().mockReturnThis(), abortSignal: async () => ({ data: null, error: null }) };
+    const rpc = vi.fn(() => deletion);
+    sb.getSupabase.mockReturnValue({ from: () => query, rpc });
     await expect(deleteDecision('p1')).resolves.toBeUndefined();
     expect(rpc).toHaveBeenCalledExactlyOnceWith('vs_delete_poll', { p_id: 'p1' });
+    expect(query.abortSignal).toHaveBeenCalledTimes(2);
+    expect(query.setHeader).toHaveBeenNthCalledWith(1, 'Authorization', 'Bearer existing-token');
+    expect(query.setHeader).toHaveBeenNthCalledWith(2, 'Authorization', 'Bearer existing-token');
+    expect(deletion.setHeader).toHaveBeenCalledExactlyOnceWith('Authorization', 'Bearer existing-token');
     expect(sb.ensureSession).not.toHaveBeenCalled();
   });
 });
