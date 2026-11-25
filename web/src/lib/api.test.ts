@@ -2,7 +2,13 @@ import { sharePoll, getSharedPoll, vote, setDid, decide, getMyPoll, deleteDecisi
 const sb = vi.hoisted(() => ({ ensureSession: vi.fn(), getExistingSessionToken: vi.fn(), getSupabase: vi.fn() }));
 vi.mock('./supabase', () => sb);
 const input = { a: '짜장면', b: '짬뽕', note: '' };
-beforeEach(() => { vi.useFakeTimers(); vi.clearAllMocks(); sb.ensureSession.mockResolvedValue('test-token'); vi.stubGlobal('fetch', vi.fn()); });
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.resetAllMocks();
+  sb.ensureSession.mockResolvedValue('test-token');
+  sb.getExistingSessionToken.mockResolvedValue('existing-token');
+  vi.stubGlobal('fetch', vi.fn());
+});
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 it('navigable result is returned unchanged', async () => {
   vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => ({ kind: 'pick', id: 'p1' }) } as unknown as Response);
@@ -40,19 +46,69 @@ it.each([null, {}, { id: 'p1', pick: 'a' }, { id: 'other', isOwner: true, pick: 
 });
 
 it('does not issue late deletion after auth timeout',async()=>{
- let resolve!:(v:string)=>void;sb.ensureSession.mockReturnValue(new Promise<string>(r=>{resolve=r;}));
+ let resolve!:(v:string)=>void;sb.getExistingSessionToken.mockReturnValue(new Promise<string>(r=>{resolve=r;}));
  const assertion=expect(deleteDecision('p1')).rejects.toMatchObject({code:'TIMEOUT'});
  await vi.advanceTimersByTimeAsync(15001);await assertion;resolve('late');await vi.advanceTimersByTimeAsync(1);expect(sb.getSupabase).not.toHaveBeenCalled();
+ expect(sb.ensureSession).not.toHaveBeenCalled();
 });
 it('uses owner-scoped delete RPC once and propagates errors',async()=>{
  const rpc=vi.fn(()=>({abortSignal:()=>Promise.resolve({error:{message:'NOT_FOUND'}})}));sb.getSupabase.mockReturnValue({rpc});
  await expect(deleteDecision('p1')).rejects.toMatchObject({code:'NOT_FOUND'});expect(rpc).toHaveBeenCalledExactlyOnceWith('vs_delete_poll',{p_id:'p1'});
+ expect(sb.ensureSession).not.toHaveBeenCalled();
 });
 it('maps history with pagination and actual choice',async()=>{
  const chain:any={};for(const name of ['select','order','range'])chain[name]=vi.fn(()=>chain);
  chain.abortSignal=vi.fn(async()=>({data:[{id:'p1',option_a:'A',option_b:'B',pick:'a',did:'b',created_at:'date'}],error:null}));
  sb.getSupabase.mockReturnValue({from:()=>chain});
  await expect(listDecisionHistory(30,30)).resolves.toEqual([{id:'p1',a:'A',b:'B',pick:'a',did:'b',createdAt:'date'}]);expect(chain.range).toHaveBeenCalledWith(30,59);
+ expect(sb.ensureSession).not.toHaveBeenCalled();
+});
+
+describe('history and deletion existing sessions', () => {
+  it('returns an empty history without a session and never creates an account or queries data', async () => {
+    sb.getExistingSessionToken.mockResolvedValue(null);
+    await expect(listDecisionHistory()).resolves.toEqual([]);
+    expect(sb.ensureSession).not.toHaveBeenCalled();
+    expect(sb.getSupabase).not.toHaveBeenCalled();
+  });
+
+  it('rejects deletion without a session before creating an account or sending an RPC', async () => {
+    sb.getExistingSessionToken.mockResolvedValue(null);
+    await expect(deleteDecision('p1')).rejects.toMatchObject({ code: 'AUTH_REQUIRED' });
+    expect(sb.ensureSession).not.toHaveBeenCalled();
+    expect(sb.getSupabase).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['history', () => listDecisionHistory()],
+    ['deletion', () => deleteDecision('p1')],
+  ] as const)('propagates a %s session-read error without anonymous fallback or a data call', async (_name, call) => {
+    const failure = new Error('existing session unavailable');
+    sb.getExistingSessionToken.mockRejectedValue(failure);
+    await expect(call()).rejects.toBe(failure);
+    expect(sb.ensureSession).not.toHaveBeenCalled();
+    expect(sb.getSupabase).not.toHaveBeenCalled();
+  });
+
+  it('does not query history when the existing session arrives after its deadline', async () => {
+    let resolve!: (token: string) => void;
+    sb.getExistingSessionToken.mockReturnValue(new Promise<string>(r => { resolve = r; }));
+    const assertion = expect(listDecisionHistory()).rejects.toMatchObject({ code: 'TIMEOUT' });
+    await vi.advanceTimersByTimeAsync(15_001);
+    await assertion;
+    resolve('late-existing-token');
+    await vi.advanceTimersByTimeAsync(1);
+    expect(sb.ensureSession).not.toHaveBeenCalled();
+    expect(sb.getSupabase).not.toHaveBeenCalled();
+  });
+
+  it('uses the existing session for a successful delete without anonymous fallback', async () => {
+    const rpc = vi.fn(() => ({ abortSignal: async () => ({ error: null }) }));
+    sb.getSupabase.mockReturnValue({ rpc });
+    await expect(deleteDecision('p1')).resolves.toBeUndefined();
+    expect(rpc).toHaveBeenCalledExactlyOnceWith('vs_delete_poll', { p_id: 'p1' });
+    expect(sb.ensureSession).not.toHaveBeenCalled();
+  });
 });
 
 const boundedCalls = [

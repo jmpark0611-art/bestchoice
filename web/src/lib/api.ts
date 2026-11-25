@@ -161,8 +161,9 @@ export async function setDid(id: string, did: Did): Promise<void> {
 export type DecisionRecord = PollSummary & { did: Did | null };
 export async function listDecisionHistory(offset = 0, limit = 30): Promise<DecisionRecord[]> {
   return withDeadline(async signal => {
-    await session();
+    const token = await getExistingSessionToken();
     if (signal.aborted) throw new AppError('TIMEOUT');
+    if (token === null) return [];
     const {data,error} = await getSupabase().from('vs_polls')
       .select('id, option_a, option_b, pick, did, created_at')
       .order('created_at', {ascending:false}).order('id', {ascending:false})
@@ -173,8 +174,9 @@ export async function listDecisionHistory(offset = 0, limit = 30): Promise<Decis
 }
 export async function deleteDecision(id:string): Promise<void> {
   return withDeadline(async signal => {
-    await session();
+    const token = await getExistingSessionToken();
     if(signal.aborted) throw new AppError('TIMEOUT');
+    if(token === null) throw new AppError('AUTH_REQUIRED');
     const {error} = await getSupabase().rpc('vs_delete_poll', {p_id:id}).abortSignal(signal);
     if(error) rpcError(error);
   },15000);
