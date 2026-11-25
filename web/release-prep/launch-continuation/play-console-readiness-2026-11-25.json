@@ -1,51 +1,163 @@
 {
   "schemaVersion": 1,
-  "recordedAtUtc": "2026-11-25T03:42:51Z",
+  "recordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
   "recordedOnKst": "2026-11-25",
-  "status": "authenticated-read-complete-no-target-app-found-in-inspected-account",
-  "sourceBaseline": {
-    "head": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
-    "tree": "f551420fe633e0a32b42d104cee1281e13b551bb"
+  "observation": {
+    "date": "2026-11-25",
+    "relativeTiming": "earlier this turn",
+    "exactObservedAtUtc": null,
+    "timePrecision": "date-and-relative-turn",
+    "recordedAtUtcIsNotObservationTime": true
   },
-  "evidenceMethod": "Visible Play Console accessibility state from an existing authenticated browser session; no app-specific record was found to inspect.",
+  "status": "create-app-form-prepared-package-availability-ui-confirmed-not-submitted",
+  "sourceBaseline": {
+    "head": "3cd46d1fb209aba58a914b6931fe5b9748ee24a9"
+  },
+  "evidenceMethod": "Actual create-app form fields and visible package-availability result reported by the task lead from the existing authenticated session. This document editor did not interact with the Console.",
   "accountScope": {
     "intendedExistingDeveloperAccountAccessed": true,
-    "personalAccountLabelVisible": true,
-    "existingAppCountVisible": 2,
+    "existingSessionReused": true,
     "developerAccountIdOmitted": true,
+    "sessionUrlOmitted": true,
     "otherAppIdentifiersAndMetricsOmitted": true
+  },
+  "createAppForm": {
+    "inspected": true,
+    "appName": {
+      "value": "결정해지니",
+      "entered": true
+    },
+    "packageName": {
+      "value": "com.jmpark0611.genie",
+      "entered": true
+    },
+    "defaultLanguage": {
+      "value": "ko-KR",
+      "displayLabelKo": "한국어",
+      "selected": true
+    },
+    "appOrGame": {
+      "value": "App",
+      "selected": true
+    },
+    "downloadType": {
+      "selectedValue": null,
+      "freeSelected": false,
+      "paidSelected": false
+    },
+    "declarations": {
+      "developerPolicyCompliance": {
+        "checked": false,
+        "consentGiven": false
+      },
+      "usExportLaws": {
+        "checked": false,
+        "consentGiven": false
+      },
+      "fullLegalTextRecorded": false,
+      "noAgreementInferredFromEarlierDeveloperAccountOrOtherApps": true
+    },
+    "notFieldsOnThisObservedForm": [
+      "supportEmail",
+      "targetAgeGroups18Plus",
+      "categoryProductivity"
+    ],
+    "finalCreateAppButtonClicked": false,
+    "submitted": false,
+    "fieldPreparationIsNotAppRegistration": true,
+    "tabMarkedHandoff": true,
+    "userTakeoverRequested": false
+  },
+  "packageAvailabilityCheck": {
+    "packageName": "com.jmpark0611.genie",
+    "buttonLabelKo": "사용 가능 여부 확인",
+    "buttonClicked": true,
+    "observedResultKo": "사용 가능한 패키지 이름",
+    "uiReportedAvailable": true,
+    "scope": "Actual availability-check UI result for the proposed package at the observed moment; not a reservation, registration or guarantee of future availability.",
+    "packageReserved": false,
+    "appRegistered": false
   },
   "target": {
     "packageName": "com.jmpark0611.genie",
-    "visibleUnfilteredListContainedTarget": false,
-    "packageSearchReturnedNoMatchingResults": true,
-    "exactSearchResultKorean": "일치하는 결과 없음",
+    "packageAvailabilityUiObserved": true,
     "registrationObserved": false,
-    "globalPackageAvailabilityEstablished": false,
+    "packageReserved": false,
+    "globalAvailabilityOrFutureRegistrationGuaranteed": false,
     "versionCodeConfirmed": false,
     "uploadCertificateConfirmed": false,
     "appSigningEnrollmentConfirmed": false
-  },
-  "accountNotice": {
-    "sellerStatusActionRequiredVisible": true,
-    "displayedDeadline": "2027년 2월까지",
-    "noticeChanged": false,
-    "immediateGenieSubmissionBlockEstablished": false
   },
   "scope": {
     "existingSessionReused": true,
     "credentialsRequested": false,
     "credentialsEntered": false,
     "authenticationAttemptPerformed": false,
+    "createFormFieldsPrepared": true,
+    "packageAvailabilityButtonClicked": true,
+    "finalCreateAppButtonClicked": false,
     "appCreated": false,
     "releaseFormSaved": false,
     "aabUploaded": false,
     "storeSubmitted": false,
     "accountSettingsChanged": false,
-    "otherAppsOpenedOrModified": false,
-    "userTakeoverRequested": false
+    "userTakeoverRequested": false,
+    "handoffTabMarkedOnly": true
   },
-  "interpretation": "This account/session's unfiltered list showed two existing apps, and the exact proposed package search had no match. This does not establish package availability across Play, nor create or register this app.",
-  "nextRequiredStep": "After source/policy/backend release gates are resolved, perform the separately authorized app-creation flow and verify its package, version and signing linkage before any upload or submission.",
-  "priorAuthenticationBlockHistoryPreserved": true
+  "interpretation": "Basic create-app form preparation and an available-package UI result are confirmed. Both download-type options remain unselected and both legal declarations unchecked. No final app creation or package reservation occurred; version, certificate and Play signing remain unverified.",
+  "nextRequiredStep": "Resolve the still-unselected free/paid choice and review the exact developer-policy and US-export declarations with valid authority, including user confirmation where required. Do not infer consent or click final app creation from these observations alone. Only an actual created app can establish its subsequent version/signing/setup records; uploads and submission remain separate actions.",
+  "priorAuthenticationBlockHistoryPreserved": true,
+  "history": [
+    {
+      "schemaVersion": 1,
+      "recordedAtUtc": "2026-11-25T03:42:51Z",
+      "recordedOnKst": "2026-11-25",
+      "status": "authenticated-read-complete-no-target-app-found-in-inspected-account",
+      "sourceBaseline": {
+        "head": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
+        "tree": "f551420fe633e0a32b42d104cee1281e13b551bb"
+      },
+      "evidenceMethod": "Visible Play Console accessibility state from an existing authenticated browser session; no app-specific record was found to inspect.",
+      "accountScope": {
+        "intendedExistingDeveloperAccountAccessed": true,
+        "personalAccountLabelVisible": true,
+        "existingAppCountVisible": 2,
+        "developerAccountIdOmitted": true,
+        "otherAppIdentifiersAndMetricsOmitted": true
+      },
+      "target": {
+        "packageName": "com.jmpark0611.genie",
+        "visibleUnfilteredListContainedTarget": false,
+        "packageSearchReturnedNoMatchingResults": true,
+        "exactSearchResultKorean": "일치하는 결과 없음",
+        "registrationObserved": false,
+        "globalPackageAvailabilityEstablished": false,
+        "versionCodeConfirmed": false,
+        "uploadCertificateConfirmed": false,
+        "appSigningEnrollmentConfirmed": false
+      },
+      "accountNotice": {
+        "sellerStatusActionRequiredVisible": true,
+        "displayedDeadline": "2027년 2월까지",
+        "noticeChanged": false,
+        "immediateGenieSubmissionBlockEstablished": false
+      },
+      "scope": {
+        "existingSessionReused": true,
+        "credentialsRequested": false,
+        "credentialsEntered": false,
+        "authenticationAttemptPerformed": false,
+        "appCreated": false,
+        "releaseFormSaved": false,
+        "aabUploaded": false,
+        "storeSubmitted": false,
+        "accountSettingsChanged": false,
+        "otherAppsOpenedOrModified": false,
+        "userTakeoverRequested": false
+      },
+      "interpretation": "This account/session's unfiltered list showed two existing apps, and the exact proposed package search had no match. This does not establish package availability across Play, nor create or register this app.",
+      "nextRequiredStep": "After source/policy/backend release gates are resolved, perform the separately authorized app-creation flow and verify its package, version and signing linkage before any upload or submission.",
+      "priorAuthenticationBlockHistoryPreserved": true
+    }
+  ]
 }

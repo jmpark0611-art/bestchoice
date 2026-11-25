@@ -109,15 +109,30 @@
   "storeListing": {
     "appName": {
       "value": "결정해지니",
-      "status": "prepared"
+      "status": "prepared",
+      "createAppFormObservation": {
+        "preparedInObservedForm": true,
+        "finalCreateSubmitted": false,
+        "evidence": "consoleAccess.createAppForm"
+      }
     },
     "defaultLanguage": {
       "value": "ko-KR",
-      "status": "prepared-for-console-entry"
+      "status": "prepared-for-console-entry",
+      "createAppFormObservation": {
+        "preparedInObservedForm": true,
+        "finalCreateSubmitted": false,
+        "evidence": "consoleAccess.createAppForm"
+      }
     },
     "appOrGame": {
       "value": "app",
-      "status": "prepared"
+      "status": "prepared",
+      "createAppFormObservation": {
+        "preparedInObservedForm": true,
+        "finalCreateSubmitted": false,
+        "evidence": "consoleAccess.createAppForm"
+      }
     },
     "category": {
       "value": "Productivity",
@@ -165,7 +180,12 @@
     "downloadPriceAndCountries": {
       "value": null,
       "status": "not-configured-by-this-packet",
-      "newUserQuestionAdded": false
+      "newUserQuestionAdded": false,
+      "createAppFormDownloadType": {
+        "selectedValue": null,
+        "freeSelected": false,
+        "paidSelected": false
+      }
     },
     "releaseNotes": {
       "locale": "ko-KR",
@@ -775,13 +795,13 @@
     },
     {
       "id": "play-console-access",
-      "scope": "account-read-access-complete-genie-app-setup-pending",
-      "nextResult": "Read-only authenticated access to the intended existing account succeeded on 2026-11-25. The unfiltered list has two existing apps; Genie was absent and com.jmpark0611.genie search returned no match in this account/session. App creation, actual package acceptance, version availability, signing linkage and app-specific requirements remain unverified. Preserve the earlier login-wall observation as history; do not ask for a login already available."
+      "scope": "create-app-form-prepared-package-availability-confirmed-final-creation-pending",
+      "nextResult": "The real create-app form contains 결정해지니, com.jmpark0611.genie, Korean ko-KR and App. Clicking 사용 가능 여부 확인 displayed 사용 가능한 패키지 이름. This is not reservation or registration. Free and paid are both unselected, and developer-policy/US-export declarations are both unchecked. Resolve only the actual remaining choice/declarations with valid authority before any final creation; version and signing remain unverified."
     },
     {
       "id": "play-entry-and-submission",
       "scope": "separate-observed-console-actions",
-      "nextResult": "The intended account is accessible but Genie was not registered in the observed list/search. Prepared copy and resolved facts can support later authorized app setup. Inspect the new app-specific fields, complete rating/testing requirements and final assets only when those screens exist. No creation, upload, save, submission or rollout was performed by this read-only observation or packet update."
+      "nextResult": "Basic create-app form preparation and the package availability UI result are observed, but final 앱 만들기 was not clicked. No app was created, release saved, AAB uploaded or submission made. After an authorized actual registration, inspect app-specific setup/testing/rating/signing requirements and use verified final materials. Support email, 18+ and Productivity were not fields on this observed create-app form."
     }
   ],
   "userDecisions": [
@@ -954,58 +974,111 @@
     "checkpointScope": "This packet describes its three Play documents. Root's consolidated record also covers four legal drafts and dated release-status updates."
   },
   "consoleAccess": {
-    "status": "authenticated-account-read-success-genie-not-registered-in-observed-account",
+    "status": "create-app-form-prepared-package-availability-ui-confirmed-not-submitted",
+    "recordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
+    "observation": {
+      "date": "2026-11-25",
+      "relativeTiming": "earlier this turn",
+      "exactObservedAtUtc": null,
+      "timePrecision": "date-and-relative-turn",
+      "recordedAtUtcIsNotObservationTime": true
+    },
     "observedAtLocalDate": "2026-11-25",
     "displayTimeZone": "Asia/Seoul",
-    "timePrecision": "day",
+    "timePrecision": "date-and-relative-turn",
     "observedAtUtc": null,
-    "observationSource": "Visible read-only Play Console state, recorded separately in the sanitized evidenceFile by the task lead.",
+    "observationSource": "Actual create-app form fields and visible package-availability result reported by the task lead from the existing authenticated session. This document editor did not interact with the Console.",
     "evidenceFile": "release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
     "evidenceFileVerifiedLocallyByPacketEditor": true,
+    "evidenceFileSha256": "e901822d03ca9a0e1a904de08a16a7d43b26d1fbda0dcef845f5b7cf00d32abc",
+    "evidenceRecordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
     "intendedExistingDeveloperAccountSelected": true,
     "authenticatedConsoleOpened": true,
-    "authenticatedAccountAppListInspected": true,
     "loginPageObserved": false,
     "successfulLoginObserved": false,
-    "successfulLoginObservedMeaning": "No new login flow or credential entry was performed; the existing authenticated session was reused.",
+    "successfulLoginObservedMeaning": "Existing authenticated session reused; no new sign-in flow or credential entry was performed.",
     "loginPerformed": false,
     "credentialEntryPerformed": false,
-    "unfilteredExistingAppRowCount": 2,
-    "geniePresentInUnfilteredList": false,
-    "packageSearch": {
-      "query": "com.jmpark0611.genie",
-      "observedMessageKo": "일치하는 결과 없음",
-      "matchFound": false
+    "actualFormInspected": true,
+    "actualCreateAppFormInspected": true,
+    "actualAppSpecificFormsInspected": false,
+    "actualAppSpecificFormsInspectedMeaning": "Post-registration app setup/release/version/signing forms have not been inspected; the unsaved create-app form has been inspected.",
+    "createAppForm": {
+      "inspected": true,
+      "appName": {
+        "value": "결정해지니",
+        "entered": true
+      },
+      "packageName": {
+        "value": "com.jmpark0611.genie",
+        "entered": true
+      },
+      "defaultLanguage": {
+        "value": "ko-KR",
+        "displayLabelKo": "한국어",
+        "selected": true
+      },
+      "appOrGame": {
+        "value": "App",
+        "selected": true
+      },
+      "downloadType": {
+        "selectedValue": null,
+        "freeSelected": false,
+        "paidSelected": false
+      },
+      "declarations": {
+        "developerPolicyCompliance": {
+          "checked": false,
+          "consentGiven": false
+        },
+        "usExportLaws": {
+          "checked": false,
+          "consentGiven": false
+        },
+        "fullLegalTextRecorded": false,
+        "noAgreementInferredFromEarlierDeveloperAccountOrOtherApps": true
+      },
+      "notFieldsOnThisObservedForm": [
+        "supportEmail",
+        "targetAgeGroups18Plus",
+        "categoryProductivity"
+      ],
+      "finalCreateAppButtonClicked": false,
+      "submitted": false,
+      "fieldPreparationIsNotAppRegistration": true,
+      "tabMarkedHandoff": true,
+      "userTakeoverRequested": false
+    },
+    "packageAvailabilityCheck": {
+      "packageName": "com.jmpark0611.genie",
+      "buttonLabelKo": "사용 가능 여부 확인",
+      "buttonClicked": true,
+      "observedResultKo": "사용 가능한 패키지 이름",
+      "uiReportedAvailable": true,
+      "scope": "Actual availability-check UI result for the proposed package at the observed moment; not a reservation, registration or guarantee of future availability.",
+      "packageReserved": false,
+      "appRegistered": false
     },
     "appRegistrationObserved": false,
-    "absenceScope": "Only the selected intended developer account and current observed session/list/search; no global package-availability or other-account claim.",
-    "globalPackageAvailabilityConfirmed": false,
-    "actualFormInspected": false,
-    "actualAppSpecificFormsInspected": false,
+    "appRegistrationCompleted": false,
+    "packageReserved": false,
+    "globalAvailabilityOrFutureRegistrationGuaranteed": false,
     "appSpecificVersionHistoryVerified": false,
     "uploadCertificateLinkageVerified": false,
-    "appRegistrationCompleted": false,
+    "appSigningEnrollmentVerified": false,
     "consoleDataSaved": false,
     "settingsChanged": false,
     "appCreated": false,
     "artifactUploaded": false,
     "storeSubmissionPerformed": false,
-    "accountNotice": {
-      "actionRequiredShown": true,
-      "observedTextKo": "2027년 2월까지 판매자 상태를 선언하세요",
-      "deadlineYearMonth": "2027-02",
-      "deadlinePrecision": "month",
-      "exactDeadlineDate": null,
-      "declarationChanged": false,
-      "genieImmediateLaunchBlockerConfirmed": false,
-      "interpretation": "An account-level action notice was observed; its applicability and effect on a future new Genie app have not been established."
-    },
+    "consoleDataSavedMeaning": "No final create/save/submission action was performed; unsaved form entry and a package-availability check were performed.",
     "publicRecordMinimization": {
       "accountIdIncluded": false,
       "sessionUrlIncluded": false,
       "otherAppIdentifiersOrStatisticsIncluded": false
     },
-    "nextStep": "Account read access is now available. Genie was not found in the selected account. Complete the later authorized app-setup work, then inspect actual package acceptance, version history, upload-key linkage, app-specific forms and testing requirements; do not infer global package availability, an unused version code or registered signing from this search.",
+    "nextStep": "Resolve the still-unselected free/paid choice and review the exact developer-policy and US-export declarations with valid authority, including user confirmation where required. Do not infer consent or click final app creation from these observations alone. Only an actual created app can establish its subsequent version/signing/setup records; uploads and submission remain separate actions.",
     "history": [
       {
         "observedAtLocalDate": "2026-11-23",
@@ -1034,11 +1107,67 @@
         "nextStep": "Complete Google sign-in to inspect the authenticated Console, app registration, available version and signing configuration. A login page is not a successful Console login, registration, save or submission.",
         "historicalEvent": true,
         "scopeNote": "Earlier 2026-11-24 login-wall observation; superseded for current account access by the 2026-11-25 read-only authenticated-session observation. No historical outcome is rewritten."
+      },
+      {
+        "status": "authenticated-account-read-success-genie-not-registered-in-observed-account",
+        "observedAtLocalDate": "2026-11-25",
+        "displayTimeZone": "Asia/Seoul",
+        "timePrecision": "day",
+        "observedAtUtc": null,
+        "observationSource": "Visible read-only Play Console state, recorded separately in the sanitized evidenceFile by the task lead.",
+        "evidenceFile": "release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
+        "evidenceFileVerifiedLocallyByPacketEditor": true,
+        "intendedExistingDeveloperAccountSelected": true,
+        "authenticatedConsoleOpened": true,
+        "authenticatedAccountAppListInspected": true,
+        "loginPageObserved": false,
+        "successfulLoginObserved": false,
+        "successfulLoginObservedMeaning": "No new login flow or credential entry was performed; the existing authenticated session was reused.",
+        "loginPerformed": false,
+        "credentialEntryPerformed": false,
+        "unfilteredExistingAppRowCount": 2,
+        "geniePresentInUnfilteredList": false,
+        "packageSearch": {
+          "query": "com.jmpark0611.genie",
+          "observedMessageKo": "일치하는 결과 없음",
+          "matchFound": false
+        },
+        "appRegistrationObserved": false,
+        "absenceScope": "Only the selected intended developer account and current observed session/list/search; no global package-availability or other-account claim.",
+        "globalPackageAvailabilityConfirmed": false,
+        "actualFormInspected": false,
+        "actualAppSpecificFormsInspected": false,
+        "appSpecificVersionHistoryVerified": false,
+        "uploadCertificateLinkageVerified": false,
+        "appRegistrationCompleted": false,
+        "consoleDataSaved": false,
+        "settingsChanged": false,
+        "appCreated": false,
+        "artifactUploaded": false,
+        "storeSubmissionPerformed": false,
+        "accountNotice": {
+          "actionRequiredShown": true,
+          "observedTextKo": "2027년 2월까지 판매자 상태를 선언하세요",
+          "deadlineYearMonth": "2027-02",
+          "deadlinePrecision": "month",
+          "exactDeadlineDate": null,
+          "declarationChanged": false,
+          "genieImmediateLaunchBlockerConfirmed": false,
+          "interpretation": "An account-level action notice was observed; its applicability and effect on a future new Genie app have not been established."
+        },
+        "publicRecordMinimization": {
+          "accountIdIncluded": false,
+          "sessionUrlIncluded": false,
+          "otherAppIdentifiersOrStatisticsIncluded": false
+        },
+        "nextStep": "Account read access is now available. Genie was not found in the selected account. Complete the later authorized app-setup work, then inspect actual package acceptance, version history, upload-key linkage, app-specific forms and testing requirements; do not infer global package availability, an unused version code or registered signing from this search.",
+        "evidenceFileSha256": "382c7ec5ae0a30762d520096b25c49fd98211351ef34bdf91848987afd2172a9",
+        "evidenceRecordedAtUtc": "2026-11-25T03:42:51Z",
+        "observedAtUtcMeaning": "Exact observation time is not separately supplied; evidenceRecordedAtUtc is the record time. Observation date is 2026-11-25 KST.",
+        "historicalEvent": true,
+        "historyEventScope": "Earlier authenticated account-list/search observation recorded at 2026-11-25T03:42:51Z; not the later create-app availability check."
       }
-    ],
-    "evidenceFileSha256": "382c7ec5ae0a30762d520096b25c49fd98211351ef34bdf91848987afd2172a9",
-    "evidenceRecordedAtUtc": "2026-11-25T03:42:51Z",
-    "observedAtUtcMeaning": "Exact observation time is not separately supplied; evidenceRecordedAtUtc is the record time. Observation date is 2026-11-25 KST."
+    ]
   },
   "operationalCorsEvidence": {
     "referenceJson": "qa/native-cors-applied-2026-11-25.json",
@@ -1480,36 +1609,61 @@
     }
   },
   "documentationRevision": {
-    "recordedAtUtc": "2026-11-25T03:46:18.990368+00:00",
-    "baseCommit": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
-    "scope": "Only the two Play submission packet documents: record three adopted support-handling choices, exact-source draft-navigation CI evidence and the new read-only authenticated Console account observation. Preserve candidate identity, historical events and all unconfirmed app-specific/release/policy facts.",
-    "approvalEvidence": "release-prep/launch-continuation/privacy-ops/privacy-operations.json#operatingDecisionsConfirmation",
+    "recordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
+    "baseCommit": "3cd46d1fb209aba58a914b6931fe5b9748ee24a9",
+    "scope": "Console information only in the Play packet plus the separate Console readiness record: actual unsubmitted create-app fields, package availability UI result and unchanged declarations/pricing. Earlier account-list observation is preserved as history.",
     "updatedFiles": [
-      "PLAY-SUBMISSION-PACKET.md",
-      "PLAY-SUBMISSION-PACKET.json"
+      "web/release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
+      "web/release-prep/launch-continuation/play-console-readiness-2026-11-25.md",
+      "web/PLAY-SUBMISSION-PACKET.json",
+      "web/PLAY-SUBMISSION-PACKET.md"
     ],
     "runtimeChangedByThisPacketUpdate": false,
     "buildsOrTestsRunByThisPacketUpdate": false,
     "newConsoleObservationRecorded": true,
+    "consoleObservationPerformedByPacketEditor": false,
     "remoteWritesByThisPacketUpdate": false,
     "previous": {
-      "recordedAtUtc": "2026-11-25T02:19:08.406259+00:00",
-      "scope": "Draft runtime integrated and exact-source three CI workflows passed; final policy answers and preserved signed candidate remain unchanged.",
+      "recordedAtUtc": "2026-11-25T03:46:18.990368+00:00",
+      "baseCommit": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
+      "scope": "Only the two Play submission packet documents: record three adopted support-handling choices, exact-source draft-navigation CI evidence and the new read-only authenticated Console account observation. Preserve candidate identity, historical events and all unconfirmed app-specific/release/policy facts.",
+      "approvalEvidence": "release-prep/launch-continuation/privacy-ops/privacy-operations.json#operatingDecisionsConfirmation",
+      "updatedFiles": [
+        "PLAY-SUBMISSION-PACKET.md",
+        "PLAY-SUBMISSION-PACKET.json"
+      ],
+      "runtimeChangedByThisPacketUpdate": false,
+      "buildsOrTestsRunByThisPacketUpdate": false,
+      "newConsoleObservationRecorded": true,
+      "remoteWritesByThisPacketUpdate": false,
       "previous": {
-        "baseCommit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
-        "previousPacketRecordedAtUtc": "2026-11-23T23:36:41Z",
-        "preparedOnKst": "2026-11-25",
-        "officialPolicyCheckedOnUtc": "2026-11-24",
-        "scope": "Three Play documentation files reconstructed from exact-base originals and the retained authoring transcript after executor/store loss. Root reviewed and reconciled the later exact-name catalog evidence, then prepared the documents for the already-authorized branch checkpoint. No Console entry, runtime edit, new build or live app validation."
+        "recordedAtUtc": "2026-11-25T02:19:08.406259+00:00",
+        "scope": "Draft runtime integrated and exact-source three CI workflows passed; final policy answers and preserved signed candidate remain unchanged.",
+        "previous": {
+          "baseCommit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
+          "previousPacketRecordedAtUtc": "2026-11-23T23:36:41Z",
+          "preparedOnKst": "2026-11-25",
+          "officialPolicyCheckedOnUtc": "2026-11-24",
+          "scope": "Three Play documentation files reconstructed from exact-base originals and the retained authoring transcript after executor/store loss. Root reviewed and reconciled the later exact-name catalog evidence, then prepared the documents for the already-authorized branch checkpoint. No Console entry, runtime edit, new build or live app validation."
+        }
+      },
+      "consoleObservationEvidence": "release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
+      "consoleObservationPerformedByPacketEditor": false,
+      "rootCompletion": {
+        "recordedAtUtc": "2026-11-25T03:59:33.636547+00:00",
+        "scope": "Reconcile new bounded server observation and exact-source policy-copy CI results; preserve original candidate and historical observations.",
+        "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+        "workflowFilesChanged": false,
+        "storeSubmitted": false
       }
     },
-    "consoleObservationEvidence": "release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
-    "consoleObservationPerformedByPacketEditor": false,
     "rootCompletion": {
-      "recordedAtUtc": "2026-11-25T03:59:33.636547+00:00",
-      "scope": "Reconcile new bounded server observation and exact-source policy-copy CI results; preserve original candidate and historical observations.",
-      "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
-      "workflowFilesChanged": false,
+      "recordedAtUtc": "2026-11-25T04:36:46.737993+00:00",
+      "scope": "Preserve the new Console form observation and all previous candidate, policy and server evidence; link the narrow session-loss fix and its actual exact-source CI outcomes.",
+      "sourceCommit": "df5f6dedae9c1d200e3d33a613512f795290eac5",
+      "evidenceFile": "qa/history-session-guard-2026-11-25.json",
+      "serverApplyRepeated": false,
+      "publicDeploymentPerformed": false,
       "storeSubmitted": false
     }
   },
@@ -1524,25 +1678,26 @@
   },
   "consoleAnswerMatrix": {
     "status": "prepared-by-question-meaning-not-console-field-ids",
-    "actualConsoleFormInspected": false,
+    "actualConsoleFormInspected": true,
     "rows": [
       {
         "field": "App or game",
         "preparedValue": "App",
-        "answerStatus": "ready",
-        "basis": "A/B decision tool; not a game."
+        "answerStatus": "selected-in-observed-unsubmitted-create-app-form",
+        "basis": "App was actually selected in the create-app form. The final create action was not performed."
       },
       {
         "field": "Default language",
         "preparedValue": "ko-KR",
-        "answerStatus": "ready",
-        "basis": "Current UI and prepared listing are Korean."
+        "answerStatus": "selected-in-observed-unsubmitted-create-app-form",
+        "basis": "Korean ko-KR was actually selected in the create-app form. The final create action was not performed."
       },
       {
         "field": "Category",
         "preparedValue": "Productivity",
         "answerStatus": "feature-based-proposal",
-        "basis": "A personal decision aid; no medical or financial service classification."
+        "basis": "A personal decision aid; no medical or financial service classification.",
+        "createAppFormFieldObserved": false
       },
       {
         "field": "Contains ads",
@@ -1562,7 +1717,8 @@
           "18+"
         ],
         "answerStatus": "user-confirmed",
-        "basis": "Existing adult-only decision; not an assigned content rating."
+        "basis": "Existing adult-only decision; not an assigned content rating.",
+        "createAppFormFieldObserved": false
       },
       {
         "field": "App access",
@@ -1627,20 +1783,20 @@
       {
         "field": "Developer account/testing requirements",
         "preparedValue": null,
-        "answerStatus": "authenticated-account-observed-new-app-requirements-not-yet-visible",
-        "basis": "The intended existing account was read successfully; the unfiltered list has two existing apps and no Genie match was found. No app-specific setup/testing form was available. Read its actual requirements after app setup; no fixed tester count/duration or exemption is presumed."
+        "answerStatus": "authenticated-create-form-observed-app-specific-requirements-unconfirmed",
+        "basis": "Existing session access and the basic create-app form are observed. No app-specific testing/setup form exists in the current unsubmitted state. No fixed test count/duration or exemption is inferred."
       },
       {
         "field": "Package/version/upload certificate registration",
         "preparedValue": null,
-        "answerStatus": "genie-not-found-in-observed-account-app-specific-identity-unverified",
-        "basis": "com.jmpark0611.genie search returned no match in the selected account/session, which does not prove global package availability. The prepared 1.0.0 (1) candidate remains unchanged; version history and Play signing linkage cannot be confirmed without the app-specific record."
+        "answerStatus": "package-availability-ui-confirmed-registration-version-signing-unconfirmed",
+        "basis": "The package availability button displayed 사용 가능한 패키지 이름 for com.jmpark0611.genie. This did not reserve/register the package or verify versionCode or upload-certificate/Play-signing linkage. The existing 1.0.0 (1) candidate is unchanged."
       },
       {
         "field": "Download price, countries and production rollout",
         "preparedValue": null,
-        "answerStatus": "unchanged-not-selected",
-        "basis": "No new payment, distribution or rollout decision in this documentation task."
+        "answerStatus": "free-and-paid-unselected-other-distribution-values-unresolved",
+        "basis": "Both free and paid were visibly unselected in the create-app form. No price, country or rollout selection or saved setting was made."
       }
     ],
     "operationalFactsNotConsoleFieldIds": [
@@ -1664,7 +1820,17 @@
       }
     ],
     "authenticatedAccountAppListInspected": true,
-    "actualAppSpecificFormsInspected": false
+    "actualAppSpecificFormsInspected": false,
+    "actualCreateAppFormInspected": true,
+    "formInspectionScope": "Unsaved create-app form only; app-specific post-registration setup, release and signing pages remain uninspected.",
+    "createAppDeclarationObservation": {
+      "developerPolicyComplianceChecked": false,
+      "usExportLawsChecked": false,
+      "consentGiven": false,
+      "finalCreateAppButtonClicked": false,
+      "source": "consoleAccess.createAppForm.declarations",
+      "requiresReviewOfActualTermsAndValidAuthority": true
+    }
   },
   "legalIntegration": {
     "preparedFiles": [
@@ -1862,9 +2028,10 @@
     "latestIsolatedAndroidEmulatorEvidence": "Preserved historical eaf89c evidence tied to the b8d9db6 signed candidate. The newer draft-navigation fixture evidence is legalIntegration.draftRuntimeCiEvidence.",
     "recordedAtUtc": "Original packet evidence date; the latest documentation update is documentationRevision.recordedAtUtc.",
     "supportFirstResponseOnlyEvent": "The earlier first-response-only event in privacy-operations.json is historical; later three-choice approval is operatingDecisionsConfirmation.",
-    "consoleAccess": "Current authenticated read-only account observation is dated 2026-11-25. Earlier approval rejection and login wall remain in consoleAccess.history; app-specific setup and signing are still unverified."
+    "consoleAccess": "Current observation is the 2026-11-25 earlier-this-turn unsaved create-app form and available-package UI result. The prior 03:42:51Z account-list/search event, earlier login wall and approval rejection remain historical events in consoleAccess.history.",
+    "latestExactSourceAndroidEvidence": "Current changed-source Android evidence is historySessionGuard for df5f6dedae9c1d200e3d33a613512f795290eac5. Earlier legal/support-copy and original signed-candidate receipts remain attributed to their own source commits."
   },
-  "consoleOpenedOrChangedMeaning": "Legacy combined field: authenticated account opened read-only; no Console data or settings were changed.",
+  "consoleOpenedOrChangedMeaning": "Legacy combined field: create-app form opened and populated, package availability checked. No final app creation, saved release or account-setting change.",
   "consoleChanged": false,
   "latestServerObservation": {
     "evidenceFile": "release-prep/launch-continuation/server-readiness-20261125T033830Z.json",
@@ -1876,5 +2043,80 @@
     "retryConditionsImproved": false,
     "additionalApplyAttemptMade": false,
     "previousDatabaseEvidencePreserved": true
+  },
+  "consoleChangedMeaning": "No persisted registration/release/account-setting change is claimed; the unsubmitted create-app form was populated.",
+  "historySessionGuard": {
+    "sourceCommit": "df5f6dedae9c1d200e3d33a613512f795290eac5",
+    "sourceSnapshotSha256": "36ff10f173297eb7e10ed3f5836cf7595af56d11de3d863aa63c619da62a8aed",
+    "sourceFiles": 163,
+    "evidenceFile": "qa/history-session-guard-2026-11-25.json",
+    "runtimeChange": "History reads and deletion use only an existing session. No-session history returns []; no-session deletion raises AUTH_REQUIRED before the RPC and preserves local records through the existing error path.",
+    "localRegression": {
+      "beforeFix": {
+        "run": 1,
+        "failed": 1
+      },
+      "afterFix": {
+        "passed": 10,
+        "failed": 0,
+        "skipped": 37
+      },
+      "node": "24.22.3",
+      "sdkMocked": true,
+      "fullSuiteRerun": false
+    },
+    "exactSourceCi": {
+      "allThreeSucceeded": true,
+      "runs": [
+        {
+          "id": 45546441289,
+          "name": "Genie Android release configuration build (no upload)",
+          "path": ".github/workflows/android-release-build-check.yml",
+          "sourceCommit": "df5f6dedae9c1d200e3d33a613512f795290eac5",
+          "status": "completed",
+          "conclusion": "success",
+          "attempt": 1,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45546441289",
+          "jobId": 138977101334,
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45546441289/job/138977101334"
+        },
+        {
+          "id": 45546441283,
+          "name": "Genie Android device check (isolated fixture)",
+          "path": ".github/workflows/android-device-check.yml",
+          "sourceCommit": "df5f6dedae9c1d200e3d33a613512f795290eac5",
+          "status": "completed",
+          "conclusion": "success",
+          "attempt": 1,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45546441283",
+          "jobId": 138977101318,
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45546441283/job/138977101318"
+        },
+        {
+          "id": 45546441257,
+          "name": "Genie Android native check (synthetic configuration)",
+          "path": ".github/workflows/android-native-check.yml",
+          "sourceCommit": "df5f6dedae9c1d200e3d33a613512f795290eac5",
+          "status": "completed",
+          "conclusion": "success",
+          "attempt": 2,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45546441257",
+          "jobId": 138979475855,
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45546441257/job/138979475855"
+        }
+      ],
+      "nativeFirstAttemptHttp429": true,
+      "nativeFailedJobRetriedOnceAfterOtherJobsCompleted": true,
+      "nativeCasesPassed": 6,
+      "sessionLossCaseRunOnNativeDevice": false
+    },
+    "preservedSignedCandidateContainsThisFix": false,
+    "newSignedCandidateCreated": false,
+    "productionBackendValidated": false,
+    "limits": [
+      "A different non-null session and the void delete RPC row-count/ownership contract are not resolved by the null-session guard.",
+      "Final public policy/provider facts and reporting/blocking server changes remain pending.",
+      "Exact final signed candidate, real devices, external services and store submission are not validated by these checks."
+    ]
   }
 }

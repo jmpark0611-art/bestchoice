@@ -2,6 +2,7 @@
 
 기준일: 2026-11-25, 한국 시간. 이 폴더는 실제 소스 통합과 운영 준비를 보조한다. 반복 ZIP은 만들지 않는다.
 
+- [기록 조회·삭제의 세션 소실 방어와 정확한 소스 검증](../../qa/history-session-guard-2026-11-25.md)
 - [실제 코드 통합 및 Android 검사 기록](../../qa/legal-runtime-integration-2026-11-25.md)
 - [문의·삭제·신고 처리 절차](privacy-ops/PRIVACY-REQUEST-RUNBOOK.md)
 - [답변 초안 8종](privacy-ops/REPLY-TEMPLATES.md)
