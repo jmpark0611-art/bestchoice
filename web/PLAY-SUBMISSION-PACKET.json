@@ -1397,8 +1397,8 @@
     }
   },
   "documentationRevision": {
-    "recordedAtUtc": "2026-11-25T02:06:46.279834+00:00",
-    "scope": "Draft runtime navigation integrated; final policy answers and preserved signed candidate unchanged.",
+    "recordedAtUtc": "2026-11-25T02:19:08.406259+00:00",
+    "scope": "Draft runtime integrated and exact-source three CI workflows passed; final policy answers and preserved signed candidate remain unchanged.",
     "previous": {
       "baseCommit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
       "previousPacketRecordedAtUtc": "2026-11-23T23:36:41Z",
@@ -1565,6 +1565,15 @@
     "draftRuntimeSourceScope": "Approved development branch only; review notice remains visible.",
     "runtimePolicyIntegrationCompletedMeaning": "Final policy facts and public URLs; draft navigation is recorded separately.",
     "currentCandidateIncludesDraftRoutes": false,
-    "runtimeIntegrationEvidence": "qa/legal-runtime-integration-2026-11-25.json"
+    "runtimeIntegrationEvidence": "qa/legal-runtime-integration-2026-11-25.json",
+    "draftRuntimeSourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+    "draftNavigationEmulatorValidated": true,
+    "draftNativeCaseCount": 2,
+    "existingNativeCasesPreserved": 4,
+    "draftRuntimeCiRunIds": [
+      45531304802,
+      45531304799,
+      45531304702
+    ]
   }
 }

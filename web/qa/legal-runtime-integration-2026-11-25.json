@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "recordedAtUtc": "2026-11-25T02:08:24.180852+00:00",
+  "recordedAtUtc": "2026-11-25T02:19:08.406259+00:00",
   "recordedOnKst": "2026-11-25",
-  "status": "draft-runtime-integrated-native-verification-pending",
+  "status": "draft-runtime-integrated-all-three-native-workflows-passed-not-release-ready",
   "repository": "jmpark0611-art/bestchoice",
   "branch": "codex/genie-android-native-check-20261123",
   "baseline": {
@@ -22,7 +22,7 @@
     "publicPolicyUrl": null,
     "policyEffectiveDate": null,
     "newBackendCallIntroduced": false,
-    "sourceCommit": null,
+    "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
     "scope": "New draft read-only legal screens and About navigation in the approved development branch."
   },
   "priorFocusedValidation": {
@@ -37,19 +37,19 @@
     "implementationPatchSha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08"
   },
   "newNativeVerification": {
-    "status": "pending",
+    "status": "passed-six-isolated-android-fixture-cases",
     "existingCaseCount": 4,
     "newCaseCount": 2,
     "expectedTotalCases": 6,
-    "allFourCasesPassed": false,
-    "allRequiredCasesPassed": false,
+    "allFourCasesPassed": true,
+    "allRequiredCasesPassed": true,
     "physicalDeviceValidated": false,
     "signedReleaseValidated": false,
     "externalMailClientValidated": false,
     "productionBackendValidated": false,
     "isolatedFixtureOnly": true,
-    "workflowRunId": null,
-    "workflowJobId": null,
+    "workflowRunId": 45531304702,
+    "workflowJobId": 138927012820,
     "caseIds": [
       "launch",
       "native-back",
@@ -80,9 +80,78 @@
       "nightModeRestorationRequired": true,
       "actualDeviceRuntimeNotClaimed": true,
       "workflowLabelsAlignedByRoot": true
-    }
+    },
+    "workflowRunUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304702",
+    "workflowJobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304702/job/138927012820",
+    "caseCount": 6,
+    "runAttempt": 1,
+    "evidence": "../release-prep/launch-continuation/ci-device-results.json",
+    "legalNightMode": {
+      "original": "no",
+      "requested": "yes",
+      "observedBeforeLaunch": "yes",
+      "restored": true,
+      "restoreFailureCode": null
+    },
+    "emailSelectionScope": "DOM Range and computed user-select; not physical long-press or clipboard permission validation",
+    "documentMeasurements": [
+      {
+        "path": "/privacy",
+        "width": 320,
+        "scrollWidth": 320,
+        "outsideControls": 0,
+        "minRelatedLinkHeight": 58,
+        "headingFocused": true,
+        "matchMediaDark": true,
+        "emailSelectionMatches": true
+      },
+      {
+        "path": "/delete-data",
+        "width": 320,
+        "scrollWidth": 320,
+        "outsideControls": 0,
+        "minRelatedLinkHeight": 58,
+        "headingFocused": true,
+        "matchMediaDark": true,
+        "emailSelectionMatches": true
+      }
+    ]
   },
-  "ciRuns": [],
+  "ciRuns": [
+    {
+      "id": 45531304802,
+      "name": "Genie Android native check (synthetic configuration)",
+      "path": ".github/workflows/android-native-check.yml",
+      "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobId": 138927013381,
+      "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304802",
+      "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304802/job/138927013381"
+    },
+    {
+      "id": 45531304799,
+      "name": "Genie Android release configuration build (no upload)",
+      "path": ".github/workflows/android-release-build-check.yml",
+      "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobId": 138927013475,
+      "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304799",
+      "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304799/job/138927013475"
+    },
+    {
+      "id": 45531304702,
+      "name": "Genie Android device check (isolated fixture)",
+      "path": ".github/workflows/android-device-check.yml",
+      "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobId": 138927012820,
+      "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304702",
+      "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304702/job/138927012820"
+    }
+  ],
   "nodeScope": {
     "availableLocalExecutable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
     "version": "v24.22.3",
@@ -110,7 +179,7 @@
     "vercelTeamId": "team_XKy1dxRwpPHathhnFHUbCidT",
     "branchAutoDeploymentDisabledInSource": true,
     "preIntegrationBranchDeploymentCount": 0,
-    "postIntegrationBranchDeploymentCount": null
+    "postIntegrationBranchDeploymentCount": 0
   },
   "scope": {
     "fullHistoricalSuiteRepeated": false,
@@ -125,7 +194,9 @@
     "pullRequestCreated": false,
     "defaultBranchMerged": false,
     "releaseExportWorkflowChanged": false,
-    "releaseProfileChanged": false
+    "releaseProfileChanged": false,
+    "newSignedCandidateCreated": false,
+    "buildArtifactsRetained": false
   },
   "remainingGates": [
     "Finalize provider data handling facts and the actual support operating decisions.",
@@ -206,5 +277,12 @@
       "gitBlob": "83f76fb964c85062add83f5a93314f92b0f55999",
       "existedAtBaseline": true
     }
-  ]
+  ],
+  "integrationCommitReceipt": "../release-prep/launch-continuation/integration-commit-receipt.json",
+  "sourceSnapshot": {
+    "fileCount": 162,
+    "sha256": "ad9ebec64f269692a2b5adfa3d8b5bbf46550222bc442889dd5f63402f822a46",
+    "evidence": "../release-prep/launch-continuation/source-snapshot-66010c2.json"
+  },
+  "ciBuildEvidence": "../release-prep/launch-continuation/ci-build-results.json"
 }

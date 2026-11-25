@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-25T02:12:42Z",
+  "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+  "parent": "818655e10fe00b65da8bfe64f77e0d928429eb9d",
+  "tree": "ce82ab86365f8782a21e1c9f0cdf833b7b3b445c",
+  "changedFiles": 27,
+  "modifiedExistingFiles": 11,
+  "newFiles": 16,
+  "unchangedExistingBlobs": 334,
+  "totalBlobs": 361,
+  "refVerified": true,
+  "commitParentAndTreeVerified": true,
+  "expectedShaLeaseUsed": true,
+  "force": false,
+  "branch": "codex/genie-android-native-check-20261123",
+  "expectedAutomaticWorkflowCount": 3,
+  "observedAutomaticWorkflowCount": 3,
+  "vercelBranchDeploymentCountAfterPush": 0,
+  "vercelBranchAutomaticDeploymentDisabled": true
+}

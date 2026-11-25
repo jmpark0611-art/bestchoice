@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "recordedAtUtc": "2026-11-25T01:56:18.869929+00:00",
-  "status": "draft-policy-navigation-integrated-native-check-pending-final-policy-and-backend",
+  "recordedAtUtc": "2026-11-25T02:19:08.406259+00:00",
+  "status": "draft-policy-navigation-integrated-six-native-cases-passed-final-policy-and-backend-pending",
   "candidate": {
     "file": "Genie-Android-1.0.0-1-20261124-candidate.aab",
     "sizeBytes": 4161320,
@@ -297,11 +297,13 @@
       "/privacy",
       "/delete-data"
     ],
-    "runtimeIntegrationEvidence": "qa/legal-runtime-integration-2026-11-25.json"
+    "runtimeIntegrationEvidence": "qa/legal-runtime-integration-2026-11-25.json",
+    "draftRuntimeSourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+    "draftNavigationEmulatorValidated": true
   },
   "currentCandidateRequiresPolicyRuntimeUpdateBeforeStoreSubmission": true,
   "currentDevelopmentVerification": {
-    "status": "native-fixture-validation-pending",
+    "status": "all-three-native-workflows-passed-six-device-cases",
     "baselineCommit": "818655e10fe00b65da8bfe64f77e0d928429eb9d",
     "legalPatchSha256": "af57c52046dcabeb2070fe6214f08a788b62e3021440717de6a4cb7bc0c52e08",
     "priorFocusedUiTests": 6,
@@ -310,6 +312,48 @@
     "existingNativeCaseCount": 4,
     "newSignedCandidateCreated": false,
     "storeSubmission": false,
-    "evidence": "qa/legal-runtime-integration-2026-11-25.json"
+    "evidence": "qa/legal-runtime-integration-2026-11-25.json",
+    "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+    "allFourCasesPassed": true,
+    "allRequiredCasesPassed": true,
+    "workflowRuns": [
+      {
+        "id": 45531304802,
+        "name": "Genie Android native check (synthetic configuration)",
+        "path": ".github/workflows/android-native-check.yml",
+        "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+        "attempt": 1,
+        "conclusion": "success",
+        "jobId": 138927013381,
+        "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304802",
+        "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304802/job/138927013381"
+      },
+      {
+        "id": 45531304799,
+        "name": "Genie Android release configuration build (no upload)",
+        "path": ".github/workflows/android-release-build-check.yml",
+        "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+        "attempt": 1,
+        "conclusion": "success",
+        "jobId": 138927013475,
+        "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304799",
+        "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304799/job/138927013475"
+      },
+      {
+        "id": 45531304702,
+        "name": "Genie Android device check (isolated fixture)",
+        "path": ".github/workflows/android-device-check.yml",
+        "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+        "attempt": 1,
+        "conclusion": "success",
+        "jobId": 138927012820,
+        "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304702",
+        "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304702/job/138927012820"
+      }
+    ],
+    "sourceSnapshotFileCount": 162,
+    "sourceSnapshotSha256": "ad9ebec64f269692a2b5adfa3d8b5bbf46550222bc442889dd5f63402f822a46",
+    "physicalDeviceValidated": false,
+    "signedCandidateDeviceValidated": false
   }
 }

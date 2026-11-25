@@ -1,0 +1,429 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-25 02:17:54 UTC",
+  "repository": "jmpark0611-art/bestchoice",
+  "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+  "run": {
+    "id": 45531304702,
+    "name": "Genie Android device check (isolated fixture)",
+    "path": ".github/workflows/android-device-check.yml",
+    "headSha": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+    "branch": "codex/genie-android-native-check-20261123",
+    "attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304702",
+    "createdAtUtc": "2026-11-25T02:12:43Z",
+    "updatedAtUtc": "2026-11-25T02:17:05Z"
+  },
+  "job": {
+    "id": 138927012820,
+    "name": "device-check",
+    "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45531304702/job/138927012820",
+    "status": "completed",
+    "conclusion": "success",
+    "startedAtUtc": "2026-11-25T02:12:46Z",
+    "completedAtUtc": "2026-11-25T02:17:04Z",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:12:46Z",
+        "completedAtUtc": "2026-11-25T02:12:47Z"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:12:47Z",
+        "completedAtUtc": "2026-11-25T02:12:48Z"
+      },
+      {
+        "name": "Require KVM and existing runner tools before downloading anything",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:12:48Z",
+        "completedAtUtc": "2026-11-25T02:12:48Z"
+      },
+      {
+        "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:12:48Z",
+        "completedAtUtc": "2026-11-25T02:12:49Z"
+      },
+      {
+        "name": "Install only locked build dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:12:49Z",
+        "completedAtUtc": "2026-11-25T02:12:54Z"
+      },
+      {
+        "name": "Verify the fixture driver's guards",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:12:54Z",
+        "completedAtUtc": "2026-11-25T02:12:55Z"
+      },
+      {
+        "name": "Resolve official pins, check existing licenses, and build fixture APKs",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:12:55Z",
+        "completedAtUtc": "2026-11-25T02:15:18Z"
+      },
+      {
+        "name": "Run the required cases with only loopback networking",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:15:18Z",
+        "completedAtUtc": "2026-11-25T02:16:59Z"
+      },
+      {
+        "name": "Record actual results and their limits",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:16:59Z",
+        "completedAtUtc": "2026-11-25T02:16:59Z"
+      },
+      {
+        "name": "Retain only a synthetic failure screen and fixed state for one day",
+        "status": "completed",
+        "conclusion": "skipped",
+        "startedAtUtc": "2026-11-25T02:16:59Z",
+        "completedAtUtc": "2026-11-25T02:16:59Z"
+      },
+      {
+        "name": "Remove this job's disposable files",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:16:59Z",
+        "completedAtUtc": "2026-11-25T02:17:02Z"
+      },
+      {
+        "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:17:02Z",
+        "completedAtUtc": "2026-11-25T02:17:03Z"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:17:03Z",
+        "completedAtUtc": "2026-11-25T02:17:03Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "startedAtUtc": "2026-11-25T02:17:03Z",
+        "completedAtUtc": "2026-11-25T02:17:03Z"
+      }
+    ]
+  },
+  "receipt": {
+    "schemaVersion": 1,
+    "status": "six-android-emulator-fixture-cases-passed-not-a-release",
+    "sourceCommit": "66010c2eca8aca06e22b4feaafaa098df2916f70",
+    "fixtureOnly": true,
+    "applicationId": "dev.local.genie.preview",
+    "debugApkSha256": "ae414f8629a28012c04d653021e57fabeb00b342d3cc76a8e3799fb52dcbb029",
+    "instrumentationApkSha256": "0d7dc83a660f0a2e89b73ae0372bcdc3918c3baa456a3a97cad4970f94952fc0",
+    "signedReleaseNotTested": true,
+    "physicalDeviceTested": false,
+    "backendContacted": false,
+    "externalNetwork": "blocked-by-loopback-only-network-namespace",
+    "emulator": {
+      "url": "https://dl.google.com/android/repository/emulator-linux_x64-16970787.zip",
+      "size": 350068887,
+      "checksumAlgorithm": "sha1",
+      "checksum": "5f7314368fc6c05c937f6991bb4106214dc389e7",
+      "package": "emulator",
+      "revision": "37.3.10",
+      "licenseId": "android-sdk-license",
+      "licenseSha1": "24333f8a63b6825ea9c5514f83c2829b004d1fee",
+      "licenseLiteralSha1": "efa68a6b3c661d18699d5c026771d5911cdc2f83",
+      "licenseNormalization": "android-TrimStringAdapter",
+      "metadataSha256": "e0e21658f189fbf221f703cbca947a5c91d661061c993f2cc435bacdf1002e3c",
+      "sha256": "a4405349d8a9c52136ab7861e5331dc40e85574bd91cb8889a298a2ff4c52e26",
+      "archiveSource": "https://developer.android.com/studio/emulator_archive",
+      "metadataSource": "https://dl.google.com/android/repository/repository2-1.xml",
+      "actualArchive": {
+        "size": 350068887,
+        "sha256": "a4405349d8a9c52136ab7861e5331dc40e85574bd91cb8889a298a2ff4c52e26"
+      }
+    },
+    "image": {
+      "url": "https://dl.google.com/android/repository/sys-img/google_apis/x86_64-36_r07.zip",
+      "size": 1895447397,
+      "checksumAlgorithm": "sha1",
+      "checksum": "c6bf44bdcd885bb902b4ba752d111a073ad7a817",
+      "package": "system-images;android-36;google_apis;x86_64",
+      "revision": "7.0.0",
+      "licenseId": "android-sdk-license",
+      "licenseSha1": "24333f8a63b6825ea9c5514f83c2829b004d1fee",
+      "licenseLiteralSha1": "efa68a6b3c661d18699d5c026771d5911cdc2f83",
+      "licenseNormalization": "android-TrimStringAdapter",
+      "metadataSha256": "d48bd8404b8d5ab42d84cc0907dfb9e55c8a50194bb07c8a864c331375dd8b3a",
+      "metadataSource": "https://dl.google.com/android/repository/sys-img/google_apis/sys-img2-1.xml",
+      "actualArchive": {
+        "size": 1895447397,
+        "sha256": "b1bb0769d0bed7698e61f203d7dc9bf6e7c37cd01a39d0d8788a11186bc78160"
+      }
+    },
+    "node": "v24.22.3",
+    "javac": "javac 21.0.13",
+    "firstInstrumentationNoRestart": true,
+    "firstLaunchMode": "activity-recreated-in-prelaunched-process",
+    "preparedProcessPreserved": true,
+    "prelaunchPid": 2132,
+    "preparedPid": 2132,
+    "pidBeforeForceStop": 2132,
+    "forceStopConfirmed": true,
+    "cases": [
+      {
+        "origin": "https://localhost",
+        "apiLevel": 36,
+        "webViewPackage": "com.google.android.webview",
+        "webViewVersion": "133.0.6943.137",
+        "caseId": "launch",
+        "passed": true
+      },
+      {
+        "from": "/about",
+        "to": "/",
+        "systemAction": "GLOBAL_ACTION_BACK",
+        "before": {
+          "focused": true,
+          "finishing": false,
+          "destroyed": false,
+          "canGoBack": true,
+          "historyIndex": 1,
+          "historySize": 2
+        },
+        "aboutTap": {
+          "css": {
+            "bottom": 367.6171875,
+            "dpr": 2,
+            "height": 592,
+            "hit": true,
+            "left": 99.3515625,
+            "right": 178.3984375,
+            "top": 349.1171875,
+            "width": 320,
+            "x": 138.875,
+            "y": 358.3671875
+          },
+          "screenX": 277.75,
+          "screenY": 764.734375,
+          "scaleX": 2,
+          "scaleY": 2,
+          "originX": 0,
+          "originY": 48,
+          "nativeScrollX": 0,
+          "nativeScrollY": 960,
+          "trustedClick": {
+            "anchorId": "home-draft-settings-link",
+            "anchorPath": "/about",
+            "id": "home-draft-settings-link",
+            "tag": "A",
+            "trusted": true,
+            "type": "click",
+            "x": 139,
+            "y": 358
+          }
+        },
+        "caseId": "native-back",
+        "passed": true
+      },
+      {
+        "devicePixelRatio": 2,
+        "outside": 0,
+        "scrollWidth": 320,
+        "visibleControls": 18,
+        "width": 320,
+        "caseId": "narrow-screen",
+        "passed": true
+      },
+      {
+        "devicePixelRatio": 2,
+        "outside": 0,
+        "scrollWidth": 320,
+        "visibleControls": 18,
+        "width": 320,
+        "explicitRestoreRequired": true,
+        "exactFieldsRestored": 3,
+        "caseId": "draft-restore-after-force-stop",
+        "passed": true
+      },
+      {
+        "schemaVersion": 1,
+        "forward": [
+          {
+            "from": "/",
+            "to": "/about",
+            "trustedClick": {
+              "anchorId": "",
+              "anchorPath": "/about",
+              "id": "",
+              "tag": "A",
+              "trusted": true,
+              "type": "click",
+              "x": 156,
+              "y": 484
+            },
+            "headingVisible": true,
+            "headingFocused": false
+          },
+          {
+            "from": "/about",
+            "to": "/privacy",
+            "trustedClick": {
+              "anchorId": "",
+              "anchorPath": "/privacy",
+              "id": "",
+              "tag": "A",
+              "trusted": true,
+              "type": "click",
+              "x": 156,
+              "y": 266
+            },
+            "headingVisible": true,
+            "headingFocused": true
+          },
+          {
+            "from": "/privacy",
+            "to": "/delete-data",
+            "trustedClick": {
+              "anchorId": "",
+              "anchorPath": "/delete-data",
+              "id": "",
+              "tag": "A",
+              "trusted": true,
+              "type": "click",
+              "x": 156,
+              "y": 443
+            },
+            "headingVisible": true,
+            "headingFocused": true
+          }
+        ],
+        "back": [
+          {
+            "from": "/delete-data",
+            "to": "/privacy",
+            "accepted": true,
+            "systemAction": "GLOBAL_ACTION_BACK",
+            "headingVisible": true,
+            "headingFocused": true,
+            "before": {
+              "focused": true,
+              "finishing": false,
+              "destroyed": false,
+              "canGoBack": true,
+              "historyIndex": 3,
+              "historySize": 4
+            }
+          },
+          {
+            "from": "/privacy",
+            "to": "/about",
+            "accepted": true,
+            "systemAction": "GLOBAL_ACTION_BACK",
+            "headingVisible": true,
+            "headingFocused": false,
+            "before": {
+              "focused": true,
+              "finishing": false,
+              "destroyed": false,
+              "canGoBack": true,
+              "historyIndex": 2,
+              "historySize": 4
+            }
+          }
+        ],
+        "externalMailAppTested": false,
+        "caseId": "legal-navigation-native-back",
+        "passed": true
+      },
+      {
+        "schemaVersion": 1,
+        "documents": [
+          {
+            "bodyBackground": "rgb(17, 17, 17)",
+            "bodyColor": "rgb(255, 255, 255)",
+            "colorScheme": "dark",
+            "emailSelectionMatches": true,
+            "emailUserSelect": "text",
+            "emailVisible": true,
+            "emailWebkitUserSelect": "text",
+            "headingFocused": true,
+            "matchMediaDark": true,
+            "minRelatedLinkHeight": 58,
+            "outsideControls": 0,
+            "path": "/privacy",
+            "relatedLinkCount": 2,
+            "relatedLinkPaths": [
+              "/delete-data",
+              "/about"
+            ],
+            "scrollWidth": 320,
+            "surfaceBackground": "rgb(29, 29, 29)",
+            "width": 320,
+            "nativeNightMask": 32,
+            "configuredNightMode": 2
+          },
+          {
+            "bodyBackground": "rgb(17, 17, 17)",
+            "bodyColor": "rgb(255, 255, 255)",
+            "colorScheme": "dark",
+            "emailSelectionMatches": true,
+            "emailUserSelect": "text",
+            "emailVisible": true,
+            "emailWebkitUserSelect": "text",
+            "headingFocused": true,
+            "matchMediaDark": true,
+            "minRelatedLinkHeight": 58,
+            "outsideControls": 0,
+            "path": "/delete-data",
+            "relatedLinkCount": 2,
+            "relatedLinkPaths": [
+              "/privacy",
+              "/about"
+            ],
+            "scrollWidth": 320,
+            "surfaceBackground": "rgb(29, 29, 29)",
+            "width": 320,
+            "nativeNightMask": 32,
+            "configuredNightMode": 2
+          }
+        ],
+        "emailSelectionMethod": "DOM-range-and-computed-user-select",
+        "externalMailAppTested": false,
+        "caseId": "legal-narrow-dark",
+        "passed": true
+      }
+    ],
+    "allFourCasesPassed": true,
+    "allRequiredCasesPassed": true,
+    "legalPhasePassed": true,
+    "legalNightMode": {
+      "original": "no",
+      "requested": "yes",
+      "observedBeforeLaunch": "yes",
+      "restored": true,
+      "restoreFailureCode": null
+    },
+    "externalMailAppTested": false,
+    "legalLightThemeLayoutTested": false,
+    "currentPhase": "legal",
+    "emulatorVersionOutput": "Android emulator version 37.3.10.0 (build_id 16970787) (CL:N/A)",
+    "disposableAvdAndDebugKeyRemoved": true
+  },
+  "rawLogStored": false,
+  "scope": "Exact isolated synthetic fixture on API36 emulator. No physical device, signed release, external mail client, native legal light-theme layout, or production backend validation."
+}
