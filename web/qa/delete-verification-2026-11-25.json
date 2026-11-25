@@ -1,0 +1,1019 @@
+{
+  "schemaVersion": 1,
+  "kind": "focused-owner-deletion-verification",
+  "recordedAtUtc": "2026-11-25T05:39:06.058755+00:00",
+  "recordedAtKst": "2026-11-25T14:39:06.058755+09:00",
+  "baselineCommit": "63c1f404643975fe8028283e4b831d56221e3c48",
+  "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+  "sourceTree": "83b60fa6cc7b459703f72006ff394449b510a964",
+  "sourceBranch": "codex/genie-android-native-check-20261123",
+  "scope": "Pin the captured existing session, require an owned record before the existing delete RPC, and confirm its absence before local cleanup.",
+  "files": [
+    {
+      "path": "web/src/lib/api.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "gitBlobSha": "a1cbba777cd9511f6219447beefccd8bba8e331d",
+      "sha256": "4eee6f39a28397b01719dfa7c03119559612d1b645a57fd3b220bdf689579c8a",
+      "bytes": 12671,
+      "change": "modified"
+    },
+    {
+      "path": "web/src/lib/api.ts",
+      "mode": "100644",
+      "type": "blob",
+      "gitBlobSha": "91d3ec71bd582ee63d661bf90e75e429481c44b7",
+      "sha256": "9a24910ccdb4fca13be1d0520987592ff2262c5a5c72810ddb4d5933eb805a65",
+      "bytes": 9617,
+      "change": "modified"
+    },
+    {
+      "path": "web/src/screens/HistoryScreen.delete-verification.test.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "gitBlobSha": "09ddab0aa3490151cec4a719d35c3c0888508275",
+      "sha256": "a94ecf27e7e240293369848e1726cb7da2028a6623f345ed5345c1f770766b73",
+      "bytes": 9332,
+      "change": "added"
+    },
+    {
+      "path": "web/src/screens/HistoryScreen.session-loss.test.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "gitBlobSha": "bb02527d79bd8f70b24f347f469d1acde8abc127",
+      "sha256": "9b2e56a1123941a838ab9dc9ca1ae86a9342d131651369ab89f685fb078c7e8e",
+      "bytes": 4172,
+      "change": "modified"
+    }
+  ],
+  "sourceSnapshotComputedByTaskLead": {
+    "baselineCount": 163,
+    "baselineSha256": "36ff10f173297eb7e10ed3f5836cf7595af56d11de3d863aa63c619da62a8aed",
+    "count": 164,
+    "sha256": "2c1f3843829802a7910a55d8c4191ab37b5ca8b4af1a132e6a83890b475a3288",
+    "changed": [
+      {
+        "path": "src/lib/api.test.ts",
+        "sha256": "4eee6f39a28397b01719dfa7c03119559612d1b645a57fd3b220bdf689579c8a"
+      },
+      {
+        "path": "src/lib/api.ts",
+        "sha256": "9a24910ccdb4fca13be1d0520987592ff2262c5a5c72810ddb4d5933eb805a65"
+      },
+      {
+        "path": "src/screens/HistoryScreen.delete-verification.test.tsx",
+        "sha256": "a94ecf27e7e240293369848e1726cb7da2028a6623f345ed5345c1f770766b73"
+      },
+      {
+        "path": "src/screens/HistoryScreen.session-loss.test.tsx",
+        "sha256": "9b2e56a1123941a838ab9dc9ca1ae86a9342d131651369ab89f685fb078c7e8e"
+      }
+    ],
+    "unchanged": 160
+  },
+  "remoteTreeVerification": {
+    "blobCount": 377,
+    "changedOrAddedFiles": 4,
+    "unchangedPreviousBlobs": 373,
+    "allPathsModesAndBlobIdsVerified": true
+  },
+  "localRegression": {
+    "node": "24.22.3",
+    "vitest": "3.2.7",
+    "runs": [
+      {
+        "file": "delete-verification-baseline.log",
+        "sha256": "335ffa83f8ef18a4259cade53421ec8f17f3baa7bb07bdaf9017eb8df95d2863",
+        "passedCases": [],
+        "failedCases": [
+          "src/screens/HistoryScreen.delete-verification.test.tsx > preserves stale owner history and device records after switching to a different valid session"
+        ],
+        "summary": [
+          "1 failed | 8 skipped (9)"
+        ]
+      },
+      {
+        "file": "delete-verification-focused.log",
+        "sha256": "31caf0390aad166c287def6976cdca858fc7e20c23dd96a9fa86038de0197c8f",
+        "passedCases": [
+          "src/screens/HistoryScreen.session-loss.test.tsx > preserves history and local records when the session is lost before confirmed deletion",
+          "src/screens/HistoryScreen.delete-verification.test.tsx > preserves stale owner history and device records after switching to a different valid session",
+          "src/screens/HistoryScreen.delete-verification.test.tsx > keeps the captured owner on both reads and deletion when the SDK session changes mid-operation",
+          "src/screens/HistoryScreen.delete-verification.test.tsx > retains local records when the void RPC succeeds but the owned row still exists",
+          "src/screens/HistoryScreen.delete-verification.test.tsx > retains device records after deletion when the final read has HTTP error",
+          "src/screens/HistoryScreen.delete-verification.test.tsx > retains device records after deletion when the final read has null body",
+          "src/screens/HistoryScreen.delete-verification.test.tsx > retains device records after deletion when the final read has object body",
+          "src/screens/HistoryScreen.delete-verification.test.tsx > retains device records after deletion when the final read has invalid JSON",
+          "src/screens/HistoryScreen.delete-verification.test.tsx > retains device records on a timed-out read before deletion and ignores its late response",
+          "src/screens/HistoryScreen.delete-verification.test.tsx > retains device records on a timed-out read after deletion and ignores its late response"
+        ],
+        "failedCases": [],
+        "summary": [
+          "10 passed (10)"
+        ]
+      },
+      {
+        "file": "api-focused.log",
+        "sha256": "a2cd9e4d215cb4cfdd941bfe2b27ade4ca0f6f7e007d183176f2045118bf62c0",
+        "passedCases": [
+          "src/lib/api.test.ts > does not issue late deletion after auth timeout",
+          "src/lib/api.test.ts > maps history with pagination and actual choice",
+          "src/lib/api.test.ts > history and deletion existing sessions > returns an empty history without a session and never creates an account or queries data",
+          "src/lib/api.test.ts > history and deletion existing sessions > rejects deletion without a session before creating an account or sending an RPC",
+          "src/lib/api.test.ts > history and deletion existing sessions > propagates a history session-read error without anonymous fallback or a data call",
+          "src/lib/api.test.ts > history and deletion existing sessions > propagates a deletion session-read error without anonymous fallback or a data call",
+          "src/lib/api.test.ts > history and deletion existing sessions > does not query history when the existing session arrives after its deadline",
+          "src/lib/api.test.ts > history and deletion existing sessions > uses the existing session for a successful delete without anonymous fallback"
+        ],
+        "failedCases": [],
+        "summary": [
+          "8 passed | 38 skipped (46)"
+        ]
+      },
+      {
+        "file": "api-rpc-focused.log",
+        "sha256": "4faad53cc8d5e5da664eeb471686aa890d2d2bc26d9f363fa526e22d9d80c6b8",
+        "passedCases": [
+          "src/lib/api.test.ts > uses owner-scoped delete RPC once and propagates errors"
+        ],
+        "failedCases": [],
+        "summary": [
+          "1 passed | 45 skipped (46)"
+        ]
+      }
+    ],
+    "distinctPassed": 19,
+    "failedAfterFix": 0,
+    "fullSuiteRerun": false,
+    "dependencyInstallPerformed": false,
+    "realBackendContacted": false
+  },
+  "localCommands": [
+    {
+      "source": "baseline",
+      "command": "node node_modules/vitest/vitest.mjs run src/screens/HistoryScreen.delete-verification.test.tsx -t 'preserves stale owner history' --reporter=verbose",
+      "failed": 1,
+      "skipped": 8
+    },
+    {
+      "source": "working",
+      "command": "node node_modules/vitest/vitest.mjs run src/screens/HistoryScreen.delete-verification.test.tsx src/screens/HistoryScreen.session-loss.test.tsx --reporter=verbose",
+      "passed": 10
+    },
+    {
+      "source": "working",
+      "command": "node node_modules/vitest/vitest.mjs run src/lib/api.test.ts -t 'deletion|history with pagination|history and deletion existing sessions' --reporter=verbose",
+      "passed": 8,
+      "skipped": 38
+    },
+    {
+      "source": "working",
+      "command": "node node_modules/vitest/vitest.mjs run src/lib/api.test.ts -t 'uses owner-scoped delete RPC once and propagates errors' --reporter=verbose",
+      "passed": 1,
+      "skipped": 45
+    }
+  ],
+  "testBoundary": {
+    "newUiCases": 9,
+    "existingNullSessionUiCases": 1,
+    "selectedApiCases": 9,
+    "distinctSelectedCases": 19,
+    "distinctUnselectedApiCases": 37,
+    "newCasesUseInstalledSupabaseSdk": true,
+    "sdkVersion": "2.119.0",
+    "newCasesMockOnlyAuthSessionSupplyAndHttpTransport": true,
+    "newCasesUseRealScreenApiSessionAndStorageModules": true,
+    "syntheticOrigin": "https://genie-test.invalid",
+    "anonymousSignupObserved": false,
+    "externalNetworkContacted": false,
+    "existingNullSessionCaseUsesSdkMock": true,
+    "apiUnitCasesUseSessionHelperMocks": true,
+    "fullSuiteRepeated": false,
+    "localFullTypecheckRepeated": false,
+    "localWebBuildRepeated": false
+  },
+  "independentReadOnlyReview": {
+    "result": "PASS-no-blocker-in-scope",
+    "fourFinalFileHashesMatched": true,
+    "checked": [
+      "request-specific Authorization in the installed SDK",
+      "normal void/204 response becomes data:null",
+      "existing owner-only SQL contract",
+      "single deadline and late-response side effects",
+      "behavioral regression boundaries"
+    ],
+    "testsExecutedByReviewer": false,
+    "productionQueriesByReviewer": false
+  },
+  "exactSourceAndroidCi": {
+    "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+    "allThreeSucceeded": true,
+    "runs": [
+      {
+        "id": 45554248233,
+        "name": "Genie Android native check (synthetic configuration)",
+        "path": ".github/workflows/android-native-check.yml",
+        "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 1,
+        "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248233",
+        "jobId": 139002382650,
+        "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248233/job/139002382650"
+      },
+      {
+        "id": 45554248205,
+        "name": "Genie Android release configuration build (no upload)",
+        "path": ".github/workflows/android-release-build-check.yml",
+        "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 1,
+        "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248205",
+        "jobId": 139002382523,
+        "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248205/job/139002382523"
+      },
+      {
+        "id": 45554248232,
+        "name": "Genie Android device check (isolated fixture)",
+        "path": ".github/workflows/android-device-check.yml",
+        "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+        "status": "completed",
+        "conclusion": "success",
+        "attempt": 1,
+        "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248232",
+        "jobId": 139002382934,
+        "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248232/job/139002382934"
+      }
+    ],
+    "workflowRerunsPerformed": 0,
+    "sourceSnapshotCountOrDigestDirectlyEmittedByCi": false,
+    "buildObservation": {
+      "schemaVersion": 1,
+      "kind": "genie-delete-verification-ci-build-results",
+      "checkedAtUtc": "2026-11-25T05:37:09.042Z",
+      "repository": "jmpark0611-art/bestchoice",
+      "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+      "sourceCommitProvenance": {
+        "expectedValue": "Task lead supplied the committed source SHA.",
+        "verification": "Both independently fetched job receipts report that exact sourceCommit; native checkout log also reports it.",
+        "receiptFields": "Preserved as directly observed. No root-computed source snapshot digest or file count has been substituted or added."
+      },
+      "allRequestedJobsCompleted": true,
+      "allRequestedJobsSucceeded": true,
+      "runs": [
+        {
+          "runId": 45554248233,
+          "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248233",
+          "checkKind": "native-synthetic-check",
+          "expectedRunAttemptFromTaskLead": 1,
+          "runAttemptFromReceipt": null,
+          "runAttemptEvidence": "Attempt 1 was supplied by the task lead; the native receipt has no runAttempt field. No rerun was performed by this observer.",
+          "jobId": 139002382650,
+          "jobName": "native-check",
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248233/job/139002382650",
+          "jobStatus": "completed",
+          "jobConclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Select the runner's existing Java 21 and Android SDK",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Install only the locked web dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Compile and verify a disposable Android bundle",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Publish the verification receipt in the job summary",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            }
+          ],
+          "sourceCommitFromReceipt": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+          "exactExpectedSourceCommit": true,
+          "checkoutHeadFromLog": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+          "checkoutHeadEvidence": "Exact SHA on the line after git log -1 --format=%H in the decoded job log.",
+          "receiptObservation": {
+            "observedAtUtc": "2026-11-25T05:35:45.713Z",
+            "sourceTool": "github_fetch_workflow_job_logs",
+            "sourceField": "structuredContent.content",
+            "marker": "GENIE_NATIVE_CHECK_RECEIPT ",
+            "processing": "Removed leading GitHub log timestamps and parsed the JSON after the marker; the receipt below is the parsed actual output. Non-JSON command references are not treated as receipts.",
+            "parsedReceiptCount": 1,
+            "rawLogsSaved": false
+          },
+          "receipt": {
+            "status": "native-check-passed-not-a-release",
+            "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+            "node": "v24.22.3",
+            "javac": "javac 21.0.13",
+            "configuredApplicationId": "kr.synthfixture.genie",
+            "versionCode": 12,
+            "versionName": "1.2.0",
+            "aabSha256": "0b8d8f566bcd29e77a0c72cd22033c8c6133924e9a8ec92bb6ae93507e264591",
+            "nativeCompilation": true,
+            "signatureVerified": true,
+            "packagedAssetsMatch": true,
+            "libraryAssetsVerified": {
+              "base/assets/native-bridge.js": "02dfc17bd41d1e5d0748f7f6c48aa9f2a3e624bb3677df488db466fbc93f2246"
+            },
+            "finalBinaryManifestIdentityVerified": true,
+            "finalApplicationId": "kr.synthfixture.genie",
+            "finalVersionCode": 12,
+            "finalVersionName": "1.2.0",
+            "finalManifestSha256": "1d51b2d36531c6bd0e411e37832e94caca524de23d16729d40b78f6e3a2dc4f2",
+            "syntheticConfigurationOnly": true,
+            "backendContacted": false,
+            "appOrDeviceLaunched": false,
+            "storeSubmission": false,
+            "productionSigningKeyUsed": false,
+            "generatedKeyAndAabDeleted": true
+          }
+        },
+        {
+          "runId": 45554248205,
+          "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248205",
+          "checkKind": "published-config-unsigned-check",
+          "expectedRunAttemptFromTaskLead": 1,
+          "runAttemptFromReceipt": 1,
+          "runAttemptEvidence": "The actual release receipt reports runAttempt 1, matching the task lead's expected attempt.",
+          "jobId": 139002382523,
+          "jobName": "unsigned-release-check",
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248205/job/139002382523",
+          "jobStatus": "completed",
+          "jobConclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Select existing Java 21 and Android SDK",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Install locked dependencies without lifecycle scripts",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Verify published inputs and compile the unsigned release candidate",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Delete this run's unsigned output and preparation workspaces",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            }
+          ],
+          "sourceCommitFromReceipt": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+          "exactExpectedSourceCommit": true,
+          "checkoutHeadFromLog": null,
+          "checkoutHeadEvidence": "Not separately extracted; exact-source verification here uses the actual receipt sourceCommit.",
+          "receiptObservation": {
+            "observedAtUtc": "2026-11-25T05:34:27.009Z",
+            "sourceTool": "github_fetch_workflow_job_logs",
+            "sourceField": "structuredContent.content",
+            "marker": "GENIE_RELEASE_BUILD_RECEIPT ",
+            "processing": "Removed leading GitHub log timestamps and parsed the JSON after the marker; the receipt below is the parsed actual output. Non-JSON command references are not treated as receipts.",
+            "parsedReceiptCount": 1,
+            "rawLogsSaved": false
+          },
+          "receipt": {
+            "schemaVersion": 1,
+            "status": "unsigned-export-awaiting-local-signing",
+            "repository": "jmpark0611-art/bestchoice",
+            "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+            "sourceRef": "refs/heads/codex/genie-android-native-check-20261123",
+            "runId": "45554248205",
+            "runAttempt": "1",
+            "applicationId": "com.jmpark0611.genie",
+            "versionCode": 1,
+            "versionName": "1.0.0",
+            "file": "android/app/build/outputs/bundle/release/app-release.aab",
+            "unsignedAabSha256": "d6031d06298e5cc3d3001ca6c3d249273c99c4d83113c30f030b791116a1cf1d",
+            "manifestSha256": "162678b2a3ba55c256eb282b5ccb716c7dc92c7654e1a772a6289db877bf90de",
+            "releaseManifestSha256": "8f131fd841d08da37dd1ccb7305582c8d1faf10f015c213015b6f6aed3d03e48",
+            "identityReceiptSha256": "d750e7786448c3107acf8365bf0377a6784611654b7232230477b6fec08d36a6",
+            "publicConfig": {
+              "supabaseUrl": "https://njrtcxohbkfgrgwhlvua.supabase.co",
+              "publicAppUrl": "https://genie-web-rosy.vercel.app",
+              "publishableKeySha256": "04918d6318b6028779b25e77fc1289cb9dda9e982842d7783ee9ef6f6fb6de21"
+            },
+            "libraryAssets": {
+              "base/assets/native-bridge.js": "02dfc17bd41d1e5d0748f7f6c48aa9f2a3e624bb3677df488db466fbc93f2246"
+            },
+            "nativeCompilation": true,
+            "unsignedVerified": true,
+            "packagedAssetsMatch": true,
+            "finalBinaryManifestIdentityVerified": true,
+            "sourceSnapshotVerified": true,
+            "productionSigningKeyUsed": false,
+            "backendContacted": false,
+            "artifactUploaded": false,
+            "storeSubmission": false,
+            "publishedInputs": {
+              "status": "published-client-config-fingerprint-matched",
+              "htmlSha256": "b792aac07c61ebca7ff945ff47ad63ff8f31ca6174f0951dfe799f424db7b30c",
+              "sourceHashes": [
+                {
+                  "path": "/assets/index-DMljNA2l.js",
+                  "sha256": "de85214b2f2f17453b518617949649978aba2d43cb62bc67b7fb9ac4e211486e"
+                }
+              ],
+              "publishableKeySha256": "04918d6318b6028779b25e77fc1289cb9dda9e982842d7783ee9ef6f6fb6de21",
+              "staticGetOnly": true,
+              "backendContacted": false
+            },
+            "workflowStatus": "unsigned-native-verified-discard-after-receipt",
+            "signingPending": true,
+            "retainedAab": false
+          }
+        }
+      ],
+      "conclusions": {
+        "nativeCompilationOnExactSourceVerified": true,
+        "syntheticTemporarySignatureVerified": true,
+        "publishedConfigurationUnsignedBuildVerified": true,
+        "sourceSnapshotVerificationReportedByUnsignedReceipt": true,
+        "finalBinaryManifestIdentityVerifiedInBothReceipts": true,
+        "productionSigningKeyUsed": false,
+        "backendContactedByBuildChecks": false,
+        "storeSubmission": false,
+        "signedReleaseCandidateCreated": false
+      },
+      "limits": [
+        "These are build-check receipts. They do not establish live Supabase behavior, physical-device compatibility, final privacy-policy readiness or Play app registration.",
+        "The native receipt is explicitly syntheticConfigurationOnly and not a release. Its temporary key and AAB were deleted.",
+        "The release check verified an unsigned bundle with published configuration and reports retainedAab false; its deletion step succeeded. Signing remains pending.",
+        "The unsigned receipt reports publishedInputs.staticGetOnly; no HTTP GET count is present and none is inferred.",
+        "No source snapshot digest or source-file count is present in the native receipt; no value is fabricated.",
+        "Workflow run metadata endpoints were not queried. Job status and step conclusions are directly observed; overall completion fields summarize only these two jobs.",
+        "The separate device-check workflow is outside this observer's scope."
+      ],
+      "collection": {
+        "readOnlyGitHubOperations": [
+          "github_fetch_workflow_run_jobs",
+          "github_fetch_workflow_job_logs"
+        ],
+        "requestedRunIds": [
+          45554248233,
+          45554248205
+        ],
+        "workflowRerunsPerformed": 0,
+        "remoteMutationsPerformed": 0,
+        "rawLogsSaved": false,
+        "rawEnvironmentValuesSaved": false,
+        "rawClientKeysSaved": false,
+        "actualReceiptsPreserved": true,
+        "failuresObserved": false,
+        "testsOrBuildsExecutedLocally": false
+      }
+    },
+    "deviceObservation": {
+      "schemaVersion": 1,
+      "repository": "jmpark0611-art/bestchoice",
+      "workflowName": "Genie Android device check (isolated fixture)",
+      "runId": 45554248232,
+      "runAttempt": 1,
+      "runUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248232",
+      "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+      "workflowStatus": "completed",
+      "workflowConclusion": "success",
+      "jobId": 139002382934,
+      "jobName": "device-check",
+      "jobStatus": "completed",
+      "jobConclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Require KVM and existing runner tools before downloading anything",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install only locked build dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Verify the fixture driver's guards",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Resolve official pins, check existing licenses, and build fixture APKs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Run the required cases with only loopback networking",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Record actual results and their limits",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Retain only a synthetic failure screen and fixed state for one day",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10
+        },
+        {
+          "name": "Remove this job's disposable files",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23
+        }
+      ],
+      "actualReceipt": {
+        "schemaVersion": 1,
+        "status": "six-android-emulator-fixture-cases-passed-not-a-release",
+        "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+        "fixtureOnly": true,
+        "applicationId": "dev.local.genie.preview",
+        "debugApkSha256": "49fb7a5dcb6048a7d23ec3d56468f9a310087bce28a7c03b95bee1d7ba2cb1a9",
+        "instrumentationApkSha256": "eb1e4fdaf249bb5467a3b431f2a774f4db829e42283d1fbd66c4bbf5edd04acd",
+        "signedReleaseNotTested": true,
+        "physicalDeviceTested": false,
+        "backendContacted": false,
+        "externalNetwork": "blocked-by-loopback-only-network-namespace",
+        "emulator": {
+          "url": "https://dl.google.com/android/repository/emulator-linux_x64-16970787.zip",
+          "size": 350068887,
+          "checksumAlgorithm": "sha1",
+          "checksum": "5f7314368fc6c05c937f6991bb4106214dc389e7",
+          "package": "emulator",
+          "revision": "37.3.10",
+          "licenseId": "android-sdk-license",
+          "licenseSha1": "24333f8a63b6825ea9c5514f83c2829b004d1fee",
+          "licenseLiteralSha1": "efa68a6b3c661d18699d5c026771d5911cdc2f83",
+          "licenseNormalization": "android-TrimStringAdapter",
+          "metadataSha256": "e0e21658f189fbf221f703cbca947a5c91d661061c993f2cc435bacdf1002e3c",
+          "sha256": "a4405349d8a9c52136ab7861e5331dc40e85574bd91cb8889a298a2ff4c52e26",
+          "archiveSource": "https://developer.android.com/studio/emulator_archive",
+          "metadataSource": "https://dl.google.com/android/repository/repository2-1.xml",
+          "actualArchive": {
+            "size": 350068887,
+            "sha256": "a4405349d8a9c52136ab7861e5331dc40e85574bd91cb8889a298a2ff4c52e26"
+          }
+        },
+        "image": {
+          "url": "https://dl.google.com/android/repository/sys-img/google_apis/x86_64-36_r07.zip",
+          "size": 1895447397,
+          "checksumAlgorithm": "sha1",
+          "checksum": "c6bf44bdcd885bb902b4ba752d111a073ad7a817",
+          "package": "system-images;android-36;google_apis;x86_64",
+          "revision": "7.0.0",
+          "licenseId": "android-sdk-license",
+          "licenseSha1": "24333f8a63b6825ea9c5514f83c2829b004d1fee",
+          "licenseLiteralSha1": "efa68a6b3c661d18699d5c026771d5911cdc2f83",
+          "licenseNormalization": "android-TrimStringAdapter",
+          "metadataSha256": "d48bd8404b8d5ab42d84cc0907dfb9e55c8a50194bb07c8a864c331375dd8b3a",
+          "metadataSource": "https://dl.google.com/android/repository/sys-img/google_apis/sys-img2-1.xml",
+          "actualArchive": {
+            "size": 1895447397,
+            "sha256": "b1bb0769d0bed7698e61f203d7dc9bf6e7c37cd01a39d0d8788a11186bc78160"
+          }
+        },
+        "node": "v24.22.3",
+        "javac": "javac 21.0.13",
+        "firstInstrumentationNoRestart": true,
+        "firstLaunchMode": "activity-recreated-in-prelaunched-process",
+        "preparedProcessPreserved": true,
+        "prelaunchPid": 2176,
+        "preparedPid": 2176,
+        "pidBeforeForceStop": 2176,
+        "forceStopConfirmed": true,
+        "cases": [
+          {
+            "origin": "https://localhost",
+            "apiLevel": 36,
+            "webViewPackage": "com.google.android.webview",
+            "webViewVersion": "133.0.6943.137",
+            "caseId": "launch",
+            "passed": true
+          },
+          {
+            "from": "/about",
+            "to": "/",
+            "systemAction": "GLOBAL_ACTION_BACK",
+            "before": {
+              "focused": true,
+              "finishing": false,
+              "destroyed": false,
+              "canGoBack": true,
+              "historyIndex": 1,
+              "historySize": 2
+            },
+            "aboutTap": {
+              "css": {
+                "bottom": 367.6171875,
+                "dpr": 2,
+                "height": 592,
+                "hit": true,
+                "left": 99.3515625,
+                "right": 178.3984375,
+                "top": 349.1171875,
+                "width": 320,
+                "x": 138.875,
+                "y": 358.3671875
+              },
+              "screenX": 277.75,
+              "screenY": 764.734375,
+              "scaleX": 2,
+              "scaleY": 2,
+              "originX": 0,
+              "originY": 48,
+              "nativeScrollX": 0,
+              "nativeScrollY": 960,
+              "trustedClick": {
+                "anchorId": "home-draft-settings-link",
+                "anchorPath": "/about",
+                "id": "home-draft-settings-link",
+                "tag": "A",
+                "trusted": true,
+                "type": "click",
+                "x": 139,
+                "y": 358
+              }
+            },
+            "caseId": "native-back",
+            "passed": true
+          },
+          {
+            "devicePixelRatio": 2,
+            "outside": 0,
+            "scrollWidth": 320,
+            "visibleControls": 18,
+            "width": 320,
+            "caseId": "narrow-screen",
+            "passed": true
+          },
+          {
+            "devicePixelRatio": 2,
+            "outside": 0,
+            "scrollWidth": 320,
+            "visibleControls": 18,
+            "width": 320,
+            "explicitRestoreRequired": true,
+            "exactFieldsRestored": 3,
+            "caseId": "draft-restore-after-force-stop",
+            "passed": true
+          },
+          {
+            "schemaVersion": 1,
+            "forward": [
+              {
+                "from": "/",
+                "to": "/about",
+                "trustedClick": {
+                  "anchorId": "",
+                  "anchorPath": "/about",
+                  "id": "",
+                  "tag": "A",
+                  "trusted": true,
+                  "type": "click",
+                  "x": 156,
+                  "y": 484
+                },
+                "headingVisible": true,
+                "headingFocused": false
+              },
+              {
+                "from": "/about",
+                "to": "/privacy",
+                "trustedClick": {
+                  "anchorId": "",
+                  "anchorPath": "/privacy",
+                  "id": "",
+                  "tag": "A",
+                  "trusted": true,
+                  "type": "click",
+                  "x": 156,
+                  "y": 266
+                },
+                "headingVisible": true,
+                "headingFocused": true
+              },
+              {
+                "from": "/privacy",
+                "to": "/delete-data",
+                "trustedClick": {
+                  "anchorId": "",
+                  "anchorPath": "/delete-data",
+                  "id": "",
+                  "tag": "A",
+                  "trusted": true,
+                  "type": "click",
+                  "x": 156,
+                  "y": 443
+                },
+                "headingVisible": true,
+                "headingFocused": true
+              }
+            ],
+            "back": [
+              {
+                "from": "/delete-data",
+                "to": "/privacy",
+                "accepted": true,
+                "systemAction": "GLOBAL_ACTION_BACK",
+                "headingVisible": true,
+                "headingFocused": true,
+                "before": {
+                  "focused": true,
+                  "finishing": false,
+                  "destroyed": false,
+                  "canGoBack": true,
+                  "historyIndex": 3,
+                  "historySize": 4
+                }
+              },
+              {
+                "from": "/privacy",
+                "to": "/about",
+                "accepted": true,
+                "systemAction": "GLOBAL_ACTION_BACK",
+                "headingVisible": true,
+                "headingFocused": false,
+                "before": {
+                  "focused": true,
+                  "finishing": false,
+                  "destroyed": false,
+                  "canGoBack": true,
+                  "historyIndex": 2,
+                  "historySize": 4
+                }
+              }
+            ],
+            "externalMailAppTested": false,
+            "caseId": "legal-navigation-native-back",
+            "passed": true
+          },
+          {
+            "schemaVersion": 1,
+            "documents": [
+              {
+                "bodyBackground": "rgb(17, 17, 17)",
+                "bodyColor": "rgb(255, 255, 255)",
+                "colorScheme": "dark",
+                "emailSelectionMatches": true,
+                "emailUserSelect": "text",
+                "emailVisible": true,
+                "emailWebkitUserSelect": "text",
+                "headingFocused": true,
+                "matchMediaDark": true,
+                "minRelatedLinkHeight": 58,
+                "outsideControls": 0,
+                "path": "/privacy",
+                "relatedLinkCount": 2,
+                "relatedLinkPaths": [
+                  "/delete-data",
+                  "/about"
+                ],
+                "scrollWidth": 320,
+                "surfaceBackground": "rgb(29, 29, 29)",
+                "width": 320,
+                "nativeNightMask": 32,
+                "configuredNightMode": 2
+              },
+              {
+                "bodyBackground": "rgb(17, 17, 17)",
+                "bodyColor": "rgb(255, 255, 255)",
+                "colorScheme": "dark",
+                "emailSelectionMatches": true,
+                "emailUserSelect": "text",
+                "emailVisible": true,
+                "emailWebkitUserSelect": "text",
+                "headingFocused": true,
+                "matchMediaDark": true,
+                "minRelatedLinkHeight": 58,
+                "outsideControls": 0,
+                "path": "/delete-data",
+                "relatedLinkCount": 2,
+                "relatedLinkPaths": [
+                  "/privacy",
+                  "/about"
+                ],
+                "scrollWidth": 320,
+                "surfaceBackground": "rgb(29, 29, 29)",
+                "width": 320,
+                "nativeNightMask": 32,
+                "configuredNightMode": 2
+              }
+            ],
+            "emailSelectionMethod": "DOM-range-and-computed-user-select",
+            "externalMailAppTested": false,
+            "caseId": "legal-narrow-dark",
+            "passed": true
+          }
+        ],
+        "allFourCasesPassed": true,
+        "allRequiredCasesPassed": true,
+        "legalPhasePassed": true,
+        "legalNightMode": {
+          "original": "no",
+          "requested": "yes",
+          "observedBeforeLaunch": "yes",
+          "restored": true,
+          "restoreFailureCode": null
+        },
+        "externalMailAppTested": false,
+        "legalLightThemeLayoutTested": false,
+        "currentPhase": "legal",
+        "emulatorVersionOutput": "Android emulator version 37.3.10.0 (build_id 16970787) (CL:N/A)",
+        "disposableAvdAndDebugKeyRemoved": true
+      },
+      "receiptChecks": {
+        "sourceCommitMatchesExpected": true,
+        "runHeadMatchesExpected": true,
+        "sixCasesPassed": true,
+        "allRequiredCasesPassed": true,
+        "backendContacted": false,
+        "disposableAvdAndDebugKeyRemoved": true
+      },
+      "receiptExtraction": {
+        "source": "completed GitHub Actions job log structuredContent.content",
+        "timestampPrefixRemoved": true,
+        "matchingObjects": 1,
+        "distinctReceipts": 1,
+        "rawLogsSaved": false,
+        "fieldsNotEmittedByReceipt": [
+          "sourceSnapshotSha256",
+          "sourceSnapshotFileCount"
+        ]
+      },
+      "limits": [
+        "The six pre-existing emulator fixture cases ran; the new deletion regression was not a native device case.",
+        "Physical devices, final signed release, real backend, external mail client, clipboard denial, and shared voting were not validated by this job.",
+        "No source inventory digest or count is attributed to the actual CI receipt."
+      ]
+    },
+    "exactCommitDeploymentCheck": {
+      "project": "genie-web",
+      "branch": "codex/genie-android-native-check-20261123",
+      "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+      "deploymentCount": 0
+    },
+    "newDeletionCasesExecutedOnAndroidDevice": false,
+    "finalSignedCandidateCreated": false,
+    "storeSubmission": false
+  },
+  "sdkReference": "https://supabase.com/docs/reference/javascript/setheader",
+  "preservedSignedCandidate": {
+    "sha256": "5fbf088745564bbe32343a485a2b316f130ba9668c529a25a48f17f557256e78",
+    "sourceCommit": "b8d9db66c249684842971410f2c7b80dd5bec395",
+    "containsThisFix": false,
+    "newSignedCandidateCreated": false
+  },
+  "remainingReleaseConditions": {
+    "readyToSubmit": false,
+    "serverMigrationRequest": "prepared-not-yet-returned; provider request ID and terminal receipt unavailable",
+    "sameMigrationAppliedAgain": false,
+    "newProductionLogOrCatalogQueryThisTask": false,
+    "existingLogDiagnosisAlreadyCoveredAttemptWindow": true,
+    "productionRuntimeFunctionOrSchemaChanged": false,
+    "privacyProviderGateNewlyClosed": false,
+    "freeDownloadPreviouslyConfirmed": true,
+    "finalPolicyAndPublicUrlsPending": true,
+    "finalSignedCandidateAndPhysicalDeviceValidationPending": true,
+    "storeAppCreationAndSubmissionPerformed": false
+  },
+  "limits": [
+    "The pre/post reads rely on the existing owner-only SELECT RLS and lack of client ownership-transfer permission. No production policy was changed or exercised here.",
+    "The void RPC supplies no affected-row count or atomic deletion receipt; same-owner final absence is confirmed, not exactly one row deleted by this call.",
+    "If the server deleted the row but confirmation failed, device data is intentionally retained. The existing screen reports that completion is unconfirmed.",
+    "A session switch does not immediately hide a previously displayed history list, and this client check cannot undo an already sent server mutation.",
+    "These checks do not cover Auth-user-wide deletion, provider retention, a live backend, Node 22 or the final signed candidate on a physical device."
+  ]
+}

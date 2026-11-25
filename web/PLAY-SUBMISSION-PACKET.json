@@ -615,7 +615,7 @@
       "대상 기록의 삭제",
       "확인 대화상자"
     ],
-    "deletionFailureHandlingKo": "이전 기록 더 보기로 필요한 기록을 찾고, 응답이 불확실하면 새로 고침으로 확인합니다. 서버 삭제 후 기기 회고·초안 정리에 실패하면 별도 안내합니다.",
+    "deletionFailureHandlingKo": "이전 기록 더 보기로 필요한 기록을 찾습니다. 같은 기존 세션으로 삭제 전 소유 행과 삭제 후 부재를 확인해야 기기 회고·초안을 정리합니다. 확인 응답이 불확실하면 기기 자료를 보존하고 새로 고침으로 확인하도록 안내하며, 확인 후 기기 정리에 실패하면 별도 안내합니다.",
     "preparedReportingAndBlockContracts": {
       "scope": "Prepared SQL only; production remains unapplied at the 16:35 UTC diagnosis.",
       "evidence": [
@@ -637,7 +637,8 @@
       "eraseEarlierWhenUnnecessary": true,
       "scope": "Minimum handling ledger only; not raw inquiry messages, sensitive attachments, app data, Auth, infrastructure logs or provider backups.",
       "automaticDeletionImplemented": false
-    }
+    },
+    "deletionConfirmationEvidence": "deleteVerification"
   },
   "appAccess": {
     "status": "instructions-prepared-current-candidate-preserved-awaiting-policy-runtime-update-operational-and-device-access",
@@ -1684,71 +1685,90 @@
     }
   },
   "documentationRevision": {
-    "recordedAtUtc": "2026-11-25T05:07:57.940677+00:00",
-    "baseCommit": "127b69e3e40e5e923450b8695331e90b546dd1d6",
-    "scope": "Free-download approval and observed free-radio selection only, in the same four Play documents. Existing history is preserved without adding a full duplicate snapshot; declarations, final creation, candidate and code/QA/backend/CI facts remain unchanged.",
+    "recordedAtUtc": "2026-11-25T05:39:06.058755+00:00",
+    "baseCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+    "scope": "Link the focused owner-deletion confirmation fix and actual exact-source Android results. Preserve free-download approval, candidate identity, all previous evidence and pending release gates.",
     "updatedFiles": [
-      "web/release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
-      "web/release-prep/launch-continuation/play-console-readiness-2026-11-25.md",
       "web/PLAY-SUBMISSION-PACKET.json",
-      "web/PLAY-SUBMISSION-PACKET.md"
+      "web/PLAY-SUBMISSION-PACKET.md",
+      "web/qa/delete-verification-2026-11-25.json",
+      "web/qa/delete-verification-2026-11-25.md"
     ],
     "runtimeChangedByThisPacketUpdate": false,
     "buildsOrTestsRunByThisPacketUpdate": false,
-    "newConsoleObservationRecorded": true,
+    "newConsoleObservationRecorded": false,
     "consoleObservationPerformedByPacketEditor": false,
-    "remoteWritesByThisPacketUpdate": false,
+    "serverMigrationApplyRepeated": false,
+    "publicDeploymentPerformed": false,
+    "storeSubmitted": false,
+    "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
     "previous": {
-      "recordedAtUtc": "2026-11-25T03:46:18.990368+00:00",
-      "baseCommit": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
-      "scope": "Only the two Play submission packet documents: record three adopted support-handling choices, exact-source draft-navigation CI evidence and the new read-only authenticated Console account observation. Preserve candidate identity, historical events and all unconfirmed app-specific/release/policy facts.",
-      "approvalEvidence": "release-prep/launch-continuation/privacy-ops/privacy-operations.json#operatingDecisionsConfirmation",
+      "recordedAtUtc": "2026-11-25T05:07:57.940677+00:00",
+      "baseCommit": "127b69e3e40e5e923450b8695331e90b546dd1d6",
+      "scope": "Free-download approval and observed free-radio selection only, in the same four Play documents. Existing history is preserved without adding a full duplicate snapshot; declarations, final creation, candidate and code/QA/backend/CI facts remain unchanged.",
       "updatedFiles": [
-        "PLAY-SUBMISSION-PACKET.md",
-        "PLAY-SUBMISSION-PACKET.json"
+        "web/release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
+        "web/release-prep/launch-continuation/play-console-readiness-2026-11-25.md",
+        "web/PLAY-SUBMISSION-PACKET.json",
+        "web/PLAY-SUBMISSION-PACKET.md"
       ],
       "runtimeChangedByThisPacketUpdate": false,
       "buildsOrTestsRunByThisPacketUpdate": false,
       "newConsoleObservationRecorded": true,
+      "consoleObservationPerformedByPacketEditor": false,
       "remoteWritesByThisPacketUpdate": false,
       "previous": {
-        "recordedAtUtc": "2026-11-25T02:19:08.406259+00:00",
-        "scope": "Draft runtime integrated and exact-source three CI workflows passed; final policy answers and preserved signed candidate remain unchanged.",
+        "recordedAtUtc": "2026-11-25T03:46:18.990368+00:00",
+        "baseCommit": "e521357baf68fc0448ce2739acd7ce9b14341d1a",
+        "scope": "Only the two Play submission packet documents: record three adopted support-handling choices, exact-source draft-navigation CI evidence and the new read-only authenticated Console account observation. Preserve candidate identity, historical events and all unconfirmed app-specific/release/policy facts.",
+        "approvalEvidence": "release-prep/launch-continuation/privacy-ops/privacy-operations.json#operatingDecisionsConfirmation",
+        "updatedFiles": [
+          "PLAY-SUBMISSION-PACKET.md",
+          "PLAY-SUBMISSION-PACKET.json"
+        ],
+        "runtimeChangedByThisPacketUpdate": false,
+        "buildsOrTestsRunByThisPacketUpdate": false,
+        "newConsoleObservationRecorded": true,
+        "remoteWritesByThisPacketUpdate": false,
         "previous": {
-          "baseCommit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
-          "previousPacketRecordedAtUtc": "2026-11-23T23:36:41Z",
-          "preparedOnKst": "2026-11-25",
-          "officialPolicyCheckedOnUtc": "2026-11-24",
-          "scope": "Three Play documentation files reconstructed from exact-base originals and the retained authoring transcript after executor/store loss. Root reviewed and reconciled the later exact-name catalog evidence, then prepared the documents for the already-authorized branch checkpoint. No Console entry, runtime edit, new build or live app validation."
+          "recordedAtUtc": "2026-11-25T02:19:08.406259+00:00",
+          "scope": "Draft runtime integrated and exact-source three CI workflows passed; final policy answers and preserved signed candidate remain unchanged.",
+          "previous": {
+            "baseCommit": "c4fb64ac3e35c5b02163614a194ba62a5d7b7ea1",
+            "previousPacketRecordedAtUtc": "2026-11-23T23:36:41Z",
+            "preparedOnKst": "2026-11-25",
+            "officialPolicyCheckedOnUtc": "2026-11-24",
+            "scope": "Three Play documentation files reconstructed from exact-base originals and the retained authoring transcript after executor/store loss. Root reviewed and reconciled the later exact-name catalog evidence, then prepared the documents for the already-authorized branch checkpoint. No Console entry, runtime edit, new build or live app validation."
+          }
+        },
+        "consoleObservationEvidence": "release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
+        "consoleObservationPerformedByPacketEditor": false,
+        "rootCompletion": {
+          "recordedAtUtc": "2026-11-25T03:59:33.636547+00:00",
+          "scope": "Reconcile new bounded server observation and exact-source policy-copy CI results; preserve original candidate and historical observations.",
+          "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
+          "workflowFilesChanged": false,
+          "storeSubmitted": false
         }
       },
-      "consoleObservationEvidence": "release-prep/launch-continuation/play-console-readiness-2026-11-25.json",
-      "consoleObservationPerformedByPacketEditor": false,
       "rootCompletion": {
-        "recordedAtUtc": "2026-11-25T03:59:33.636547+00:00",
-        "scope": "Reconcile new bounded server observation and exact-source policy-copy CI results; preserve original candidate and historical observations.",
-        "sourceCommit": "bd9667cd61f04d8bbfc72d13d5d7263095df50a5",
-        "workflowFilesChanged": false,
+        "recordedAtUtc": "2026-11-25T04:36:46.737993+00:00",
+        "scope": "Preserve the new Console form observation and all previous candidate, policy and server evidence; link the narrow session-loss fix and its actual exact-source CI outcomes.",
+        "sourceCommit": "df5f6dedae9c1d200e3d33a613512f795290eac5",
+        "evidenceFile": "qa/history-session-guard-2026-11-25.json",
+        "serverApplyRepeated": false,
+        "publicDeploymentPerformed": false,
         "storeSubmitted": false
+      },
+      "previousRevisionRecordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
+      "freeDownloadEvent": {
+        "approvalEventId": "free-download-only-2026-11-25",
+        "consoleRecordAtUtc": "2026-11-25T05:05:26.915Z",
+        "scope": "free download only",
+        "numericPriceSet": false,
+        "declarationsAgreed": false,
+        "finalAppCreated": false
       }
-    },
-    "rootCompletion": {
-      "recordedAtUtc": "2026-11-25T04:36:46.737993+00:00",
-      "scope": "Preserve the new Console form observation and all previous candidate, policy and server evidence; link the narrow session-loss fix and its actual exact-source CI outcomes.",
-      "sourceCommit": "df5f6dedae9c1d200e3d33a613512f795290eac5",
-      "evidenceFile": "qa/history-session-guard-2026-11-25.json",
-      "serverApplyRepeated": false,
-      "publicDeploymentPerformed": false,
-      "storeSubmitted": false
-    },
-    "previousRevisionRecordedAtUtc": "2026-11-25T04:25:01.729051+00:00",
-    "freeDownloadEvent": {
-      "approvalEventId": "free-download-only-2026-11-25",
-      "consoleRecordAtUtc": "2026-11-25T05:05:26.915Z",
-      "scope": "free download only",
-      "numericPriceSet": false,
-      "declarationsAgreed": false,
-      "finalAppCreated": false
     }
   },
   "copyValidation": {
@@ -2117,7 +2137,8 @@
     "recordedAtUtc": "Original packet evidence date; the latest documentation update is documentationRevision.recordedAtUtc.",
     "supportFirstResponseOnlyEvent": "The earlier first-response-only event in privacy-operations.json is historical; later three-choice approval is operatingDecisionsConfirmation.",
     "consoleAccess": "Current free selection follows the explicit 2026-11-25 approval and the actual UI sequence recorded at 05:05:26.915Z. The earlier unselected create-form state is preserved in consoleAccess.events; existing account-list/login/rejection history is unchanged.",
-    "latestExactSourceAndroidEvidence": "Current changed-source Android evidence is historySessionGuard for df5f6dedae9c1d200e3d33a613512f795290eac5. Earlier legal/support-copy and original signed-candidate receipts remain attributed to their own source commits."
+    "latestExactSourceAndroidEvidence": "Current changed-source Android evidence is deleteVerification for 91f130abb9eb7e11fc3f1a5643ed889eaec597da. The earlier historySessionGuard, legal/support-copy and signed-candidate receipts remain attributed to their own source commits.",
+    "historySessionGuard": "Historical null-session fix. Its different-valid-session limitation is addressed by deleteVerification under the existing owner-only RLS contract; atomic affected-row proof remains unavailable."
   },
   "consoleOpenedOrChangedMeaning": "Legacy combined field: create-app form re-opened/reprepared and free selected after explicit approval; package availability checked again. No final app creation, release save or account-setting change.",
   "consoleChanged": false,
@@ -2205,6 +2226,69 @@
       "A different non-null session and the void delete RPC row-count/ownership contract are not resolved by the null-session guard.",
       "Final public policy/provider facts and reporting/blocking server changes remain pending.",
       "Exact final signed candidate, real devices, external services and store submission are not validated by these checks."
+    ]
+  },
+  "deleteVerification": {
+    "recordedAtUtc": "2026-11-25T05:39:06.058755+00:00",
+    "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+    "sourceSnapshotSha256": "2c1f3843829802a7910a55d8c4191ab37b5ca8b4af1a132e6a83890b475a3288",
+    "sourceFiles": 164,
+    "evidenceFile": "qa/delete-verification-2026-11-25.json",
+    "evidenceFileSha256": "d6086a25cfb7a77542a14f4e2d5a03b6930214907c02853497274a0a3a0790af",
+    "runtimeChange": "Pin the captured existing session, require an owned record before the existing delete RPC, and confirm its absence before local cleanup.",
+    "distinctLocalTestsPassed": 19,
+    "realSdkTransportBoundaryCasesPassed": 9,
+    "exactSourceCi": {
+      "allThreeSucceeded": true,
+      "runs": [
+        {
+          "id": 45554248233,
+          "name": "Genie Android native check (synthetic configuration)",
+          "path": ".github/workflows/android-native-check.yml",
+          "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+          "status": "completed",
+          "conclusion": "success",
+          "attempt": 1,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248233",
+          "jobId": 139002382650,
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248233/job/139002382650"
+        },
+        {
+          "id": 45554248205,
+          "name": "Genie Android release configuration build (no upload)",
+          "path": ".github/workflows/android-release-build-check.yml",
+          "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+          "status": "completed",
+          "conclusion": "success",
+          "attempt": 1,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248205",
+          "jobId": 139002382523,
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248205/job/139002382523"
+        },
+        {
+          "id": 45554248232,
+          "name": "Genie Android device check (isolated fixture)",
+          "path": ".github/workflows/android-device-check.yml",
+          "sourceCommit": "91f130abb9eb7e11fc3f1a5643ed889eaec597da",
+          "status": "completed",
+          "conclusion": "success",
+          "attempt": 1,
+          "url": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248232",
+          "jobId": 139002382934,
+          "jobUrl": "https://github.com/jmpark0611-art/bestchoice/actions/runs/45554248232/job/139002382934"
+        }
+      ],
+      "newDeletionCasesExecutedOnAndroidDevice": false
+    },
+    "preservedSignedCandidateContainsThisFix": false,
+    "newSignedCandidateCreated": false,
+    "productionBackendValidated": false,
+    "limits": [
+      "The pre/post reads rely on the existing owner-only SELECT RLS and lack of client ownership-transfer permission. No production policy was changed or exercised here.",
+      "The void RPC supplies no affected-row count or atomic deletion receipt; same-owner final absence is confirmed, not exactly one row deleted by this call.",
+      "If the server deleted the row but confirmation failed, device data is intentionally retained. The existing screen reports that completion is unconfirmed.",
+      "A session switch does not immediately hide a previously displayed history list, and this client check cannot undo an already sent server mutation.",
+      "These checks do not cover Auth-user-wide deletion, provider retention, a live backend, Node 22 or the final signed candidate on a physical device."
     ]
   }
 }
