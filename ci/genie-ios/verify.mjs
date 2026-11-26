@@ -11,6 +11,70 @@ const run = (cmd, args, opts = {}) => execFileSync(cmd, args, { encoding: 'utf8'
 const tryRun = (cmd, args) => { try { return { ok: true, out: run(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] }) }; } catch (e) { return { ok: false, out: String(e.stderr || e.message) }; } };
 const plistJson = (file) => JSON.parse(run('plutil', ['-convert', 'json', '-o', '-', file]));
 const plistJsonFromXml = (xml) => JSON.parse(run('plutil', ['-convert', 'json', '-o', '-', '-'], { input: xml }));
+// plutil cannot convert plists with <date>/<data> values to JSON ("invalid object in plist for destination format"),
+// which is the case for embedded.mobileprovision (CreationDate, DeveloperCertificates). Parse the XML plist directly:
+// <date> -> ISO string, <data> -> base64 string (no whitespace), other types as in JSON.
+const parseXmlPlist = (xml) => {
+  const text = String(xml).replace(/^[^<]*(?=<)/, '');
+  const unescape = (t) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+  const re = /<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<!DOCTYPE[^>]*>|<(\/?)([A-Za-z]+)(?:\s[^>]*?)?(\/?)>|([^<]+)/g;
+  const tokens = [];
+  let m;
+  while ((m = re.exec(text))) {
+    if (m[2]) tokens.push({ close: m[1] === '/', self: m[3] === '/', tag: m[2] });
+    else if (m[4] !== undefined && m[4].trim() !== '') tokens.push({ text: m[4] });
+  }
+  let i = 0;
+  const readText = (tag) => {
+    let t = '';
+    if (tokens[i] && tokens[i].text !== undefined) t = tokens[i++].text;
+    const c = tokens[i++];
+    if (!c || !c.close || c.tag !== tag) throw new Error(`plist: expected </${tag}>`);
+    return t;
+  };
+  const readValue = () => {
+    const t = tokens[i++];
+    if (!t || t.text !== undefined) throw new Error('plist: unexpected token');
+    if (t.self) {
+      if (t.tag === 'true') return true;
+      if (t.tag === 'false') return false;
+      if (t.tag === 'string') return '';
+      if (t.tag === 'dict') return {};
+      if (t.tag === 'array') return [];
+      throw new Error(`plist: unexpected <${t.tag}/>`);
+    }
+    switch (t.tag) {
+      case 'dict': {
+        const o = {};
+        while (!(tokens[i].close && tokens[i].tag === 'dict')) {
+          const k = tokens[i++];
+          if (k.tag !== 'key' || k.close) throw new Error('plist: expected <key>');
+          const key = unescape(readText('key'));
+          o[key] = readValue();
+        }
+        i++;
+        return o;
+      }
+      case 'array': {
+        const a = [];
+        while (!(tokens[i].close && tokens[i].tag === 'array')) a.push(readValue());
+        i++;
+        return a;
+      }
+      case 'string': return unescape(readText('string'));
+      case 'integer': return parseInt(readText('integer'), 10);
+      case 'real': return parseFloat(readText('real'));
+      case 'date': return readText('date').trim();
+      case 'data': return readText('data').replace(/\s+/g, '');
+      case 'true': case 'false': { const v = t.tag === 'true'; i++; return v; }
+      default: throw new Error(`plist: unsupported <${t.tag}>`);
+    }
+  };
+  while (tokens[i] && !(tokens[i].tag === 'plist' && !tokens[i].close)) i++;
+  if (!tokens[i]) throw new Error('plist: <plist> not found');
+  i++;
+  return readValue();
+};
 
 const sha256 = createHash('sha256').update(readFileSync(ipa)).digest('hex');
 const dir = mkdtempSync(join(tmpdir(), 'genie-ipa-'));
@@ -22,8 +86,8 @@ const info = plistJson(join(app, 'Info.plist'));
 
 const codesignVerify = tryRun('codesign', ['--verify', '--deep', '--strict', '--verbose=2', app]);
 const codesignInfo = tryRun('codesign', ['-dvvv', app]);
-const ent = plistJsonFromXml(run('codesign', ['-d', '--entitlements', ':-', app]));
-const prof = plistJsonFromXml(run('security', ['cms', '-D', '-i', join(app, 'embedded.mobileprovision')]));
+const ent = parseXmlPlist(run('codesign', ['-d', '--entitlements', ':-', app]));
+const prof = parseXmlPlist(run('security', ['cms', '-D', '-i', join(app, 'embedded.mobileprovision')]));
 const authority = (codesignInfo.out.match(/^Authority=(.*)$/m) || [])[1] || null;
 const signedTeam = (codesignInfo.out.match(/^TeamIdentifier=(.*)$/m) || [])[1] || null;
 
