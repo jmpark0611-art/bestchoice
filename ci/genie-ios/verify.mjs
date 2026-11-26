@@ -1,6 +1,6 @@
 // Verifies the exported IPA and writes genie-ios-1.0-verification.json (no secrets inside).
 // Usage: node verify.mjs <ipa> <outJson> <ascPlanJson> <expectedBuild> <expectedTeam> <signingCertSha1>
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdtempSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
@@ -8,7 +8,11 @@ import { tmpdir } from 'node:os';
 
 const [, , ipa, out, planPath, expectedBuild, expectedTeam, certSha1] = process.argv;
 const run = (cmd, args, opts = {}) => execFileSync(cmd, args, { encoding: 'utf8', maxBuffer: 64 << 20, ...opts });
-const tryRun = (cmd, args) => { try { return { ok: true, out: run(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] }) }; } catch (e) { return { ok: false, out: String(e.stderr || e.message) }; } };
+const tryRun = (cmd, args) => {
+  const r = spawnSync(cmd, args, { encoding: 'utf8', maxBuffer: 64 << 20 });
+  if (r.status === 0 && !r.error) return { ok: true, out: `${r.stdout || ''}${r.stderr || ''}` };
+  return { ok: false, out: String((r.stderr && r.stderr.length ? r.stderr : null) || r.error?.message || '') };
+};
 const plistJson = (file) => JSON.parse(run('plutil', ['-convert', 'json', '-o', '-', file]));
 const plistJsonFromXml = (xml) => JSON.parse(run('plutil', ['-convert', 'json', '-o', '-', '-'], { input: xml }));
 // plutil cannot convert plists with <date>/<data> values to JSON ("invalid object in plist for destination format"),
