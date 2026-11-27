@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SOURCE_SHA: c0f3e3423032712caf0fdd806ce94aa1ad48b46e
+  SOURCE_SHA: 619a5fdc48b7ff6a49dfcc37ebab354330083c82
   ICON_SVG_SHA256: 40da87a9c53a174430cebde4bc658bb1143514e953db94eb8384eb14509d28f9
   BUNDLE_ID: com.jmpark0611.genie
 

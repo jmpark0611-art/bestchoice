@@ -1,3 +1,9 @@
+> **2026-11-27 갱신 — 최종본으로 전환**
+> `privacy.html`·`delete-data.html`은 더 이상 검토본이 아니며, 게시 전 확정 항목을 실제 확인된 동작으로 바꾼 최종 템플릿이다.
+> 남은 자리표시자는 운영자가 정해야 하는 세 가지뿐이다: `{{EFFECTIVE_DATE}}`(시행일), `{{OPERATOR_NAME}}`(운영자 표기), `{{CONTACT_EMAIL}}`(문의 메일).
+> 이 폴더는 Vite `public` 바깥이라 자리표시자가 있는 파일은 배포되지 않는다. 값을 정한 뒤 `cd web && npm run legal:render -- --date YYYY-MM-DD --operator "…" --email …`로 `web/public/privacy.html`, `web/public/delete-data.html`을 만들어 커밋하면 웹 배포 때 `/privacy.html`, `/delete-data.html`로 공개된다. `npm run legal:check`는 템플릿에 초안 문구가 없고 자리표시자가 정확히 세 가지인지 검사한다.
+> 아래 본문과 `privacy-evidence.json`의 SHA-256은 2026-11-25 초안 기준의 기록이며 새 HTML과 일치하지 않는다.
+
 # 결정해지니 개인정보·삭제 안내 게시 검토
 
 ## 완료한 준비물

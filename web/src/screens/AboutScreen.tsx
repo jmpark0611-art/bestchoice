@@ -67,10 +67,10 @@ export function AboutScreen() {
       <h2 id="about-title">이용 안내</h2>
       <section className="legal-entry" aria-labelledby="legal-entry-title">
         <h3 id="legal-entry-title">개인정보와 삭제 안내</h3>
-        <p>어떤 정보가 남는지, 직접 지우려면 어떻게 하는지 확인하세요. 정식 공개 전 검토본이에요.</p>
+        <p>어떤 정보가 남는지, 직접 지우려면 어떻게 하는지 확인하세요.</p>
         <nav className="legal-links" aria-label="개인정보와 삭제 안내">
-          <Link to="/privacy" className="btn ghost">개인정보처리방침 (검토본)</Link>
-          <Link to="/delete-data" className="btn ghost">데이터 삭제 안내 (검토본)</Link>
+          <Link to="/privacy" className="btn ghost">개인정보처리방침</Link>
+          <Link to="/delete-data" className="btn ghost">데이터 삭제 안내</Link>
         </nav>
       </section>
       <ul className="help">
@@ -79,14 +79,14 @@ export function AboutScreen() {
         <li>투표 링크를 받은 사람은 두 선택지, 기준과 상황 한 줄을 볼 수 있어요. AI의 선택과 투표 수는 투표한 뒤에 보여요. 누가 어디에 투표했는지는 저장하지만 이름은 수집하지 않아요.</li>
         <li>결론은 판단을 돕는 참고용이에요. 의료·법률·투자처럼 중요한 결정은 전문가와 확인하세요.</li>
         <li>결정 기록은 만든 날부터 달력 기준 2개월이 지난 뒤 매일 한국시간 03:10의 정기 정리 작업에서 삭제돼요.</li>
-        <li>AI 결과에 문제가 있으면 결과 화면의 ‘AI 답변 신고’에서 이유와 보낼 내용을 확인할 수 있어요. 신고의 실제 접수·처리 동작은 정식 공개 전에 확인 중이에요. 접수할 때에는 해당 결정의 식별자와 신고 사유·설명이 전달돼요. 운영자는 문제를 확인하기 위해 해당 결정의 선택지·상황·AI 결과를 볼 수 있어요. 서버가 접수 번호를 돌려준 경우에만 접수 완료로 안내해요.</li>
-        <li>공유 질문의 ‘질문 신고’와 ‘이 작성자 차단’도 정식 공개 전에 실제 접수·저장 동작을 확인 중이에요. 차단이 완료되면 현재 이용 상태에서 해당 작성자의 공유 질문을 숨기는 방식이에요. 다른 기기나 새 이용 상태에는 이어지지 않을 수 있어요. 완료 안내가 표시됐는지 확인해 주세요.</li>
+        <li>AI 결과에 문제가 있으면 결과 화면의 ‘AI 답변 신고’에서 이유와 보낼 내용을 확인할 수 있어요. 접수할 때에는 해당 결정의 식별자와 신고 사유·설명이 전달돼요. 운영자는 문제를 확인하기 위해 해당 결정의 선택지·상황·AI 결과를 볼 수 있어요. 서버가 접수 번호를 돌려준 경우에만 접수 완료로 안내해요.</li>
+        <li>공유 질문은 ‘질문 신고’로 신고하고 ‘이 작성자 차단’으로 숨길 수 있어요. 차단하면 현재 이용 상태에서 해당 작성자의 공유 질문을 숨기는 방식이에요. 다른 기기나 새 이용 상태에는 이어지지 않을 수 있어요. 완료 안내가 표시됐는지 확인해 주세요.</li>
         <li>운영: 에스제이컴퍼니 · 대표 박지민 · 문의 jmpark0611@gmail.com</li>
       </ul>
       <Link to="/content-policy">공유 콘텐츠 이용정책</Link>
       <section className="sharebox" aria-label="공유 질문 차단 관리">
         <h3>차단한 작성자</h3>
-        <p className="small">차단 해제 동작은 정식 공개 전에 확인 중이에요. 차단한 질문의 링크에서 한 명씩, 여기에서는 모두 해제를 요청하는 방식이에요. 해제 완료 안내를 확인하세요. 질문·투표·신고 기록을 지우는 기능은 아니에요.</p>
+        <p className="small">차단한 질문의 링크에서 한 명씩, 여기에서는 모두 해제를 요청할 수 있어요. 해제 완료 안내를 확인하세요. 질문·투표·신고 기록을 지우는 기능은 아니에요.</p>
         <button type="button" className="btn ghost" disabled={clearingBlocks} onClick={() => void clearBlocks()}>
           {clearingBlocks ? '차단 해제 중…' : '작성자 차단 모두 해제'}
         </button>

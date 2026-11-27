@@ -112,6 +112,7 @@ const checks = {
   displayName: info.CFBundleDisplayName === '결정해지니',
   marketingVersion: info.CFBundleShortVersionString === '1.0',
   buildNumber: info.CFBundleVersion === expectedBuild,
+  exportComplianceDeclared: info.ITSAppUsesNonExemptEncryption === false,
   buildNumberUniqueVsAppStoreConnect: plan.existingNumericBuildMax === null || Number(expectedBuild) > plan.existingNumericBuildMax,
   sdkIsIphoneOS26: /^iphoneos26(\.|$)/.test(info.DTSDKName || ''),
   signedByAppleDistribution: /^Apple Distribution: /.test(authority || '') || /^iPhone Distribution: /.test(authority || ''),
@@ -152,9 +153,8 @@ const report = {
   codesignVerifyOutput: codesignVerify.out.trim().split('\n').slice(-4),
   notVerified: [
     'Physical iPhone/iPad install and launch (no device in CI).',
-    'Production server behavior from the iOS app: Capacitor iOS origin is capacitor://localhost, which is not in the saved VS_ALLOWED_ORIGINS list (https://localhost is, for Android). vs-decide/decision-ai calls from iOS are expected to be refused until the owner approves adding it.',
-    'Latest production RPCs/backend changes (ANDROID-SERVER-CHANGES-PENDING.md) are not validated by this build.',
-    'App Store Connect upload, processing, export compliance (ITSAppUsesNonExemptEncryption is not set), privacy nutrition labels and review.',
+    'Production server behavior from the iOS app: the 2026-11-27 server changes (capacitor://localhost in VS_ALLOWED_ORIGINS, report/block RPC migrations) were verified by preflight and catalog reads only; no real iOS-originated request was made by this build.',
+    'App Store Connect upload, processing, privacy nutrition labels and review. Export compliance is declared in Info.plist (ITSAppUsesNonExemptEncryption=false) and still has to be accepted in App Store Connect.',
   ],
 };
 writeFileSync(out, JSON.stringify(report, null, 2) + '\n');
