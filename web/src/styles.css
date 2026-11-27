@@ -239,11 +239,11 @@ h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 18px; 
 .report-consent input, .setting-toggle input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--a); }
 .decision-report .btn.text { min-height: 44px; }
 
-/* In-app legal drafts: readable text, local navigation, and selectable contact. */
+/* In-app legal pages: readable text, local navigation, and selectable contact. */
 .legal-entry, .legal-document, .legal-heading, .legal-section, .legal-contact, .legal-links {
   display: flex; flex-direction: column; gap: 12px; min-width: 0; overflow-wrap: anywhere;
 }
-.legal-entry, .legal-review {
+.legal-entry {
   padding: 14px; border: 2px solid var(--ink); border-radius: 12px; background: var(--a-weak);
 }
 .legal-entry p, .legal-document p { margin: 0; }
@@ -253,7 +253,6 @@ h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 18px; 
 .legal-document { gap: 24px; line-height: 1.75; }
 .legal-document h1 { font-size: 28px; line-height: 1.35; }
 .legal-document h2 { font-size: 20px; line-height: 1.45; }
-.legal-review h2 { margin-bottom: 10px; font-size: 18px; }
 .legal-facts { display: flex; flex-direction: column; gap: 16px; margin: 0; }
 .legal-facts > div { padding-left: 12px; border-left: 3px solid var(--a); }
 .legal-facts dt { font-weight: 700; }

@@ -61,17 +61,18 @@ it('opens both notices from About, crosses documents, and preserves the record-m
   const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
   open('/about');
   expect(screen.getByRole('heading', { name: '이용 안내' })).toHaveAttribute('id', 'about-title');
+  expect(screen.queryByText(/검토본|정식 공개 전|확인 중이에요/)).not.toBeInTheDocument();
   const links = within(screen.getByRole('navigation', { name: '개인정보와 삭제 안내' }));
-  expect(links.getByRole('link', { name: '데이터 삭제 안내 (검토본)' })).toHaveAttribute('href', '/delete-data');
-  await user.click(links.getByRole('link', { name: '개인정보처리방침 (검토본)' }));
+  expect(links.getByRole('link', { name: '데이터 삭제 안내' })).toHaveAttribute('href', '/delete-data');
+  await user.click(links.getByRole('link', { name: '개인정보처리방침' }));
   expectPath('/privacy');
   expect(screen.getByRole('heading', { name: '개인정보처리방침' })).toHaveFocus();
-  expect(screen.getByRole('heading', { name: '정식 공개 전 검토본' })).toBeInTheDocument();
+  expect(screen.queryByText(/검토본|정식 공개 전|확인 중이에요/)).not.toBeInTheDocument();
 
   await user.click(screen.getByRole('link', { name: '데이터 삭제 안내 보기' }));
   expectPath('/delete-data');
   expect(screen.getByRole('heading', { name: '데이터 삭제 안내' })).toHaveFocus();
-  await user.click(screen.getByRole('link', { name: '개인정보처리방침 검토본 보기' }));
+  await user.click(screen.getByRole('link', { name: '개인정보처리방침 보기' }));
   expectPath('/privacy');
   await user.click(screen.getByRole('link', { name: '이용 안내와 기록 관리' }));
 
@@ -79,7 +80,7 @@ it('opens both notices from About, crosses documents, and preserves the record-m
   for (const name of ['작성자 차단 모두 해제', '이 기기의 초안 모두 지우기', '기본 기준 지우기', '이 기기의 회고 모두 지우기']) {
     expect(screen.getByRole('button', { name })).toBeInTheDocument();
   }
-  await user.click(screen.getByRole('link', { name: '데이터 삭제 안내 (검토본)' }));
+  await user.click(screen.getByRole('link', { name: '데이터 삭제 안내' }));
   expectPath('/delete-data');
   expect(screen.getByRole('heading', { name: '데이터 삭제 안내' })).toBeVisible();
   await user.click(screen.getByRole('link', { name: '이용 안내로 돌아가기' }));
@@ -95,7 +96,7 @@ it.each([
   const user = userEvent.setup();
   open(path);
   expect(screen.getByRole('heading', { name: title })).toHaveFocus();
-  expect(screen.getByText(/정식 시행일과 공개 주소는 아직 정하지 않았어요/)).toBeInTheDocument();
+  expect(screen.queryByText(/검토본|정식 공개 전|확인 중이에요|아직 정하지 않았어요/)).not.toBeInTheDocument();
   expect(screen.getByText('jmpark0611@gmail.com')).toBeVisible();
   await user.click(screen.getByRole('link', { name: '이용 안내로 돌아가기' }));
   expectPath('/about');
@@ -106,7 +107,7 @@ it.each([
 it('keeps document links in router history for ordinary back navigation', async () => {
   const user = userEvent.setup();
   open('/about');
-  await user.click(screen.getByRole('link', { name: '개인정보처리방침 (검토본)' }));
+  await user.click(screen.getByRole('link', { name: '개인정보처리방침' }));
   await user.click(screen.getByRole('link', { name: '데이터 삭제 안내 보기' }));
   await user.click(screen.getByRole('button', { name: '테스트 뒤로가기' }));
   expectPath('/privacy');

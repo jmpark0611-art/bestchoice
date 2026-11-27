@@ -19,10 +19,6 @@ export function LegalInfoScreen({ document }: { document: LegalDocumentKind }) {
           <h1 id="legal-title" ref={title} tabIndex={-1}>{content.title}</h1>
           <p>{content.introduction}</p>
         </header>
-        <aside className="legal-review" aria-labelledby="legal-review-title">
-          <h2 id="legal-review-title">정식 공개 전 검토본</h2>
-          <p>{content.reviewNote}</p>
-        </aside>
         {content.sections.map(section => (
           <section className="legal-section" key={section.id} aria-labelledby={`legal-${section.id}`}>
             <h2 id={`legal-${section.id}`}>{section.title}</h2>

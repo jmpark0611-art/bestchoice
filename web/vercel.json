@@ -2,7 +2,8 @@
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "git": {
     "deploymentEnabled": {
-      "codex/genie-android-native-check-20261123": false
+      "codex/genie-android-native-check-20261123": false,
+      "genie/ios-build2-release-text-20261127": false
     }
   }
 }
