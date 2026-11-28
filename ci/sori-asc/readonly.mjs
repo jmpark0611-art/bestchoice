@@ -25,13 +25,15 @@ if (!app.error) {
   const b = await get(`/v1/builds?filter[app]=${APP}&sort=-uploadedDate&limit=4&fields[builds]=version,processingState,uploadedDate,expired&include=preReleaseVersion&fields[preReleaseVersions]=version`);
   out.recentBuilds = b.error || b.data.map((x) => ({ build: x.attributes.version, processingState: x.attributes.processingState,
     uploaded: x.attributes.uploadedDate, appVersion: (b.included || []).find((pv) => pv.id === x.relationships?.preReleaseVersion?.data?.id)?.attributes?.version }));
-  const g = await get(`/v1/apps/${APP}/subscriptionGroups?include=subscriptions&fields[subscriptionGroups]=referenceName&fields[subscriptions]=productId,name,state,reviewNote,subscriptionPeriod&limit[subscriptions]=50`);
+  const g = await get(`/v1/apps/${APP}/subscriptionGroups?fields[subscriptionGroups]=referenceName&limit=20`);
   if (g.error) out.subscriptionGroups = g.error;
   else {
     out.subscriptionGroups = [];
     for (const grp of g.data) {
       const subs = [];
-      for (const s of (g.included || []).filter((i) => i.type === 'subscriptions' && grp.relationships.subscriptions.data.some((d) => d.id === i.id))) {
+      const gs = await get(`/v1/subscriptionGroups/${grp.id}/subscriptions?fields[subscriptions]=productId,name,state,reviewNote,subscriptionPeriod&limit=50`);
+      if (gs.error) { out.subscriptionGroups.push({ id: grp.id, error: gs.error }); continue; }
+      for (const s of gs.data) {
         const intro = await get(`/v1/subscriptions/${s.id}/introductoryOffers?limit=200&fields[subscriptionIntroductoryOffers]=offerMode,duration,numberOfPeriods,startDate,endDate`);
         const modes = intro.error ? intro.error : [...new Set(intro.data.map((o) => `${o.attributes.offerMode}/${o.attributes.duration}/${o.attributes.numberOfPeriods}`))];
         const note = s.attributes.reviewNote || '';
