@@ -3,14 +3,14 @@ name: Genie Android unsigned candidate export
 # A single short-lived unsigned export from the approved PUBLIC repository.
 # No signing secrets, backend interaction, cache, deployment or store submission.
 # Only edits to this workflow trigger a new export; app changes do not upload it.
-# Refresh the candidate from build inputs validated at 91f130abb9eb7e11fc3f1a5643ed889eaec597da.
+# Refresh the candidate from the final release wording and policy source on 2026-11-28.
 # Device run 45278517165 passed all four cases in attempts 1, 3 and 4.
 # About touch stages and the prepared-process force-stop boundary are verified.
 # Guarded reporting RPCs and Android CORS still require production validation.
 on:
   push:
     branches:
-      - codex/genie-android-native-check-20261123
+      - codex/genie-release-finalization-20261128
     paths:
       - '.github/workflows/android-release-export.yml'
 
@@ -26,7 +26,7 @@ jobs:
     if: >-
       github.repository == 'jmpark0611-art/bestchoice' &&
       github.event.repository.private == false &&
-      github.ref == 'refs/heads/codex/genie-android-native-check-20261123'
+      github.ref == 'refs/heads/codex/genie-release-finalization-20261128'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     defaults:
