@@ -1,0 +1,74 @@
+name: Genie iOS upload build 2 to App Store Connect
+
+# Owner-approved (2026-11-28): upload the already verified IPA from run 45973677528 to App Store Connect.
+# No rebuild, no review submission, no tester invites, no app metadata changes.
+# Runs once when this workflow file is pushed to ci/genie-ios-upload.
+on:
+  push:
+    branches: [ci/genie-ios-upload]
+    paths: ['.github/workflows/genie-ios-upload.yml']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: genie-ios-upload
+  cancel-in-progress: false
+
+env:
+  BUILD_RUN_ID: '45973677528'
+  ARTIFACT_NAME: genie-ios-1.0-release-45973677528
+  IPA_SHA256: 17af896fae2f38a29d7ca9b5c678fd465b4bb24e852d7bc0b46129af61ff9db3
+
+jobs:
+  upload:
+    if: github.repository == 'jmpark0611-art/bestchoice' && github.ref == 'refs/heads/ci/genie-ios-upload'
+    runs-on: macos-15
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Download the verified build-2 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          run-id: ${{ env.BUILD_RUN_ID }}
+          repository: ${{ github.repository }}
+          github-token: ${{ github.token }}
+          path: ipa
+
+      - name: Check IPA identity
+        run: |
+          set -euo pipefail
+          ls -la ipa
+          echo "$IPA_SHA256  ipa/genie-ios-1.0-release.ipa" | shasum -a 256 -c -
+          node -e "const v=require('./ipa/genie-ios-1.0-verification.json'); if(v.status!=='signed-app-store-ipa-verified-not-uploaded'||!Object.values(v.checks).every(Boolean)||v.app.build!=='2'||v.app.bundleId!=='com.jmpark0611.genie'){process.exit(1)} console.log(v.app.bundleId, v.app.version, v.app.build)"
+          XCODE=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)
+          sudo xcode-select -s "$XCODE/Contents/Developer"
+          xcodebuild -version
+
+      - name: Validate and upload with the App Store Connect API key
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          set -euo pipefail
+          [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ] && [ -n "$ASC_KEY_P8" ] || { echo "::error::ASC secrets missing"; exit 1; }
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          KEYFILE="$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          if printf '%s' "$ASC_KEY_P8" | grep -q 'BEGIN PRIVATE KEY'; then printf '%s\n' "$ASC_KEY_P8" > "$KEYFILE"
+          else printf '%s' "$ASC_KEY_P8" | base64 --decode > "$KEYFILE"; fi
+          chmod 600 "$KEYFILE"
+          xcrun altool --validate-app -f ipa/genie-ios-1.0-release.ipa -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+          xcrun altool --upload-app -f ipa/genie-ios-1.0-release.ipa -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+          {
+            echo "## Genie iOS 1.0 (2) uploaded to App Store Connect"
+            echo "IPA sha256 $IPA_SHA256 from run $BUILD_RUN_ID. Not submitted for review."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove API key
+        if: always()
+        run: rm -rf "$HOME/.appstoreconnect/private_keys"
