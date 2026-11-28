@@ -1,0 +1,33 @@
+name: Sori App Store Connect 1.0.6 paid setup
+
+# Owner-approved (2026-11-28): create 1.0.6 with build 20, final subscription review notes, 7-day free trials.
+# No review submission, no Add for Review, no price or metadata changes.
+on:
+  push:
+    branches: [ci/sori-asc-106]
+    paths: ['.github/workflows/sori-asc-106.yml', 'ci/sori-asc/**']
+
+permissions:
+  contents: read
+
+jobs:
+  read:
+    if: github.repository == 'jmpark0611-art/bestchoice' && github.ref == 'refs/heads/ci/sori-asc-106'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24.22.3'
+      - name: Version 1.0.6 + build 20, review notes, 7-day trials; then read back
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          rc=0; node ci/sori-asc/apply106.mjs || rc=$?
+          node ci/sori-asc/readonly.mjs
+          exit $rc
