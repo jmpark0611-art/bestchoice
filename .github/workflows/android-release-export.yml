@@ -3,7 +3,7 @@ name: Genie Android unsigned candidate export
 # A single short-lived unsigned export from the approved PUBLIC repository.
 # No signing secrets, backend interaction, cache, deployment or store submission.
 # Only edits to this workflow trigger a new export; app changes do not upload it.
-# Refresh the candidate from the final release wording and policy source on 2026-11-28.
+# Refresh the candidate after the final policy and Vitest security update on 2026-11-28.
 # Device run 45278517165 passed all four cases in attempts 1, 3 and 4.
 # About touch stages and the prepared-process force-stop boundary are verified.
 # Guarded reporting RPCs and Android CORS still require production validation.
